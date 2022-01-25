@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
 
 class Particle:
-    def __init__(self, pos, dir, wgt):
+    def __init__(self, pos, dir, weight):
         self.pos = pos
+        self.R = GetRadius(self.pos)
         self.dir = dir
         self.weight = weight
         
         self.distance_to_collision = 0.0
         self.distance_to_edge = 0.0
-        self.collide = False
-        self.is_alive = True
+        self.alive = True
         self.group = 1
-        self.zone = Mesh.getZone(self.pos)
+        self.zone = Mesh.GetZone(self.R)
+        self.ds = 0.0
         
-    def getDistanceToCollision(self, RNG, material):
-        rn = RNG.newNumber(0,1)
-        sigt = material.sigt(self.zone, self.group) # might need to change to []
-        self.distance_to_collision = -np.log(1.0-rn)/sigt
+    def GetRadius(self):
+        return np.sqrt(sum(pos**2))
         
-    def getDistanceToEdge():
-        
-        
-    def move(self, distance):
+    def Move(self, distance):
         self.pos += distance
+        self.zone = Mesh.GetZone(self.R)
         
-    def updateWeight(self):
-        self.weight *= np.exp(-ds*sigt[self.zone,:])
+    def UpdateWeight(self):
+        sigt = material.sigt
+        self.weight *= np.exp(-self.ds*sigt[self.zone,:])

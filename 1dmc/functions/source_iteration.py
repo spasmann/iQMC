@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 class SourceIteration:
-    def __init__():
+    def __init__(init_data):
+        self.init_data = init_data
         self.itt = 0
         self.max_iter = 50
         self.tol = 1e-5

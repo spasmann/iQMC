@@ -10,8 +10,8 @@ class Tallies:
         self.shannon_entropy = False
         
         self.phi_avg = np.zeros(Nr, G)
-        self.dphi = np.zeros(Nr, G)
         self.phi_avg_old = np.zeros(Nr, G)
+        self.dphi = np.zeros(Nr, G)
         self.phi_edge = np.zeros(Nr+1, G)
         self.J_avg = np.zeros(Nr, G)
         self.J_edge = np.zeros(Nr+1, G)
@@ -29,10 +29,13 @@ class Tallies:
         if (self.edge_current):
             self.EdgeCurrent()
             
-    def AvgScalarFlux(self,particle, material, mesh):
+    def AvgScalarFlux(self, particle, material, mesh):
         zone = particle.zone
         G = particle.G
         weight = particle.weight
+        ds = particle.PathLength(zone)
+        sigt = material.sigt(zone)
+        dV = mesh.dV(zone)
         self.avg_scalar_flux[zone, G] += weight*(1-np.exp(-(ds*sigt)))/(sigt*dV)
 
     def DeltaFlux(self):

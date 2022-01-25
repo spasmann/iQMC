@@ -8,21 +8,24 @@ class Sweep:
         self.tallies = tallies
         self.totalDim = self.GetDim()
         self.rng = RNG(self.totalDim, self.init_data)
-        
-        if (material.G > 1):
-            self.q = self.phi_avg*np.transpose(material.sigs) + init_data.source
-        else:
-            self.q = self.phi_avg*np.transpose(material.sigs) + init_data.source
-            
-        self.particles = Samples.GenerateParticles(init_data, material, self.q)
+        self.q = GetSource()
+        self.particles = Samples.GenerateParticles(self.init_data, 
+                                                   self.material, 
+                                                   self.q)
                 
     def Run(self):
        for particle in self.particles:
-           tallies.Tally(particle)
-
-          
-    def GetDim(self):
+           while (particle.alive)
+               tallies.Tally(self.particle, self.material, self.mesh)
+               particle.Move()
+    
+    def GetSource(self):
+        if (material.G > 1):
+            return self.phi_avg*np.transpose(material.sigs) + init_data.source
+        else:
+            return self.phi_avg*material.sigs + init_data.source
         
-       
+        
+    def GetDim(self):
        
         
