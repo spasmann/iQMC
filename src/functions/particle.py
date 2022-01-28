@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-from mesh import Mesh
 
 class Particle:
     def __init__(self, pos, dir, weight):

@@ -1,4 +1,3 @@
 # -*- coding: utf-8 -*-
 
-
-data = GarciaInit()
+__all__ = ["garcia_init"]

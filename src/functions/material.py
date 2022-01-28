@@ -30,6 +30,12 @@ class Material:
                 self.R = np.array([4.27996]) #cylinder
             else:
                 self.R = np.array([6.082547]) #sphere
+                
+        elif (material_code == "test_data"):
+            self.sigt = np.array((1.0))
+            self.sigs = np.array((0.75))
+            self.siga = self.sigt - self.sigs
+            
         else:
             print("Type 'help(Material)' for a list of available materials")
     

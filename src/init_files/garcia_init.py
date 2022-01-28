@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from mesh import Mesh
 
 class GarciaInit:
     def __init__(self, N=100, Nx=10, generator="random"):

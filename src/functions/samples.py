@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
-from particle import Particle
 
 class Samples:
     """
@@ -27,7 +26,7 @@ class Samples:
             pos = self.GetPos(randPos)
             mu = self.GetDir(randMu)
             R = self.GetR(pos)
-            zone = mesh.GetZone(self.)
+            zone = mesh.GetZone(R)
             q = Q[zone,:]
             weight = self.GetWeight(q, zone)
             particle = Particle(pos, mu, weight)

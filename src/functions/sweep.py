@@ -5,6 +5,7 @@ class Sweep:
         self.init_data = init_data
         self.mesh = mesh
         self.material = material
+        self.source = self.init_data.source
         self.phi_avg = phi_avg
         self.tallies = tallies
         self.totalDim = self.GetDim() # think i want to move GetDim somewhere else
@@ -31,12 +32,12 @@ class Sweep:
     
 
     def GetSource(self):
-        if (material.G > 1):
-            return self.phi_avg*np.transpose(material.sigs) + init_data.source
+        if (self.material.G > 1):
+            return self.phi_avg*np.transpose(self.material.sigs) + self.source
         else:
-            return self.phi_avg*material.sigs + init_data.source
+            return self.phi_avg*self.material.sigs + self.source
         
         
-    def GetDim(self):
+   # def GetDim(self):
        
         
