@@ -1,7 +1,18 @@
 # -*- coding: utf-8 -*-
+"""
+Want to restructure the cross section input at some point. I think a separate
+file for each material/geometry, then when running the simulation the data is 
+read as an input.
+
+cross sections need to be a matrix of size (Nx, G)
+"""
+import numpy as np
 
 class Material:
-    def __init__(material_code, geometry):
+    def __init__(self, material_code, geometry, mesh):
+        self.mesh = mesh
+        self.Nx = mesh.Nx
+        
         if (material_code == "2pu"):
             self.nu = np.array([(2.84)])
             self.nu = np.reshape(nu,(1,1))
@@ -32,9 +43,17 @@ class Material:
                 self.R = np.array([6.082547]) #sphere
                 
         elif (material_code == "test_data"):
-            self.sigt = np.array((1.0))
-            self.sigs = np.array((0.75))
+            self.G = 1
+            self.sigt = np.ones((self.Nx, self.G))
+            self.sigs = 0.25*self.sigt
             self.siga = self.sigt - self.sigs
+        elif (material_code == "garcia_data"):
+            self.G = 1
+            self.sigt = np.ones((self.Nx, self.G))
+            self.c = 1.0
+            self.sigs = np.exp(-self.mesh.midpoints/self.c)
+            self.siga = self.sigt - self.sigs
+
             
         else:
             print("Type 'help(Material)' for a list of available materials")
