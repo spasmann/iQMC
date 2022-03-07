@@ -26,9 +26,5 @@ SI = SourceIteration(data2)
 SI.max_iter = 20
 # run source iteration
 SI.Run()
-phi2 = SI.tallies.phi_avg
-Nx = range(data2.Nx)
 
-plt.plot(Nx, phi1, label='random')
-plt.plot(Nx, phi2, label='sobol')
 

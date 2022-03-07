@@ -8,7 +8,7 @@ Created on Mon Mar  7 12:00:10 2022
 import h5py
 import numpy as np
 
-def SaveData(init_data, tallies, fname = "default", path = "../saved_data/"):
+def SaveData(init_data, SI, fname = "default", path = "../saved_data/"):
     if (fname == "default"):
         fname = "{}-{}-{}-{}".format(init_data.material_code,
                                      init_data.generator,
@@ -18,6 +18,10 @@ def SaveData(init_data, tallies, fname = "default", path = "../saved_data/"):
     with h5py.File(path+fname, 'w') as f:
         f.create_dataset('N', data = init_data.N)
         f.create_dataset('Nx', data = init_data.Nx)
-        f.create_dataset('phi_avg', data = tallies.phi_avg)
+        f.create_dataset('RB', data = init_data.RB)
+        f.create_dataset('itt', data = SI.itt)
+        f.create_dataset('phi_avg', data = SI.tallies.phi_avg)
+        f.create_dataset('delta_flux', data = SI.norm_hist)
+
     
     return
