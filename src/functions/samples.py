@@ -57,7 +57,7 @@ class Samples:
     def RightBoundaryParticles(self):
         for i in range(self.N):
             randMu = self.rng[i,self.counter]
-            pos = [self.RB - 1e-9]
+            pos = np.array((self.RB - 1e-9,))
             mu = -np.sqrt(randMu)
             weight = self.BoundaryWeight(self.phi_right)
             particle = Particle(pos, mu, weight)
@@ -66,7 +66,7 @@ class Samples:
     def LeftBoundaryParticles(self):
         for i in range(self.N):
             randMu = self.rng[i,self.counter]
-            pos = [self.LB + 1e-9]
+            pos = np.array((self.LB + 1e-9,))
             mu = np.sqrt(randMu)
             weight = self.BoundaryWeight(self.phi_left)
             particle = Particle(pos, mu, weight)

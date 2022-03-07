@@ -16,10 +16,17 @@ class GarciaInit:
         self.right = False
         self.left = True
         self.phi_left = 1.0
+        self.source = np.zeros((self.Nx,self.G))
         self.material_code = "garcia_data"
         self.geometry = "slab"
-        self.mesh = Mesh(self.Nx, [self.RB])
+        self.avg_scalar_flux = True
+        self.edge_scalar_flux = False
+        self.avg_angular_flux = True
+        self.avg_current = False
+        self.edge_current = False
+        self.shannon_entropy = False
+        self.save_data = True
+        self.mesh = Mesh(self.Nx, np.array((self.RB,)))
         self.material = Material(self.material_code, self.geometry, self.mesh)
-        self.source = np.zeros((self.Nx,self.G))
         
         

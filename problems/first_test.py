@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 # initialize problem data
-N = 2**12
+N = 2**10
 data1 = TestInit(N=N, generator="halton")
 data2 = TestInit(N=N, generator="sobol")
 # initialize source iteration

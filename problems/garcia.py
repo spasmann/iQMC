@@ -9,9 +9,12 @@ import matplotlib.pyplot as plt
 
 
 # initialize problem data
-N = 2**12
+N = 2**10
 data1 = GarciaInit(N=N, generator="random")
+data1.material.c = 1.0
 data2 = GarciaInit(N=N, generator="sobol")
+data2.material.c = 1.0
+
 # initialize source iteration
 SI = SourceIteration(data1)
 SI.max_iter = 20

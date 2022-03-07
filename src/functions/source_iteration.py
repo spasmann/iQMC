@@ -2,6 +2,7 @@
 
 from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
+from src.functions.save_data import SaveData
 
 class SourceIteration:
     def __init__(self, init_data):
@@ -12,7 +13,7 @@ class SourceIteration:
         self.max_iter = 50
         self.tol = 1e-6
         self.norm_hist = []
-        self.tallies = Tallies(self.init_data.Nx, self.init_data.material.G)
+        self.tallies = Tallies(self.init_data)
         self.sweep = Sweep(self.init_data,
                            self.mesh,
                            self.material)
@@ -25,5 +26,7 @@ class SourceIteration:
             self.norm_hist.append(self.tallies.delta_flux)
             print("**********************")
             print("Iteration:", self.itt, "change: ",self.tallies.delta_flux)
-            
+        
+        if (self.init_data.save_data):
+            SaveData(self.init_data, self.tallies)
     

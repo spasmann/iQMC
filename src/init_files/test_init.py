@@ -17,8 +17,14 @@ class TestInit:
         self.left = False
         self.material_code = "test_data"
         self.geometry = "slab"
-        self.mesh = Mesh(self.Nx, [self.RB])
+        self.mesh = Mesh(self.Nx, np.array((self.RB,)))
         self.material = Material(self.material_code, self.geometry, self.mesh)
         self.source = np.ones((self.Nx,self.G))
+        self.avg_scalar_flux = True
+        self.edge_scalar_flux = False
+        self.avg_angular_flux = False
+        self.avg_current = False
+        self.edge_current = False
+        self.shannon_entropy = False
         
         

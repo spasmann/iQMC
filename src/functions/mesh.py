@@ -7,7 +7,7 @@ class Mesh:
         self.dr = R[-1]/Nr
         self.lowR = np.linspace(0,(R[-1]-self.dr),Nr)
         self.highR = np.linspace(self.dr,(R[-1]),Nr)
-        self.midpoints = self.highR - self.lowR
+        self.midpoints = np.linspace(self.dr, R[-1]-self.dr, Nr)
     def GetZone(self, r):
         return (np.fabs(r) >= self.lowR)*(np.fabs(r) < self.highR)
     

@@ -52,6 +52,7 @@ class Material:
             self.sigt = np.ones((self.Nx, self.G))
             self.c = 1.0
             self.sigs = np.exp(-self.mesh.midpoints/self.c)
+            self.sigs = np.reshape(self.sigs, (self.Nx, self.G))
             self.siga = self.sigt - self.sigs
 
             
