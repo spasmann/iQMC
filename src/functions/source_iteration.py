@@ -19,6 +19,11 @@ class SourceIteration:
                            self.mesh,
                            self.material)
     def Run(self):
+        print("--------- Source Iteration ---------")
+        print("Material: ", self.init_data.material_code)
+        print("Random Number Generator: ", self.init_data.generator)
+        print("Number of Particles per Iteration: ", self.init_data.N)
+        print("Number of Spatial Cells: ", self.init_data.Nx)
         while (self.itt<self.max_iter) and (self.tallies.delta_flux > self.tol):
             self.tallies.phi_avg_old[:] = self.tallies.phi_avg[:] # shallow copy
             self.sweep.Run(self.tallies)

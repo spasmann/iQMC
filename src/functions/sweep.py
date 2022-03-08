@@ -2,6 +2,7 @@
 
 from src.functions.geometry import Geometry
 from src.functions.samples import Samples
+import numpy as np
 
 class Sweep:
     def __init__(self, init_data, mesh, material):
@@ -22,7 +23,11 @@ class Sweep:
         self.samples.GenerateParticles(self.q)
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.R)
-            #particle.weight = self.q[particle.zone,:]*self.geometry.CellVolume(particle.zone)*self.Nx/self.N
+            #print("######### Particle ", count+1," #########")
+            #print("mu = ", particle.dir)
+            #print("x = ", particle.pos)
+            #print("weight = ", particle.weight)
+            #print("zone = ", particle.zone)
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 tallies.Tally(particle, 
@@ -33,11 +38,12 @@ class Sweep:
                 particle.Move()
                 particle.IsAlive(self.mesh)
                 particle.zone = self.mesh.GetZone(particle.R)
+                #print("x = ", particle.pos)
             count += 1
     
     def GetSource(self, phi_avg):
         if (self.material.G > 1):
-            return (phi_avg*np.transpose(self.material.sigs) + self.source)
+            return (np.dot(phi_avg,np.transpose(self.material.sigs)) + self.source)
         else:
             return (phi_avg*self.material.sigs + self.source)
         

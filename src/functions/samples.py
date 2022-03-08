@@ -16,6 +16,7 @@ class Samples:
         self.generator = init_data.generator
         self.geometry = geometry
         self.mesh = mesh
+        self.G = init_data.G
         self.N = init_data.N
         self.Nx = init_data.Nx
         self.totalDim = init_data.totalDim
@@ -33,8 +34,6 @@ class Samples:
         self.counter = 0
         self.GetRnMatrix()
         self.particles = []
-        self.VolumetricParticles()
-        self.counter += 2 # used  to index the random number matrix 
         if (self.left):
             self.LeftBoundaryParticles()
             self.counter += 1
@@ -42,13 +41,15 @@ class Samples:
             self.GetRnMatrix()
             self.RightBoundaryParticles()
             self.counter += 1
+        self.VolumetricParticles()
+        self.counter += 2 # used  to index the random number matrix 
 
     def VolumetricParticles(self):
         for i in range(self.N):
             randPos = self.rng[i,self.counter]
             randMu = self.rng[i,self.counter+1]
-            pos = self.GetPos(randPos)
-            mu = self.GetDir(randMu)
+            pos = self.GetPos(randPos) 
+            mu = self.GetDir(randMu) + 1e-9
             zone = self.mesh.GetZone(pos)
             weight = self.VolumetricWeight(zone)
             particle = Particle(pos, mu, weight)
@@ -58,7 +59,7 @@ class Samples:
         for i in range(self.N):
             randMu = self.rng[i,self.counter]
             pos = np.array((self.RB - 1e-9,))
-            mu = -np.sqrt(randMu)
+            mu = -np.sqrt(randMu) + 1e-9
             weight = self.BoundaryWeight(self.phi_right)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
@@ -67,7 +68,7 @@ class Samples:
         for i in range(self.N):
             randMu = self.rng[i,self.counter]
             pos = np.array((self.LB + 1e-9,))
-            mu = np.sqrt(randMu)
+            mu = np.sqrt(randMu) + 1e-9
             weight = self.BoundaryWeight(self.phi_left)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
@@ -76,7 +77,7 @@ class Samples:
         return np.random.uniform(0,1,[self.N,self.totalDim])
     
     def SobolMatrix(self):
-        sampler = Sobol(d=self.totalDim,scramble=True)
+        sampler = Sobol(d=self.totalDim,scramble=False)
         m = round(math.log(self.N, 2))
         return sampler.random_base2(m=m)
     
@@ -105,11 +106,14 @@ class Samples:
             return np.abs(pos)
     
     def VolumetricWeight(self, zone):
-        return self.q[zone,:]*self.geometry.CellVolume(zone)*self.Nx/self.N
+        weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
+        assert (weight.shape == (1, self.G))
+        return weight
     
     def BoundaryWeight(self, BV):
         # BV: boundary value, i.e. phi_left or phi_right
-        return BV*self.geometry.SurfaceArea()*self.Nx/self.N
+        weight = BV/self.N*self.geometry.SurfaceArea()
+        return weight
  
     
 

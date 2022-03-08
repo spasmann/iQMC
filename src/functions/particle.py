@@ -17,7 +17,7 @@ class Particle:
         if (pos.size > 1):
             return np.sqrt(sum(pos**2))
         else:
-            return pos#np.abs(pos)
+            return pos
 
     def Move(self):
         self.pos += self.ds*self.dir

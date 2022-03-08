@@ -26,5 +26,6 @@ class TestInit:
         self.avg_current = False
         self.edge_current = False
         self.shannon_entropy = False
+        self.save_data = True
         
         

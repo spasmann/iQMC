@@ -12,37 +12,8 @@ class Material:
     def __init__(self, material_code, geometry, mesh):
         self.mesh = mesh
         self.Nx = mesh.Nx
-        
-        if (material_code == "2pu"):
-            self.nu = np.array([(2.84)])
-            self.nu = np.reshape(nu,(1,1))
-            
-            self.sigf = np.array([(0.0816)])
-            self.sigf = np.reshape(sigf,(1,1))
-            
-            self.sigc = np.array([(0.019584)])
-            self.sigc = np.reshape(sigc,(1,1))
-            
-            self.sigs = np.array([(0.225216)])
-            self.sigs = np.reshape(sigs,(1,1,1))
-            
-            self.sigt = np.array([(0.32640)])
-            self.sigt = np.reshape(sigt,(1,1))
-            
-            self.X = np.array([(1.0)])
-            self.X = np.reshape(X,(1,1))
-            
-            #critical radius of geo
-            if (Geo == 1):
-                self.R = np.array([2.256751]) #slab
-                self.true_flux = np.array([0.9701734, 0.8810540, 0.7318131, 0.4902592])
-                self.true_flux_r =  np.array([0.25,0.5,0.75,1.0])*self.R[0]
-            elif (Geo == 2):
-                self.R = np.array([4.27996]) #cylinder
-            else:
-                self.R = np.array([6.082547]) #sphere
-                
-        elif (material_code == "test_data"):
+    
+        if (material_code == "test_data"):
             self.G = 1
             self.sigt = np.ones((self.Nx, self.G))
             self.sigs = 0.25*self.sigt
@@ -54,9 +25,17 @@ class Material:
             self.sigs = np.exp(-self.mesh.midpoints/self.c)
             self.sigs = np.reshape(self.sigs, (self.Nx, self.G))
             self.siga = self.sigt - self.sigs
-
+        elif (material_code == 12):
+            self.G = material_code
+            self.D = np.genfromtxt("../src/multigroup_xs/D_{}G_HDPE.csv".format(self.G), delimiter=",")
+            self.siga = np.genfromtxt("../src/multigroup_xs/Siga_{}G_HDPE.csv".format(self.G), delimiter=",")
+            self.sigs = np.genfromtxt("../src/multigroup_xs/Scat_{}G_HDPE.csv".format(self.G), delimiter=",")
+            self.sigs = np.flip(self.sigs,1)
+            self.sigt = 1/(3*self.D)
+            # repeat sigt so its shape (Nx, G)
+            self.sigt = np.tile(self.sigt, (self.Nx,1))
             
-        else:
-            print("Type 'help(Material)' for a list of available materials")
+        #else:
+        #    print("Type 'help(Material)' for a list of available materials")
     
         
