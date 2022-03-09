@@ -22,18 +22,20 @@ This is the basic structure all problems should follow. A base script in the
 only wants to run the three pre-defined problems you only need to edit the problem file.
 The init_files create an object of the necessary parameters and can therefore be edited
 in the problem file after initialization. Ex:
+```
     init_data = GarciaInit()
     init_data.N = 2**10
-
+```
 A full list of initialization parameters is below.
 
 The initialization data object is then used to initialize the Source Iteration.
 The Source Iteration algorithm is then executed with the *Run* function. Ex:
+```
     # initialize source iteration
     SI = SourceIteration(init_data)
     # run source iteration
     SI.Run()
-
+```
 If *save_data = True* the basic simulation parameters and tally results are 
 saved in a HDF5 file located in */saved_data/*.
 
