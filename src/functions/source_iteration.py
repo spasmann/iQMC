@@ -18,6 +18,7 @@ class SourceIteration:
         self.sweep = Sweep(self.init_data,
                            self.mesh,
                            self.material)
+        self.error = np.empty((0,1))
     def Run(self):
         print("--------- Source Iteration ---------")
         print("Material: ", self.init_data.material_code)
@@ -32,6 +33,10 @@ class SourceIteration:
             self.norm_hist = np.append(self.norm_hist, self.tallies.delta_flux)
             print("**********************")
             print("Iteration:", self.itt, "change: ",self.tallies.delta_flux)
+            if (self.init_data.G > 1):
+                relError = np.abs(self.tallies.phi_avg - self.init_data.true_flux)/self.init_data.true_flux
+                infNorm = np.linalg.norm(relError, np.inf)
+                self.error = np.append(self.error, infNorm)
         
         if (self.init_data.save_data):
             SaveData(self.init_data, self)

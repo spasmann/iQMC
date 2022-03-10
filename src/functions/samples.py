@@ -74,6 +74,7 @@ class Samples:
             self.particles.append(particle)
         
     def RandomMatrix(self):
+        np.random.seed(12345)
         return np.random.uniform(0,1,[self.N,self.totalDim])
     
     def SobolMatrix(self):
@@ -82,7 +83,7 @@ class Samples:
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=True)
+        sampler = Halton(d=self.totalDim,scramble=False)
         return sampler.random(n=self.N)
     
     def GetRnMatrix(self):

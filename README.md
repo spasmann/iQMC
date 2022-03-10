@@ -12,14 +12,16 @@ plug-and-play compatibility with different solvers.
 
 To use 1DQMC, simply clone the repo to your local machine and navigate to the
 */problems/* folder to run one of the available problems. Ex:
+```
     python garcia.py
+```
 
 This will run the Garcia problem as described in [2]. The parameters for initializing
-the Garcia problem are written in */src/init_files/garcia_init.py. 
+the Garcia problem are written in */src/init_files/garcia_init.py*. 
 
-This is the basic structure all problems should follow. A base script in the 
-*/problems/* folder and an initialization file in */src/init_files/*. If the user
-only wants to run the three pre-defined problems you only need to edit the problem file.
+This is the basic structure all problems should follow. A script in the 
+*/problems/* folder and an initialization file in */src/init_files/*. If you 
+wants to run the three pre-defined problems you only need to edit the problem file.
 The init_files create an object of the necessary parameters and can therefore be edited
 in the problem file after initialization. Ex:
 ```
@@ -28,7 +30,7 @@ in the problem file after initialization. Ex:
 ```
 A full list of initialization parameters is below.
 
-The initialization data object is then used to initialize the Source Iteration.
+The parameters data object is then used to initialize the Source Iteration.
 The Source Iteration algorithm is then executed with the *Run* function. Ex:
 ```
     # initialize source iteration
@@ -37,19 +39,51 @@ The Source Iteration algorithm is then executed with the *Run* function. Ex:
     SI.Run()
 ```
 If *save_data = True* the basic simulation parameters and tally results are 
-saved in a HDF5 file located in */saved_data/*.
+saved in a HDF5 file located in */saved_data/* and can be plotted using scripts
+in */plotting/*.
+
+For creating custom problems, a new init_file will need to be created and new
+material data (cross sections) will need to be defined in */src/functions/materials.py*.
+The init_file will need to contain all relevant variables listed in the section
+below.
+
+## Init File Variables
+
+- N: Number of particles per iteration per source
+- Nx: Number of spatial cells
+- generator: Random number generator
 
 
+        self.N = N
+        self.Nx = Nx
+        self.generator = generator
+        self.totalDim = 3
+        self.RB = 5
+        self.LB = 0
+        self.G = 1
+        self.right = False
+        self.left = True
+        self.phi_left = 1.0
+        self.source = np.zeros((self.Nx,self.G))
+        self.material_code = "garcia_data"
+        self.geometry = "slab"
+        self.avg_scalar_flux = True
+        self.edge_scalar_flux = False
+        self.avg_angular_flux = False
+        self.avg_current = False
+        self.edge_current = False
+        self.shannon_entropy = False
+        self.save_data = True
+        self.mesh = Mesh(self.Nx, np.array((self.RB,)))
+        self.material = Material(self.material_code, self.geometry, self.mesh)
+        
+### Tallies
+
+## Source Iteration Variables
 
 ## Available Problems
 
 ## Random Number Generators
-
-## Tallies
-
-## Init File Variables
-
-## Source Iteration Variables
 
 ## Saving Output Data
 
@@ -60,13 +94,10 @@ saved in a HDF5 file located in */saved_data/*.
 - Scipy
 - h5py
 
-1-Dimensional Quasi-Monte Carlo code for neutron transport.
-
-Source code is located in */src/functions*
-
-*/src/init_files/* contains problem-specific initialization parameters
 
 
 [1] Pasmann, S., Variansyah, I., and McClarren, R. G. Convergent transport 
     source iteration calculations with quasi-monte carlo. vol. 124,
     American Nuclear Society, pp. 192–195.
+    
+[2] 

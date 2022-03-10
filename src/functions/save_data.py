@@ -24,6 +24,7 @@ def SaveData(init_data, SI, fname = "default", path = "../saved_data/"):
         f.create_dataset('delta_flux', data = SI.norm_hist)
         if (init_data.G > 1):
             f.create_dataset('true_flux', data = init_data.true_flux)
+            f.create_dataset('error', data = SI.error)
     print("---------------------------------------")
     print("Simulation Data Saved at: ",path+fname)
     print("---------------------------------------")
