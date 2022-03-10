@@ -47,12 +47,14 @@ material data (cross sections) will need to be defined in */src/functions/materi
 The init_file will need to contain all relevant variables listed in the section
 below.
 
+
 ## Init File Variables
 
-- N: Number of particles per iteration per source
-- Nx: Number of spatial cells
-- generator: Random number generator
-
+```
+    N: Number of particles per iteration per source
+    Nx: Number of spatial cells
+    generator: Random number generator
+```
 
         self.N = N
         self.Nx = Nx
@@ -81,11 +83,18 @@ below.
 
 ## Source Iteration Variables
 
-## Available Problems
+## Predefined Problems
 
 ## Random Number Generators
 
 ## Saving Output Data
+
+After the Source Iteration has completed, if *save_data = True*, the output data
+will be stored in a HDF5 file in */saved_data/* with the following naming
+convention:
+```
+    Material_code-Generator-N-Nx
+```
 
 ## Citations
 
