@@ -23,11 +23,6 @@ class Sweep:
         self.samples.GenerateParticles(self.q)
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.R)
-            #print("######### Particle ", count+1," #########")
-            #print("mu = ", particle.dir)
-            #print("x = ", particle.pos)
-            #print("weight = ", particle.weight)
-            #print("zone = ", particle.zone)
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 tallies.Tally(particle, 

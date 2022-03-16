@@ -4,10 +4,9 @@ import numpy as np
 class Particle:
     def __init__(self, pos, dir, weight):
         self.pos = pos
+        self.weight = weight
         self.R = self.GetRadius(self.pos)
         self.dir = dir
-        self.weight = weight
-        
         self.alive = True
         self.group = 1
         self.ds = 0.0
