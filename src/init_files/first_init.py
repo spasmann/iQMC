@@ -4,7 +4,7 @@ import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
 
-class TestInit:
+class FirstInit:
     def __init__(self, N=1000, Nx=20, generator="random"):
         self.N = N
         self.Nx = Nx
@@ -15,7 +15,7 @@ class TestInit:
         self.G = 1
         self.right = False
         self.left = False
-        self.material_code = "test_data"
+        self.material_code = "first_data"
         self.geometry = "slab"
         self.mesh = Mesh(self.Nx, np.array((self.RB,)))
         self.material = Material(self.material_code, self.geometry, self.mesh)
