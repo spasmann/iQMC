@@ -1,8 +1,8 @@
 # 1DQMC
 Author: Sam Pasmann
 
-1DQMC is a hyrbid Quasi-Monte Carlo (QMC) and deterministic code for neutron transport.
-The theory behind the code is outlined in [1]. 1DQM uses Quasi-Monte Carlo 
+QMC1D is a hyrbid Quasi-Monte Carlo (QMC) and deterministic code for neutron transport.
+The theory behind the code is outlined in [1]. QMC1D uses Quasi-Monte Carlo 
 methods to solve successive iterations of the standard Source Iteration for 
 neutron transport. In the future, iterative methods like
 Krylov Subspace methods will also be added as the base QMC code allows for 
@@ -51,41 +51,82 @@ below.
 ## Init File Variables
 
 ```
-    N: Number of particles per iteration per source
-    Nx: Number of spatial cells
-    generator: Random number generator
+    N: int, Number of particles per iteration per source
+    
+    Nx: int, Number of spatial cells
+    
+    generator: string, Random number generator
+    
+    totalDim: int, Number of dimensions to be sampled in the problem
+    
+    RB: float, Right most boundary of problem
+    
+    LB: float, Left most boundary of problem
+    
+    G: int, Number of groups
+    
+    right: True or False, Has right boundary source
+    
+    left: True or False, Has left boundary source
+    
+    phi_right: float, strength of right boundary source
+    
+    phi_left: float, strength of left boundary source
+    
+    source: numpy array (Nx,G), strength of volumetric source
+    
+    material_code: string, specify cross section data
+    
+    avg_scalar_flux: True or False, toggle average spatial cell scalar flux tally
+    
+    edge_scalar_flux: True or False, toggle edge spatial cell scalar flux tally
+    
+    avg_agular_flux: True or False, toggle average spatial cell angular flux tally
+    
+    avg_current: True or False, toggle average spatial cell current tally
+    
+    edge_current: True or False, toggle edge spatial cell current tally
+    
+    save_data: True or False, save output data to HDF5 file
+    
+    mesh: Mesh object, create tally mesh given Nx and numpy array of RB
+    
+    material: Material object, create cross section data given material code
+              geometry, and mesh
+              
+    # Optional Variables #
+    
+    true_flux: numpy array (Nx,G), a known analytic or benchmark solution for
+               the scalar flux
 ```
-
-        self.N = N
-        self.Nx = Nx
-        self.generator = generator
-        self.totalDim = 3
-        self.RB = 5
-        self.LB = 0
-        self.G = 1
-        self.right = False
-        self.left = True
-        self.phi_left = 1.0
-        self.source = np.zeros((self.Nx,self.G))
-        self.material_code = "garcia_data"
-        self.geometry = "slab"
-        self.avg_scalar_flux = True
-        self.edge_scalar_flux = False
-        self.avg_angular_flux = False
-        self.avg_current = False
-        self.edge_current = False
-        self.shannon_entropy = False
-        self.save_data = True
-        self.mesh = Mesh(self.Nx, np.array((self.RB,)))
-        self.material = Material(self.material_code, self.geometry, self.mesh)
-        
-### Tallies
 
 ## Source Iteration Variables
 
+The initialization of the SourceIteration() object also contains variables which
+the user may want to change after initialization and before the .Run() command.
+```
+    max_iter: int, maximum number of iterations 
+    tol: float, desired convergence tolerance
+```
+
 ## Predefined Problems
 
+Currently there are two fully defined problems available garcia.py and multigroup.py.
+
+**garcia.py** features an exponentialy decaying scattering cross section with space,
+a left boundary source, and no volumetric source.
+
+**multigroup.py** simulates an infinite medium multi-group problem given cross
+sections from high-density polyethylene. Currently there is data available for 
+a 12, 70, or 618 group problem. This problem also features a true_flux variable 
+which represents the analytic solution.
+
 ## Random Number Generators
+
+Currently the available *generator* variables are:
+    - "random" : numpy's pseudo-random number generator
+    - "sobol" : sobol sequence from scipy.qmc
+    - "halton" : halton sequence from scipy.qmc
 
 ## Saving Output Data
 
@@ -93,21 +134,23 @@ After the Source Iteration has completed, if *save_data = True*, the output data
 will be stored in a HDF5 file in */saved_data/* with the following naming
 convention:
 ```
-    Material_code-Generator-N-Nx
+    material_code-generator-N-Nx
 ```
-## Testing
 
-## Citations
+## Citing
 
-### Dependencies
+## Dependencies
 - Numpy
+- Matplotlib
 - Scipy
 - h5py
 
-
+## References 
 
 [1] Pasmann, S., Variansyah, I., and McClarren, R. G. Convergent transport 
     source iteration calculations with quasi-monte carlo. vol. 124,
     American Nuclear Society, pp. 192–195.
     
-[2] 
+[2] Garcia, R., Siewert, C., Radiative Transfer in Finite Inhomogeneous 
+    Plane-Parallel Atmospheres, J. Quantitative Spectroscopy & Radiative 
+    Transfer, 27, 2, pp. 141–148.
