@@ -28,7 +28,7 @@ in the problem file after initialization. Ex:
     init_data = GarciaInit()
     init_data.N = 2**10
 ```
-A full list of initialization parameters is below.
+A full list of initialization parameters is in the section below.
 
 The parameters data object is then used to initialize the Source Iteration.
 The Source Iteration algorithm is then executed with the *Run* function. Ex:
@@ -124,9 +124,11 @@ which represents the analytic solution.
 ## Random Number Generators
 
 Currently the available *generator* variables are:
-    - "random" : numpy's pseudo-random number generator
-    - "sobol" : sobol sequence from scipy.qmc
-    - "halton" : halton sequence from scipy.qmc
+```
+    "random" : numpy's pseudo-random number generator
+    "sobol" : sobol sequence from scipy.qmc
+    "halton" : halton sequence from scipy.qmc
+```
 
 ## Saving Output Data
 
