@@ -10,8 +10,14 @@ plug-and-play compatibility with different solvers.
  
 ## Basic Usage 
 
-To use 1DQMC, simply clone the repo to your local machine and navigate to the
-*/problems/* folder to run one of the available problems. Ex:
+The source functions can be installed as a package. Clone the repo, pen terminal 
+and within the QMC1D folder type:
+```
+    python -m build
+```
+
+Alternatively, simply navigate to the */problems/* folder to run one of the 
+available problems. Ex:
 ```
     python garcia.py
 ```
@@ -21,7 +27,8 @@ the Garcia problem are written in */src/init_files/garcia_init.py*.
 
 This is the basic structure all problems should follow. A script in the 
 */problems/* folder and an initialization file in */src/init_files/*. If you 
-wants to run the three pre-defined problems you only need to edit the problem file.
+want to run the two pre-defined problems you only need to edit the problem file.
+
 The init_files create an object of the necessary parameters and can therefore be edited
 in the problem file after initialization. Ex:
 ```
