@@ -22,18 +22,19 @@ class Sweep:
         tallies.ResetPhiAvg()
         self.samples.GenerateParticles(self.q)
         for particle in self.samples.particles:
-            particle.zone = self.mesh.GetZone(particle.R)
+            particle.zone = self.mesh.GetZone(particle.R, particle.dir)
+            particle.IsAlive(self.mesh)
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
-                tallies.Tally(particle, 
-                              self.material, 
-                              self.geometry)
+                #print("pos: ", particle.pos)
+                #print("mu: ", particle.dir)
+                #print("ds: ",particle.ds)
+                tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)
                 particle.Move()
                 particle.IsAlive(self.mesh)
-                particle.zone = self.mesh.GetZone(particle.R)
-                #print("x = ", particle.pos)
+                particle.zone = self.mesh.GetZone(particle.R, particle.dir)
             count += 1
     
     def GetSource(self, phi_avg):
@@ -42,7 +43,5 @@ class Sweep:
         else:
             return (phi_avg*self.material.sigs + self.source)
         
-        
-   # def GetDim(self):
        
         

@@ -4,7 +4,6 @@ import numpy as np
 
 class Geometry:
     def __init__(self, geometry, mesh):
-        #self.mesh = Mesh()
         self.geometry = geometry
         self.mesh = mesh
         
@@ -14,10 +13,11 @@ class Geometry:
         
     def SlabEdge(self, particle):
         if (particle.dir >= 0):
-            ds = (self.mesh.highR[particle.zone] - particle.R)/(particle.dir)
+            ds = (self.mesh.highR[particle.zone] - particle.R)/(particle.dir) + 1e-9
         elif (particle.dir < 0):
-            ds = (self.mesh.lowR[particle.zone] - particle.R)/(particle.dir)
-        return ds + 1e-9
+            ds = (self.mesh.lowR[particle.zone] - particle.R)/(particle.dir) + 1e-9
+        return ds 
+
     
     def CellVolume(self, zone):
         if (self.geometry == "slab"):

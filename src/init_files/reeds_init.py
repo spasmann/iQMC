@@ -1,23 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Mar 28 13:43:00 2022
+
+@author: sampasmann
+"""
+
 # -*- coding: utf-8 -*-
 
 import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
+from src.init_files.reeds_solution import reeds_sol
 
-class GarciaInit:
-    def __init__(self, N=2**12, Nx=20, generator="random"):
+class ReedsInit:
+    def __init__(self, N=2**12, Nx=180, generator="sobol"):
         self.N = N
         self.Nx = Nx
         self.generator = generator
-        self.totalDim = 3
-        self.RB = 5
-        self.LB = 0
+        self.totalDim = 2
+        self.RB = 8.0
+        self.LB = -8.0
         self.G = 1
         self.right = False
-        self.left = True
-        self.phi_left = 1.0
-        self.source = np.zeros((self.Nx,self.G))
-        self.material_code = "garcia_data"
+        self.left = False
+        self.material_code = "reeds_data"
         self.geometry = "slab"
         self.avg_scalar_flux = True
         self.edge_scalar_flux = False
@@ -28,5 +35,6 @@ class GarciaInit:
         self.save_data = True
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)
+        self.source = self.material.source
         
         

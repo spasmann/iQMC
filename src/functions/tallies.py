@@ -44,7 +44,10 @@ class Tallies:
         ds = particle.ds
         sigt = material.sigt[zone,:]
         dV = geometry.CellVolume(zone)
-        self.phi_avg[zone, :] += weight*(1-np.exp(-(ds*sigt)))/(sigt*dV)
+        if (sigt.all() > 1e-16):
+            self.phi_avg[zone,:] += weight*(1-np.exp(-(ds*sigt)))/(sigt*dV)
+        else:
+            self.phi_avg[zone,:] += weight*ds/dV
 
     #def AvgAngularFlux(self, particle, material, geometry):        
 

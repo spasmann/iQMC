@@ -18,7 +18,9 @@ def SaveData(init_data, SI, fname = "default", path = "../saved_data/"):
     with h5py.File(path+fname, 'w') as f:
         f.create_dataset('N', data = init_data.N)
         f.create_dataset('Nx', data = init_data.Nx)
+        f.create_dataset('LB', data = init_data.LB)
         f.create_dataset('RB', data = init_data.RB)
+        f.create_dataset('generator', data = init_data.generator)
         f.create_dataset('itt', data = SI.itt)
         f.create_dataset('phi_avg', data = SI.tallies.phi_avg)
         f.create_dataset('delta_flux', data = SI.norm_hist)

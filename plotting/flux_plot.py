@@ -12,23 +12,27 @@ import h5py
 
 
 path = "../saved_data/"
-fname1 = "test_data-random-1024-20"
-fname2 = "test_data-sobol-1024-20"
-
-f1 = h5py.File(path+fname1, 'r')
-f2 = h5py.File(path+fname2, 'r')
-print("Keys: ", list(f1.keys()))
-
-phi1 = f1['phi_avg'][:]
-phi2 = f2['phi_avg'][:]
-RB = f1['RB'][...]
-Nx = f1['Nx'][...]
-midpoints = np.linspace(0,RB,Nx)
+fname1 = "reeds_data-sobol-1024-180"
+fname2 = "reeds_data-sobol-2048-180"
+fname3 = "reeds_data-halton-2048-180"
+files = [fname1, fname2, fname3]
 
 plt.figure(dpi=200)
-for G in range(phi1.shape[1]):
-    plt.plot(midpoints, phi1[:][:,G], label='random')
-    plt.plot(midpoints, phi2[:][:,G], label='sobol')
-plt.xlabel('Midoints')
-plt.ylabel('Cell Averaged Scalar Flux')
+for file in files:
+    f = h5py.File(path+file, 'r')
+    print("Keys: ", list(f.keys()))
+    phi = f['phi_avg'][:]
+    RB = f['RB'][...]
+    LB = f['LB'][...]
+    Nx = f['Nx'][...]
+    N = f['N'][...]
+    generator = f['generator'][...]
+    midpoints = np.linspace(LB,RB,Nx)
+    for G in range(phi.shape[1]):
+        plt.plot(midpoints, phi[:][:,G], label=generator)
+    f.close()    
+    
+
+plt.xlabel(r'Spatial Position $x$')
+plt.ylabel(r'Cell Averaged Scalar Flux $\phi$')
 plt.legend()

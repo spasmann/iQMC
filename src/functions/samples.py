@@ -49,8 +49,8 @@ class Samples:
             randPos = self.rng[i,self.counter]
             randMu = self.rng[i,self.counter+1]
             pos = self.GetPos(randPos) 
-            mu = self.GetDir(randMu) + 1e-9
-            zone = self.mesh.GetZone(pos)
+            mu = self.GetDir(randMu) 
+            zone = self.mesh.GetZone(pos, mu)
             weight = self.VolumetricWeight(zone)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
@@ -78,7 +78,7 @@ class Samples:
         return np.random.uniform(0,1,[self.N,self.totalDim])
     
     def SobolMatrix(self):
-        sampler = Sobol(d=self.totalDim,scramble=False)
+        sampler = Sobol(d=self.totalDim,scramble=True)
         m = round(math.log(self.N, 2))
         return sampler.random_base2(m=m)
     
@@ -95,7 +95,7 @@ class Samples:
             self.rng = self.HaltonMatrix()
     
     def GetPos(self, randPos):
-        return ((self.RB-self.LB)*randPos)
+        return ((self.RB-self.LB)*randPos + self.LB)
     
     def GetDir(self, randMu):
         return (2*randMu - 1)
@@ -108,7 +108,10 @@ class Samples:
     
     def VolumetricWeight(self, zone):
         weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
-        assert (weight.shape == (1, self.G))
+        #try:
+        #    assert (weight.shape == (1, self.G))
+        #except:
+        #        print("fail")
         return weight
     
     def BoundaryWeight(self, BV):
