@@ -19,6 +19,7 @@ class GarciaInit:
         self.source = np.zeros((self.Nx,self.G))
         self.material_code = "garcia_data"
         self.geometry = "slab"
+        self.true_flux = np.array((False)) # no analytic solution for scalar flux
         self.avg_scalar_flux = True
         self.edge_scalar_flux = False
         self.avg_angular_flux = False

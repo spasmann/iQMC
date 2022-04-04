@@ -33,6 +33,7 @@ class ReedsInit:
         self.edge_current = False
         self.shannon_entropy = False
         self.save_data = True
+        self.true_flux = reeds_sol(self.Nx)
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)
         self.source = self.material.source

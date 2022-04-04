@@ -23,9 +23,9 @@ class Samples:
         self.RB = init_data.RB
         self.LB = init_data.LB
         self.left = init_data.left
+        self.right = init_data.right
         if (self.left):
             self.phi_left = init_data.phi_left
-        self.right = init_data.right
         if (self.right):
             self.phi_right = init_data.phi_right
 
@@ -38,7 +38,7 @@ class Samples:
             self.LeftBoundaryParticles()
             self.counter += 1
         if (self.right):
-            self.GetRnMatrix()
+            #self.GetRnMatrix()
             self.RightBoundaryParticles()
             self.counter += 1
         self.VolumetricParticles()
@@ -83,7 +83,7 @@ class Samples:
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=False)
+        sampler = Halton(d=self.totalDim,scramble=True)
         return sampler.random(n=self.N)
     
     def GetRnMatrix(self):
@@ -108,10 +108,6 @@ class Samples:
     
     def VolumetricWeight(self, zone):
         weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
-        #try:
-        #    assert (weight.shape == (1, self.G))
-        #except:
-        #        print("fail")
         return weight
     
     def BoundaryWeight(self, BV):

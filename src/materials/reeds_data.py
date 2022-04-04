@@ -8,6 +8,7 @@ Created on Mon Mar 28 13:22:41 2022
 import numpy as np
 
 def reeds_data(Nx=1000):
+    G = 1 # number of energy groups
     sigt = np.zeros((Nx,1))
     sigs = np.zeros((Nx,1))
     source = np.zeros((Nx,1))
@@ -54,5 +55,5 @@ def reeds_data(Nx=1000):
         
     siga = (sigt - sigs)
     
-    return sigt, sigs, siga, source
+    return sigt, sigs, siga, source, G
 

@@ -33,7 +33,7 @@ class SourceIteration:
             self.norm_hist = np.append(self.norm_hist, self.tallies.delta_flux)
             print("**********************")
             print("Iteration:", self.itt, "change: ",self.tallies.delta_flux)
-            if (self.init_data.G > 1):
+            if (self.init_data.true_flux.any()):
                 relError = np.abs(self.tallies.phi_avg - self.init_data.true_flux)/self.init_data.true_flux
                 infNorm = np.linalg.norm(relError, np.inf)
                 self.error = np.append(self.error, infNorm)
