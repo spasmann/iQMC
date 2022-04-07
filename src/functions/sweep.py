@@ -16,9 +16,10 @@ class Sweep:
         self.geometry = Geometry(init_data.geometry, self.mesh)
         self.samples = Samples(self.init_data, self.geometry, self.mesh)
                 
-    def Run(self, tallies):
+    def Run(self, tallies, q):
         count = 0
-        self.q = self.GetSource(tallies.phi_avg)
+        #self.q = self.GetSource(tallies.phi_avg)
+        self.q = q
         tallies.ResetPhiAvg()
         self.samples.GenerateParticles(self.q)
         for particle in self.samples.particles:
@@ -37,11 +38,7 @@ class Sweep:
                 particle.zone = self.mesh.GetZone(particle.R, particle.dir)
             count += 1
     
-    def GetSource(self, phi_avg):
-        if (self.material.G > 1):
-            return (np.dot(phi_avg,np.transpose(self.material.sigs)) + self.source)
-        else:
-            return (phi_avg*self.material.sigs + self.source)
+
         
        
         

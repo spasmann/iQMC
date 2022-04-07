@@ -14,8 +14,8 @@ class Tallies:
         self.Nr = init_data.Nx
         self.G = init_data.G
         
-        self.phi_avg = np.zeros((self.Nr, self.G))
-        self.phi_avg_old = np.zeros((self.Nr, self.G))
+        self.phi_avg = np.ones((self.Nr, self.G))
+        self.phi_avg_old = np.ones((self.Nr, self.G))
         self.dphi = np.zeros((self.Nr, self.G))
         self.phi_edge = np.zeros((self.Nr+1, self.G))
         self.J_avg = np.zeros((self.Nr, self.G))

@@ -22,7 +22,7 @@ for file in files:
     f = h5py.File(path+file, 'r')
     print("Keys: ", list(f.keys()))
     phi = f['phi_avg'][:]
-    #true = f['true_flux'][:]
+    true = f['true_flux'][:]
     RB = f['RB'][...]
     LB = f['LB'][...]
     Nx = f['Nx'][...]
@@ -31,7 +31,7 @@ for file in files:
     midpoints = np.linspace(LB,RB,Nx)
     for G in range(phi.shape[1]):
         plt.plot(midpoints, phi[:][:,G], label=generator)
-        #plt.plot(midpoints, true[:][:,G])
+        plt.plot(midpoints, true[:][:,G])
     f.close()    
     
 

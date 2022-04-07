@@ -7,7 +7,7 @@ from src.functions.source_iteration import SourceIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    N = 2**11
+    N = 2**5
     data1 = GarciaInit(N=N, generator="sobol")
     #data2 = GarciaInit(N=N, generator="sobol")
     

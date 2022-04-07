@@ -8,6 +8,7 @@ import numpy as np
 class SourceIteration:
     def __init__(self, init_data):
         self.init_data = init_data
+        self.source = self.init_data.source
         self.mesh = init_data.mesh
         self.material = self.init_data.material
         self.itt = 0
@@ -27,7 +28,8 @@ class SourceIteration:
         print("Number of Spatial Cells: ", self.init_data.Nx)
         while (self.itt<self.max_iter) and (self.tallies.delta_flux > self.tol):
             self.tallies.phi_avg_old[:] = self.tallies.phi_avg[:] # shallow copy
-            self.sweep.Run(self.tallies)
+            self.q = self.GetSource(self.tallies.phi_avg)
+            self.sweep.Run(self.tallies, self.q)
             self.tallies.DeltaFlux() 
             self.itt += 1
             self.norm_hist = np.append(self.norm_hist, self.tallies.delta_flux)
@@ -40,4 +42,14 @@ class SourceIteration:
         
         if (self.init_data.save_data):
             SaveData(self.init_data, self)
+
+
+    def GetSource(self, phi_avg):
+        if (self.material.G > 1):
+            return (np.dot(phi_avg,np.transpose(self.material.sigs)) + self.source)
+        else:
+            return (phi_avg*self.material.sigs + self.source)
+    
+    
+    
     
