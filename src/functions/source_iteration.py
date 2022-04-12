@@ -20,6 +20,7 @@ class SourceIteration:
                            self.mesh,
                            self.material)
         self.error = np.empty((0,1))
+        self.fname = "default"
     def Run(self):
         print("--------- Source Iteration ---------")
         print("Material: ", self.init_data.material_code)
@@ -41,7 +42,7 @@ class SourceIteration:
                 self.error = np.append(self.error, infNorm)
         
         if (self.init_data.save_data):
-            SaveData(self.init_data, self)
+            SaveData(self.init_data, self, self.fname)
 
 
     def GetSource(self, phi_avg):

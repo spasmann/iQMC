@@ -12,12 +12,13 @@ import h5py
 
 
 path = "../saved_data/"
-#fname1 = "reeds_data-sobol-1024-180"
-#fname2 = "reeds_data-sobol-2048-180"
-fname3 = "12-halton-1024-20"
+fname1 = "reeds_data-halton-16384-180"
+fname2 = "reeds_data-halton-4096-180"
+fname3 = "reeds_data-halton-1024-180"
 files = [fname3]
 
 plt.figure(dpi=200)
+count = 0
 for file in files:
     f = h5py.File(path+file, 'r')
     print("Keys: ", list(f.keys()))
@@ -30,10 +31,11 @@ for file in files:
     generator = f['generator'][...]
     midpoints = np.linspace(LB,RB,Nx)
     for G in range(phi.shape[1]):
-        plt.plot(midpoints, phi[:][:,G], label=generator)
-        plt.plot(midpoints, true[:][:,G])
-    f.close()    
-    
+        plt.plot(midpoints, phi[:][:,G], label=files[count])
+
+    f.close()
+    count += 1
+plt.plot(midpoints, true[:], label="true")  
 
 plt.xlabel(r'Spatial Position $x$')
 plt.ylabel(r'Cell Averaged Scalar Flux $\phi$')

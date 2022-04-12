@@ -59,4 +59,5 @@ def reeds_sol(Nx=1000):
         elif (6.0<= x):
             y[count] = y5(x)
         count += 1
+    y = np.reshape(y, (Nx,1))
     return y

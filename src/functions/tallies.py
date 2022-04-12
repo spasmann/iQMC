@@ -45,7 +45,7 @@ class Tallies:
         sigt = material.sigt[zone,:]
         sigt = np.reshape(sigt, (1,G))
         dV = geometry.CellVolume(zone)
-        if (sigt.all() > 1e-16):
+        if (sigt.all() > 1e-12):
             self.phi_avg[zone,:] += (weight*(1-np.exp(-(ds*sigt)))/(sigt*dV))[0,:]
         else:
             self.phi_avg[zone,:] += (weight*ds/dV)    

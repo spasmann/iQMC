@@ -49,12 +49,14 @@ class PowerIteration:
             
     def GetSource(self, phi_avg):
         if (self.material.G > 1):
-            if (self.material.sigs.shape == (self.material.Nx, self.material.G, self.material.G)):
+            if (self.material.media > 1):
                 q = np.zeros((self.material.Nx, self.material.G))
                 for cell in range(self.material.Nx):
-                    q[cell,:] = (np.dot(phi_avg[cell,:],self.material.sigs[cell,:,:].T) + np.sum(phi_avg[cell,:]*self.material.sigf[cell,:]*self.material.nu[cell,:],axis=1)*self.material.chi[cell,:]/self.k)
+                    q[cell,:] = (np.dot(phi_avg[cell,:],self.material.sigs[cell,:,:]) 
+                                + np.dot(phi_avg[cell,:]*self.material.sigf[cell,:]*self.material.nu[cell,:],self.material.chi[cell,:])/self.k)
+                return q
             else:
-                return (np.dot(phi_avg,self.material.sigs.T) + np.sum(phi_avg*self.material.sigf*self.material.nu,axis=1)*self.material.chi/self.k)
+                return (np.dot(phi_avg,self.material.sigs) + np.dot((phi_avg*self.material.sigf*self.material.nu).sum(axis=1),self.material.chi)/self.k)
         else:
             return (phi_avg*self.material.sigs + phi_avg*self.material.sigf*self.material.nu/self.k)
     
@@ -63,7 +65,6 @@ class PowerIteration:
         self.k = self.k*((self.material.nu*self.material.sigf*self.tallies.phi_avg).sum()
                         /(self.material.nu*self.material.sigf*self.tallies.phi_avg_old).sum())
     def DeltaK(self):
-        #self.dk = abs(self.k-self.k_old).sum()/self.k.size
         self.dk = abs(self.k-self.k_old)
         
         

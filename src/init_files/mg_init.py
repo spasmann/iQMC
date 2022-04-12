@@ -38,6 +38,8 @@ class MultiGroupInit:
         self.phi_right = 0.5*self.true_flux[0,:]
         self.phi_right = np.reshape(self.phi_right, (1,self.G))
         
+        self.moment_match = False
+        
 
 def TrueFlux(material, Q, Nx):
     """

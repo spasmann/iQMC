@@ -7,10 +7,16 @@ from src.functions.source_iteration import SourceIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    N = 2**10
+    N = 2**12
     data = ReedsInit(N=N, generator="halton")
 
     SI = SourceIteration(data)
-    SI.max_iter = 20
+    SI.max_iter = 10
+    SI.Run()
+    
+    data.moment_match = True
+    SI = SourceIteration(data)
+    SI.fname = "moment_match_halton"
+    SI.max_iter = 10
     # run source iteration
     SI.Run()
