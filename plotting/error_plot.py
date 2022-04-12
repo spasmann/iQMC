@@ -13,14 +13,14 @@ import h5py
 
 
 path = "../saved_data/"
-fname1 = "reeds_data-random-4096-180"
-fname2 = "moment_match_random"
-fname3 = "reeds_data-halton-4096-180"
-fname4 = "moment_match_halton"
-files = [fname1, fname2, fname3, fname4]
+fname1 = "reeds_data-halton-2048-180"
+fname2 = "reeds_data-sobol-2048-180"
+fname3 = "reeds_data-latin_hypercube-2048-180"
+fname4 = "reeds_data-random-2048-180"
+files = [fname1,fname2, fname3, fname4]
 
 
-plt.figure(dpi=200)
+plt.figure(dpi=200,figsize=(15,8))
 count = 0
 for file in files:
     f = h5py.File(path+file, 'r')
@@ -34,7 +34,7 @@ for file in files:
     f.close()    
     count += 1
 
-plt.legend()
+plt.legend(loc="upper right")
 matplotlib.rcParams.update({'font.size': 16})
 ylabel = r'$||\frac{\phi_i - \phi}{\phi}||_\infty$'
 plt.grid()

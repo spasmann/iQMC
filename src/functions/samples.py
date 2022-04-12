@@ -2,7 +2,7 @@
 
 import numpy as np
 import math
-from scipy.stats.qmc import Sobol, Halton
+from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
 from src.functions.moment_matching import shift_samples
 
@@ -15,6 +15,7 @@ class Samples:
     """
     def __init__(self, init_data, geometry, mesh):
         self.generator = init_data.generator
+        self.RQMC = False
         self.geometry = geometry
         self.mesh = mesh
         self.G = init_data.G
@@ -87,7 +88,11 @@ class Samples:
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=False)
+        sampler = Halton(d=self.totalDim,scramble=self.RQMC)
+        return sampler.random(n=self.N)
+    
+    def LatinHypercube(self):
+        sampler = LatinHypercube(d=self.totalDim)
         return sampler.random(n=self.N)
     
     def GetRnMatrix(self):
@@ -97,6 +102,8 @@ class Samples:
             self.rng = self.SobolMatrix()
         elif (self.generator == "halton"):
             self.rng = self.HaltonMatrix()
+        elif (self.generator == "latin_hypercube"):
+            self.rng = self.LatinHypercube()
     
     def GetPos(self, randPos):
         return ((self.RB-self.LB)*randPos + self.LB)
