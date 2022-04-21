@@ -23,20 +23,30 @@ class Material:
             self.sigt, self.sigs, self.siga, self.source, self.G = reeds_data(self.Nx)
             self.media = 9
             
-        elif (material_code == "u235H2O_data"):
-            from src.materials.u235_H2O_data import u235H2O_data
-            self.sigt, self.sigs, self.sigf, self.siga, self.chi, self.nu, self.G = u235H2O_data(self.Nx)
+        elif (material_code == "URRb_H2Oa5_2_0_SL_data"):
+            from src.materials.URRb_H2Oa5_2_0_SL_data import URRb_H2Oa5_2_0_SL_data
+            self.sigt, self.sigs, self.sigf, self.siga, self.chi, self.nu, self.G = URRb_H2Oa5_2_0_SL_data(self.Nx)
             self.media = 2
         
-        elif (material_code == "pu239_data"):
-            from src.materials.pu239_data import pu239_data
-            self.sigt, self.sigs, self.siga, self.sigf, self.nu, self.G = pu239_data(self.Nx)
+        elif (material_code == "PUa_1_0_SL_data"):
+            from src.materials.PUa_1_0_SL_data import PUa_1_0_SL_data
+            self.sigt, self.sigs, self.siga, self.sigf, self.chi, self.nu, self.G = PUa_1_0_SL_data(self.Nx)
+            self.media = 1
+            
+        elif (material_code == "Ua_1_0_SL_data"):
+            from src.materials.Ua_1_0_SL_data import Ua_1_0_SL_data
+            self.sigt, self.sigs, self.siga, self.sigf, self.chi, self.nu, self.G = Ua_1_0_SL_data(self.Nx)
             self.media = 1
         
         elif (material_code == "URRa_2_0_SL"):
             from src.materials.URRa_2_0_SL_data import URRa_2_0_SL_data
             self.sigt, self.sigs, self.sigf, self.siga, self.chi, self.nu, self.G = URRa_2_0_SL_data(self.Nx)
             self.media = 1
+            
+        elif (material_code == "PUa_H2O_1_0_SL"):
+            from src.materials.PUa_H2O_1_0_SL_data import PUa_H2O_1_0_SL_data
+            self.sigt, self.sigs, self.sigf, self.siga, self.chi, self.nu, self.G = PUa_H2O_1_0_SL_data(self.Nx)
+            self.media = 2
             
         elif (material_code == 12 or 70 or 618):
             from src.materials.hdpe_data import hdpe_data

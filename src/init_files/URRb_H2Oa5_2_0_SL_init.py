@@ -10,7 +10,7 @@ import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
 
-class u235H2O_init:
+class URRb_H2Oa5_2_0_SL_init:
     def __init__(self, N=2**10, Nx=100, generator="halton"):
         self.N = N
         self.Nx = Nx
@@ -21,7 +21,7 @@ class u235H2O_init:
         self.G = 2
         self.right = False
         self.left = False
-        self.material_code = "u235H2O_data"
+        self.material_code = "URRb_H2Oa5_2_0_SL_data"
         self.geometry = "slab"
         self.avg_scalar_flux = True
         self.edge_scalar_flux = False
@@ -30,6 +30,7 @@ class u235H2O_init:
         self.edge_current = False
         self.shannon_entropy = False
         self.save_data = True
+        self.moment_match = False
         self.true_flux = np.array((False))
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)

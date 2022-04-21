@@ -11,19 +11,20 @@ Created on Mon Apr  4 18:07:27 2022
 
 import numpy as np
 
-def u235H2O_data(Nx=10):    
+def URRb_H2Oa5_2_0_SL_data(Nx=10):    
     G = 2
+
     Nu = np.array([(2.5,2.5),(0.0,0.0)])
     Sig_f = np.array([(0.029564,0.000836),(0.0,0.0)])
     Sig_c = np.array([(0.024069,0.001104),(0.018564,0.00074)])
     Sig_s = np.array([((2.9183,0.000767),(0.04635,0.83892)),
                        ((2.9676,0.000336),(0.04749,0.83975))])
-    #Sig_s = np.array([((0.000767, 2.9183),(0.83892, 0.04635)),
-    #                   ((0.000336, 2.9676),(0.83975, 0.04749))])
     Sig_t = np.array([(2.9727,0.88721),(2.9865,0.88798)])
     Sig_a = Sig_c + Sig_f
     X = np.array([(0.0,1.0),(0.0,0.0)])
     R = np.array([6.696802, 7.822954])
+    
+    #Sig_s = np.flip(Sig_s,1)
     
     sigt = np.zeros((Nx,G))
     sigs = np.zeros((Nx,G,G))
@@ -56,6 +57,6 @@ def u235H2O_data(Nx=10):
             chi[count,:]  = X[1,:]
             nu[count,:]   = Nu[1,:]
         count += 1
-        sigs = np.flip(sigs,1)
+        
         
     return sigt, sigs, sigf, siga, chi, nu, G

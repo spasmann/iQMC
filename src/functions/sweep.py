@@ -4,6 +4,7 @@ from src.functions.geometry import Geometry
 from src.functions.samples import Samples
 import numpy as np
 
+
 class Sweep:
     def __init__(self, init_data, mesh, material):
         self.init_data = init_data
@@ -15,10 +16,9 @@ class Sweep:
         self.totalDim = self.init_data.totalDim 
         self.geometry = Geometry(init_data.geometry, self.mesh)
         self.samples = Samples(self.init_data, self.geometry, self.mesh)
-                
+    
     def Run(self, tallies, q):
         count = 0
-        #self.q = self.GetSource(tallies.phi_avg)
         self.q = q
         tallies.ResetPhiAvg()
         self.samples.GenerateParticles(self.q)
@@ -27,9 +27,6 @@ class Sweep:
             particle.IsAlive(self.mesh)
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
-                #print("pos: ", particle.pos)
-                #print("mu: ", particle.dir)
-                #print("ds: ",particle.ds)
                 tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)

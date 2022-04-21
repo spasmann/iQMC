@@ -13,13 +13,23 @@ class Tallies:
         
         self.Nr = init_data.Nx
         self.G = init_data.G
+        self.dtype = np.float64
         
-        self.phi_avg = np.ones((self.Nr, self.G))
-        self.phi_avg_old = np.ones((self.Nr, self.G))
-        self.dphi = np.zeros((self.Nr, self.G))
-        self.phi_edge = np.zeros((self.Nr+1, self.G))
-        self.J_avg = np.zeros((self.Nr, self.G))
-        self.J_edge = np.zeros((self.Nr+1, self.G))
+        if (init_data.avg_scalar_flux):
+            self.phi_avg = np.random.random(size=(self.Nr,self.G))
+            self.phi_avg_old = np.random.random(size=(self.Nr,self.G))
+        if (init_data.edge_scalar_flux):
+            self.phi_edge = np.zeros((self.Nr+1, self.G), self.dtype)
+        if (init_data.avg_current):
+            self.J_avg = np.zeros((self.Nr, self.G), self.dtype)
+        if (init_data.edge_current):
+            self.J_edge = np.zeros((self.Nr+1, self.G), self.dtype)
+        if (init_data.shannon_entropy):
+            self.SE = np.zeros((self.Nr, self.G), self.dtype)
+            
+
+        
+        
         self.delta_flux = 1.0
         
     def Tally(self, particle, material, mesh):

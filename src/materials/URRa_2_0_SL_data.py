@@ -23,22 +23,20 @@ def URRa_2_0_SL_data(Nx=10):
     R = np.array([7.566853])
     
     sigt = np.zeros((Nx,G))
-    #sigs = np.zeros((Nx,G,G))
+    sigs = np.zeros((Nx,G,G))
     sigf = np.zeros((Nx,G))
     siga = np.zeros((Nx,G))
     chi = np.zeros((Nx,G))
     nu = np.zeros((Nx,G))
-    xspan = np.linspace(-R[0],R[0],num=Nx)
+    xspan = np.linspace(0,2*R[0],num=Nx)
     count = 0
-    for x in xspan:
-        if (-R[0] <= x <= R[0]):
-            sigt[count,:] = Sig_t[:]
-            #sigs[count,:,:] = Sig_s[:]
-            sigf[count,:] = Sig_f[:]
-            #siga[count,:] = Sig_a[:]
-            chi[count,:]  = X[:]
-            nu[count,:]   = Nu[:]
-        count += 1
+    for count in range(Nx):
+        sigt[count,:] = Sig_t[:]
+        sigs[count,:,:] = Sig_s[:]
+        sigf[count,:] = Sig_f[:]
+        #siga[count,:] = Sig_a[:]
+        chi[count,:]  = X[:]
+        nu[count,:]   = Nu[:]
 
         
-    return sigt, Sig_s, sigf, siga, chi, nu, G
+    return sigt, sigs, sigf, siga, chi, nu, G

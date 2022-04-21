@@ -8,13 +8,13 @@ Created on Mon Apr  4 18:29:16 2022
 
 import sys
 sys.path.append("../")
-from src.init_files.u235H2O_init import u235H2O_init
+from src.init_files.URRb_H2Oa5_2_0_SL_init import URRb_H2Oa5_2_0_SL_init
 from src.functions.power_iteration import PowerIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    N = 2**10
-    data = u235H2O_init(N=1000, Nx=10, generator="halton")
+    data = URRb_H2Oa5_2_0_SL_init(N=1000, Nx=20, generator="halton")
+    data.save_data = False
 
     SI = PowerIteration(data)
     SI.max_iter = 20

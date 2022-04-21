@@ -17,7 +17,9 @@ fname1 = "reeds_data-halton-2048-180"
 fname2 = "reeds_data-sobol-2048-180"
 fname3 = "reeds_data-latin_hypercube-2048-180"
 fname4 = "reeds_data-random-2048-180"
-files = [fname1,fname2, fname3, fname4]
+
+fname5 = "reeds_data-halton-32768-32"
+files = [fname5]
 
 
 plt.figure(dpi=200,figsize=(15,8))

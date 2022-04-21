@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Apr  4 17:52:16 2022
+Created on Mon Apr  4 18:29:16 2022
 
 @author: sampasmann
 """
 
 import sys
 sys.path.append("../")
-from src.init_files.pu239Criticality_init import pu239Criticality_init
+from src.init_files.PUa_H2O_1_0_SL_init import PUa_H2O_1_0_SL_init
 from src.functions.power_iteration import PowerIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    data = pu239Criticality_init(N=10000, Nx=100, generator="halton")
+    data = PUa_H2O_1_0_SL_init(N=5000, Nx=80, generator="halton")
+    data.save_data = False
 
     SI = PowerIteration(data)
-    SI.max_iter = 20
+    SI.max_iter = 30
     # run source iteration
     SI.Run()
