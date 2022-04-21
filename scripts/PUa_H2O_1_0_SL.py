@@ -13,7 +13,7 @@ from src.functions.power_iteration import PowerIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    data = PUa_H2O_1_0_SL_init(N=5000, Nx=80, generator="halton")
+    data = PUa_H2O_1_0_SL_init(N=2000, Nx=200, generator="halton")
     data.save_data = False
 
     SI = PowerIteration(data)

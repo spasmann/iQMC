@@ -13,7 +13,7 @@ import numpy as np
 
 def PUa_H2O_1_0_SL_data(Nx=10):    
     G = 1
-
+    """
     Nu = np.array([(3.24),(0.0)])
     Sig_f = np.array([(0.081600),(0.0)])
     Sig_c = np.array([(0.019584),(0.032640)])
@@ -23,13 +23,13 @@ def PUa_H2O_1_0_SL_data(Nx=10):
     X = np.array([(1.0),(0.0)])
     R = np.array([1.317862, 2.849725])
 
-    
     sigt = np.zeros((Nx,G))
     sigs = np.zeros((Nx,G,G))
     sigf = np.zeros((Nx,G))
     siga = np.zeros((Nx,G))
     chi = np.zeros((Nx,G))
     nu = np.zeros((Nx,G))
+    
     xspan = np.linspace(-R[-1],R[-1],num=Nx)
     count = 0
     for x in xspan:
@@ -55,7 +55,43 @@ def PUa_H2O_1_0_SL_data(Nx=10):
             chi[count,:]  = X[1]
             nu[count,:]   = Nu[1]
         count += 1
+    """
+    R = np.array([1.317862, 2.849725])
+
+    sigt = np.zeros((Nx,G))
+    sigs = np.zeros((Nx,G,G))
+    sigf = np.zeros((Nx,G))
+    siga = np.zeros((Nx,G))
+    chi = np.zeros((Nx,G))
+    nu = np.zeros((Nx,G))
     
+    xspan = np.linspace(-R[-1],R[-1],num=Nx)
+    count = 0
+    for x in xspan:
+        if (-R[1] <= x <= -R[0]):
+            sigt[count,:] = 0.32640
+            sigs[count,:,:] = 0.293760
+            sigf[count,:] = 0.0
+            siga[count,:] = 0.032640
+            chi[count,:]  = 0.0
+            nu[count,:]   = 0.0
+            
+        elif (-R[0] < x < R[0]):
+            sigt[count,:] = 0.32640
+            sigs[count,:,:] = 0.225216
+            sigf[count,:] = 0.081600
+            siga[count,:] = 0.081600+0.019584
+            chi[count,:]  = 1.0
+            nu[count,:]   = 3.24
+            
+        elif ( R[0] <= x <= R[1]):
+            sigt[count,:] = 0.32640
+            sigs[count,:,:] = 0.293760
+            sigf[count,:] = 0.0
+            siga[count,:] = 0.032640
+            chi[count,:]  = 0.0
+            nu[count,:]   = 0.0
+        count += 1
         
         
     return sigt, sigs, sigf, siga, chi, nu, G
