@@ -10,6 +10,7 @@ if __name__ == "__main__":
     N = 2**10
     #data1 = MultiGroupInit(N=N, generator="random")
     data2 = MultiGroupInit(N=N, generator="halton")
+    data2.save_data = False
     #data3 = MultiGroupInit(N=N, generator="sobol")
     
 

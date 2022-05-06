@@ -23,17 +23,20 @@ class Particle:
         self.R = self.GetRadius(self.pos)
         
     def UpdateWeight(self, sigt):
-        self.weight *= np.exp(-self.ds*sigt)
+        try:
+            self.weight *= np.exp(-self.ds*sigt)
+        except:
+            print("fail")
         
     def UpdateZone(self, mesh):
-        self.zone = Mesh.GetZone(self.R)
+        self.zone = Mesh.GetZone(self.R, self.dir)
     
     def GetZone(self, mesh):
-        self.zone = mesh.GetZone(self.R)
+        self.zone = mesh.GetZone(self.R, self.dir)
         
     def IsAlive(self, mesh):
         if (self.dir > 0):
-            if (self.R >= mesh.highR[mesh.Nx-1]):
+            if (self.R >= mesh.highR[-1]):
                 self.alive = False
         else:
             if (self.R <= mesh.lowR[0]):

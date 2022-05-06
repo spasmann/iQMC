@@ -2,8 +2,9 @@
 
 import numpy as np
 import math
-from scipy.stats.qmc import Sobol, Halton
+from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
+from src.functions.moment_matching import shift_samples
 
 class Samples:
     """
@@ -14,6 +15,7 @@ class Samples:
     """
     def __init__(self, init_data, geometry, mesh):
         self.generator = init_data.generator
+        self.RQMC = False
         self.geometry = geometry
         self.mesh = mesh
         self.G = init_data.G
@@ -23,9 +25,10 @@ class Samples:
         self.RB = init_data.RB
         self.LB = init_data.LB
         self.left = init_data.left
+        self.right = init_data.right
+        self.moment_match = init_data.moment_match
         if (self.left):
             self.phi_left = init_data.phi_left
-        self.right = init_data.right
         if (self.right):
             self.phi_right = init_data.phi_right
 
@@ -38,19 +41,21 @@ class Samples:
             self.LeftBoundaryParticles()
             self.counter += 1
         if (self.right):
-            self.GetRnMatrix()
             self.RightBoundaryParticles()
             self.counter += 1
         self.VolumetricParticles()
         self.counter += 2 # used  to index the random number matrix 
+        
+        if (self.moment_match):
+            self.moment_matching()
 
     def VolumetricParticles(self):
         for i in range(self.N):
             randPos = self.rng[i,self.counter]
             randMu = self.rng[i,self.counter+1]
             pos = self.GetPos(randPos) 
-            mu = self.GetDir(randMu) + 1e-9
-            zone = self.mesh.GetZone(pos)
+            mu = self.GetDir(randMu) 
+            zone = self.mesh.GetZone(pos, mu)
             weight = self.VolumetricWeight(zone)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
@@ -78,12 +83,16 @@ class Samples:
         return np.random.uniform(0,1,[self.N,self.totalDim])
     
     def SobolMatrix(self):
-        sampler = Sobol(d=self.totalDim,scramble=False)
+        sampler = Sobol(d=self.totalDim,scramble=self.RQMC)
         m = round(math.log(self.N, 2))
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=False)
+        sampler = Halton(d=self.totalDim,scramble=self.RQMC)
+        return sampler.random(n=self.N)
+    
+    def LatinHypercube(self):
+        sampler = LatinHypercube(d=self.totalDim)
         return sampler.random(n=self.N)
     
     def GetRnMatrix(self):
@@ -93,9 +102,11 @@ class Samples:
             self.rng = self.SobolMatrix()
         elif (self.generator == "halton"):
             self.rng = self.HaltonMatrix()
+        elif (self.generator == "latin_hypercube"):
+            self.rng = self.LatinHypercube()
     
     def GetPos(self, randPos):
-        return ((self.RB-self.LB)*randPos)
+        return ((self.RB-self.LB)*randPos + self.LB)
     
     def GetDir(self, randMu):
         return (2*randMu - 1)
@@ -108,7 +119,6 @@ class Samples:
     
     def VolumetricWeight(self, zone):
         weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
-        assert (weight.shape == (1, self.G))
         return weight
     
     def BoundaryWeight(self, BV):
@@ -116,7 +126,35 @@ class Samples:
         weight = BV/self.N*self.geometry.SurfaceArea()
         return weight
  
-    
+    def moment_matching(self):
+        ## Currently only shifting volumetric particles
+        ## could shift boundary particle angle in the future
+        x = np.zeros(self.N)
+        mu = np.zeros(self.N)
+        # we only want to shift the volumetric particles not the boundary
+        start = 0
+        end = self.N
+        if (self.left):
+            start += self.N
+            end += self.N
+        if (self.right):
+            start += self.N
+            end += self.N
+        # take angle and position from voluemtric particles into new arrays
+        count = 0
+        for i in range(start,end):
+            x[count] = self.particles[i].pos
+            mu[count] = self.particles[i].dir
+            count += 1
+        # shift new arrays
+        shifted_x = shift_samples(self.LB, self.RB, x)
+        shifted_mu = shift_samples(-1.0, 1.0, mu)
+        # put shifted values back into particles
+        count = 0
+        for j in range(start, end):
+            self.particles[j].pos = shifted_x[count]
+            self.particles[j].dir = shifted_mu[count]
+            count += 1
 
         
         
