@@ -12,6 +12,6 @@ class Mesh:
         if (mu > 0):    
             return np.argmax((r > self.lowR)*(r <= self.highR))
         else:
-            return np.argmax((r > self.lowR)*(r <= self.highR))
+            return np.argmax((r >= self.lowR)*(r < self.highR))
 
     

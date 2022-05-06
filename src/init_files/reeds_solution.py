@@ -34,29 +34,31 @@ def reeds_sol(Nx=1000):
     3.119310353653182*10**(-3)*np.exp(0.5254295183311557*x) - 6.336401143340483*10**(-7)*np.exp(1.108937229227813*x) -
     3.528757679361232*10**(-8)*np.exp(1.615640334315550*x) - 4.405514335746888*10**(-18)*np.exp(4.554850586269065*x))
 
-    xspan = np.linspace(-8.0,8.0,num=Nx)
+    LB = -8
+    RB = 8
+    dx = (RB-LB)/Nx
+    xspan = np.linspace(LB+dx/2,RB-dx/2,Nx)
     y = np.zeros(Nx)
     count = 0
-    
     for x in xspan:
         x = np.abs(x)
         if (x < -6.0):
             y[count] = y5(x)
-        elif (-6.0 <= x < -5.0):
+        elif (-6.0 < x < -5.0):
             y[count] = y4(x)
-        elif (-5.0 <= x < -3.0):
+        elif (-5.0 < x < -3.0): #vacuum region 1
             y[count] = y3(x)
-        elif (-3.0 <= x < -2.0):
+        elif (-3.0 < x < -2.0):
             y[count] = y2(x)
-        elif (-2.0 <= x < 2.0):
+        elif (-2.0 < x < 2.0):
             y[count] = y1(x)
-        elif (2.0 <= x < 3.0):
+        elif (2.0 < x < 3.0):
             y[count] = y2(x)
-        elif (3.0<= x < 5.0):
+        elif (3.0< x < 5.0): #vacuum region 2
             y[count] = y3(x)
-        elif (5.0<= x < 6.0):
+        elif (5.0< x < 6.0):
             y[count] = y4(x)
-        elif (6.0<= x):
+        elif (6.0< x):
             y[count] = y5(x)
         count += 1
     y = np.reshape(y, (Nx,1))

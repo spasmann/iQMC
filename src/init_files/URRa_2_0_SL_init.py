@@ -18,7 +18,6 @@ class URRa_2_0_SL_init:
         self.totalDim = 2
         self.RB = 7.566853 
         self.LB = -7.566853 
-        self.G = 2
         self.right = False
         self.left = False
         self.material_code = "URRa_2_0_SL"
@@ -34,4 +33,5 @@ class URRa_2_0_SL_init:
         self.true_flux = np.array((False))
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)
+        self.G = self.material.G
         self.source = np.zeros((self.Nx,self.G))

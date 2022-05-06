@@ -19,7 +19,6 @@ class PUa_1_0_SL_init:
         self.totalDim = 2
         self.RB = 1.853722
         self.LB = -1.853722
-        self.G = 2
         self.right = False
         self.left = False
         self.material_code = "PUa_1_0_SL_data"
@@ -35,4 +34,5 @@ class PUa_1_0_SL_init:
         self.true_flux = np.array((False))
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)
+        self.G = self.material.G
         self.source = np.ones((self.Nx,self.G))

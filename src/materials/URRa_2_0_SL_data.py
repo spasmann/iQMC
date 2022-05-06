@@ -16,20 +16,31 @@ def URRa_2_0_SL_data(Nx=10):
     Nu = np.array([(2.5,2.5)])
     Sig_f = np.array([(0.050632,0.0010484)])
     Sig_c = np.array([(0.025788,0.0010046)])
-    Sig_s = np.array([(2.44383,0.029227),(0.0, 0.62568)])
+    
+    Sig_s = np.array([(2.44383,0.029227),
+                      (0.0,0.62568)])
+    
     Sig_t = np.array([(2.52025,0.65696)])
     Sig_a = Sig_c + Sig_f
     X = np.array([(0.0,1.0)])
     R = np.array([7.566853])
     
-    #Sig_s = np.flip(Sig_s,axis=1)
+    sigt = np.tile(Sig_t, (Nx,1))
+    sigs = np.tile(Sig_s, (Nx,1,1))
+    sigf = np.tile(Sig_f, (Nx,1))
+    siga = np.tile(Sig_a, (Nx,1))
+    chi = np.tile(X, (Nx,1))
+    nu = np.tile(Nu, (Nx,1))
     
+    
+    """
     sigt = np.zeros((Nx,G))
     sigs = np.zeros((Nx,G,G))
     sigf = np.zeros((Nx,G))
     siga = np.zeros((Nx,G))
     chi = np.zeros((Nx,G))
     nu = np.zeros((Nx,G))
+    
     
     xspan = np.linspace(-R[0],R[0],num=Nx)
     count = 0
@@ -40,6 +51,6 @@ def URRa_2_0_SL_data(Nx=10):
         siga[count,:] = Sig_a[:]
         chi[count,:]  = X[:]
         nu[count,:]   = Nu[:]
-
+    """
         
     return sigt, sigs, sigf, siga, chi, nu, G

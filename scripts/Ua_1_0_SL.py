@@ -14,11 +14,11 @@ from src.functions.power_iteration import PowerIteration
 if __name__ == "__main__":
     
     # initialize problem data
-    data = Ua_1_0_SL_init(N=1000, Nx=100, generator="halton")
+    data = Ua_1_0_SL_init(N=1000, Nx=50, generator="halton")
     data.save_data = False
     data.RQMC = False
 
-    PI = PowerIteration(data,k=2.25)
+    PI = PowerIteration(data)
     PI.max_iter = 10
     # run source iteration
     PI.Run()
