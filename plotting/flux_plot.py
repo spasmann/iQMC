@@ -12,11 +12,8 @@ import h5py
 
 
 path = "../saved_data/"
-fname1 = "reeds_data-halton-16384-180"
-fname2 = "reeds_data-halton-4096-180"
-fname3 = "reeds_data-halton-1024-180"
-fname5 = "reeds_data-halton-2000-400"
-files = [fname5]
+fname1 = "reeds_data-halton-1024-1024"
+files = [fname1]
 
 plt.figure(dpi=200)
 count = 0

@@ -23,7 +23,7 @@ print("Keys: ", list(f1.keys()))
 
 phi1 = f1['phi_avg'][:]
 phi2 = f2['phi_avg'][:]
-phi3 = f3['phi_evg'][:]
+phi3 = f3['phi_avg'][:]
 itt1 = f1['itt'][...]
 itt2 = f2['itt'][...]
 itt3 = f3['itt'][...]
