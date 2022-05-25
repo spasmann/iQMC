@@ -7,10 +7,15 @@ Created on Mon Mar 28 13:22:51 2022
 """
 
 import numpy as np
+
 """
-Analytic solution to reeds problem. Returns array and plot.
+Analytic solution to reeds problem. 
+
+This version calculates the solution at the cell center. 
+
+Returns numpy array of size (Nx,1).
 """
-def reeds_sol(Nx=1000):
+def reeds_sol(Nx=16*100):
 
     y1 = lambda x: (1 - 5.96168047527760*10**(-47)*np.cosh(52.06761235859028*x) -
     6.78355315350872*10**(-56)*np.cosh(62.76152118553390*x) -
@@ -63,3 +68,4 @@ def reeds_sol(Nx=1000):
         count += 1
     y = np.reshape(y, (Nx,1))
     return y
+

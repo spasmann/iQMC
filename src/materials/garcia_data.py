@@ -10,10 +10,10 @@ import numpy as np
 
 def garcia_data(mesh, Nx=1000):
     G = 1
-    sigt = np.ones((Nx, G))
     c = 1.0
+    sigt = np.ones((Nx, G))
     sigs = np.exp(-mesh.midpoints/c)
-    sigs = np.reshape(sigs, (Nx, G))
+    sigs = np.reshape(sigs, (Nx,G,G))
     siga = sigt - sigs
     
     return sigt, sigs, siga, G

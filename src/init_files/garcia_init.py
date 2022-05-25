@@ -13,8 +13,10 @@ class GarciaInit:
         self.RB = 5
         self.LB = 0
         self.G = 1
+        self.c = 1.0
         self.right = False
         self.left = True
+        self.moment_match = False
         self.phi_left = 1.0
         self.source = np.zeros((self.Nx,self.G))
         self.material_code = "garcia_data"
