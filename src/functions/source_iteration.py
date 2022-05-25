@@ -46,21 +46,21 @@ class SourceIteration:
         if (self.save_data):
             SaveData(self.init_data, self, self.fname)
 
-    """
+    
     def GetSource(self, phi_avg):
         if (self.material.G > 1):
             return (np.dot(phi_avg,np.transpose(self.material.sigs)) + self.source)
         else:
             return (phi_avg*self.material.sigs + self.source)
-    """
     
+    """
     def GetSource(self, phi_avg):
         # calculate source for every cell individually
         q = np.zeros((self.material.Nx, self.material.G))
         for cell in range(self.material.Nx):
-            q[cell,:] = (np.dot(phi_avg[cell,:], (self.material.sigs[:,:])+self.source[cell,:]) )
+            q[cell,:] = (np.dot(phi_avg[cell,:], (self.material.sigs[cell,:,:])+self.source[cell,:]) )
         return q
-    
+    """
     
     
     

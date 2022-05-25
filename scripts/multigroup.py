@@ -9,10 +9,10 @@ import numpy as np
 
 if __name__ == "__main__":
     # initialize problem data
-    N = 2**11
+    N = 2**10
     data1 = MultiGroupInit(N=N, generator="halton")
     SI = SourceIteration(data1)
-    SI.max_iter = 100
+    SI.max_iter = 50
     SI.Run()
     
 

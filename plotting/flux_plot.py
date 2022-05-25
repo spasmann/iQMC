@@ -12,7 +12,7 @@ import h5py
 
 
 path = "../saved_data/"
-fname1 = "12-halton-4096-20"
+fname1 = "12-halton-1024-20"
 #fname1 = "reeds_data-halton-2048-80"
 files = [fname1]
 
