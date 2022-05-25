@@ -15,7 +15,11 @@ path = "../saved_data/"
 fname1 = "reeds_data-halton-16384-180"
 fname2 = "reeds_data-halton-4096-180"
 fname3 = "reeds_data-halton-1024-180"
+<<<<<<< HEAD
 fname5 = "12-halton-1024-20"
+=======
+fname5 = "reeds_data-halton-2000-400"
+>>>>>>> 493a1141ed56ef9e67784f5c8e613194ca5045cc
 files = [fname5]
 
 plt.figure(dpi=200)
