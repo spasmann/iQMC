@@ -7,7 +7,7 @@ from src.functions.save_data import SaveData
 import numpy as np
 import matplotlib.pyplot as plt
 
-#from numba import njit
+from numba import njit
 
 class PowerIteration:
     def __init__(self, init_data, k = 1.0):
@@ -79,16 +79,20 @@ class PowerIteration:
         q : source term
 
         """
-        q = np.empty((self.material.Nx, self.material.G))
+        q = np.empty((self.material.Nx, self.material.G), np.float64)
         for cell in range(self.material.Nx):
             q[cell,:] = (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:]) 
                         + np.dot(phi_avg_f[cell,:]*self.material.sigf[cell,:]*self.material.nu[cell,:],self.material.chi[cell,:])/self.k)
+            assert (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])[0] >=  phi_avg_s[cell,:][0])
+            #assert (np.sum(np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])) == np.sum(phi_avg_s[cell,:]))
         return q
+    
     
     def UpdateK(self):
         self.k_old = self.k
         self.k = self.k*(np.sum(self.material.nu*self.material.sigf*self.tallies.phi_avg)
                         /np.sum(self.material.nu*self.material.sigf*self.phi_f))
+    #@njit
     def DeltaK(self):
         self.dk = abs(self.k-self.k_old)
         

@@ -10,9 +10,10 @@ import numpy as np
 import os
 
 def PUa_1_0_SL_data(Nx=100):
-    """
+
     G = 1
     dtype = np.float64
+    
     sigt = np.array((0.32640),dtype)
     sigs = np.array((0.225216),dtype)
     sigc = np.array((0.019584),dtype)
@@ -28,8 +29,8 @@ def PUa_1_0_SL_data(Nx=100):
     siga = np.tile(siga, (Nx,G))
     nu = np.tile(nu,(Nx,G))
     chi = np.tile(chi,(Nx,G))
-    """
     
+    """
     G = 2
     Nu = np.array([(3.24, 3.24)])
     Sig_f = np.array([(0.081600,0.081600)])
@@ -53,5 +54,5 @@ def PUa_1_0_SL_data(Nx=100):
         #siga[count,:] = Sig_a[:]
         chi[count,:]  = X[:]
         nu[count,:]   = Nu[:]
-    
+    """
     return sigt, sigs, siga, sigf, chi, nu, G

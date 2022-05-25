@@ -83,7 +83,7 @@ class Samples:
         return np.random.uniform(0,1,[self.N,self.totalDim])
     
     def SobolMatrix(self):
-        sampler = Sobol(d=self.totalDim,scramble=True)
+        sampler = Sobol(d=self.totalDim,scramble=self.RQMC)
         m = round(math.log(self.N, 2))
         return sampler.random_base2(m=m)
     
