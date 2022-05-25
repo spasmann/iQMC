@@ -14,6 +14,6 @@ if __name__ == "__main__":
     
     data1 = MultiGroupInit(N=N, generator="halton")
     SI = SourceIteration(data1)
-    SI.max_iter = 20
+    SI.max_iter = 50
     SI.Run()
     
