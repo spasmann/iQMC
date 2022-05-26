@@ -21,25 +21,23 @@ f3 = h5py.File(path+fname3, 'r')
 
 print("Keys: ", list(f1.keys()))
 
-phi1 = f1['phi_avg'][:]
-phi2 = f2['phi_avg'][:]
-phi3 = f3['phi_avg'][:]
+dphi1 = f1['delta_flux'][:]
+dphi2 = f2['delta_flux'][:]
+dphi3 = f3['delta_flux'][:]
 itt1 = f1['itt'][...]
 itt2 = f2['itt'][...]
 itt3 = f3['itt'][...]
 
-err1 = np.linalg.norm(norm1[:itt1-1] - norm1[1:])
-err2 = norm2[:itt2-1] - norm2[1:]
-err2 = norm3[:itt3-1] - norm3[1:]
-
 plt.figure(dpi=200, figsize=(8,5))
-plt.plot(range(itt1), norm1[:], label='random')
-plt.plot(range(itt3), norm3[:], label='halton')
-plt.plot(range(itt2), norm2[:], label='sobol')
+plt.plot(range(itt1), dphi1[:], label='random')
+plt.plot(range(itt2), dphi2[:], label='sobol')
+plt.plot(range(itt3), dphi3[:], label='halton')
 plt.grid()
 plt.yscale('log')
-plt.xticks(range(0,itt1+1,2))
+plt.xticks(range(0,itt3+1,2))
 plt.legend()
+plt.xlabel('Number of Iterations')
+plt.ylabel('Relative Residual')
 
 """
 # difference in norms between iterations

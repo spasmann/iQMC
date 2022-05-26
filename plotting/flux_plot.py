@@ -13,7 +13,8 @@ import h5py
 
 path = "../saved_data/"
 fname1 = "12-halton-1024-20"
-#fname1 = "reeds_data-halton-2048-80"
+#fname1 = "reeds_data-halton-1024-64"
+#fname2 = "reeds_data-random-4096-64"
 files = [fname1]
 
 plt.figure(dpi=200)

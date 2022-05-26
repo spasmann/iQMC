@@ -29,10 +29,11 @@ for k in generators:
     N = [2**10, 2**11, 2**12, 2**13, 2**14]
     Nx = [50*1, 50*2, 50*4, 50*8, 50*16]
     diagonal = False
-
+    
 
     if (diagonal):
-        diag = np.zeros(len(N))    
+        diag = np.zeros(len(N))
+        
         
     for i in range(len(Nx)):
         line = np.zeros(len(N))
