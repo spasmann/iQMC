@@ -9,9 +9,10 @@ import numpy as np
 
 if __name__ == "__main__":
     # initialize problem data
+    G = 70
     N = 2**10
     Nx = 5
-    data1 = MultiGroupInit(N=N, Nx=Nx, generator="halton")
+    data1 = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator="halton")
     SI = SourceIteration(data1)
     SI.max_iter = 50
     SI.Run()

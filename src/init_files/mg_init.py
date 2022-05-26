@@ -19,7 +19,7 @@ class MultiGroupInit:
         self.G = numGroups
         self.right = True
         self.left = True
-        self.source = np.ones((self.Nx, self.G))
+        self.source = np.ones((self.Nx,self.G))
         self.material_code = numGroups
         self.geometry = "slab"
         self.avg_scalar_flux = True
@@ -29,7 +29,6 @@ class MultiGroupInit:
         self.edge_current = False
         self.shannon_entropy = False
         self.save_data = True
-        self.moment_match = False
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)
         self.true_flux = TrueFlux(self.material, self.source, self.Nx)
@@ -38,8 +37,9 @@ class MultiGroupInit:
         self.phi_right = 0.5*self.true_flux[0,:]
         self.phi_right = np.reshape(self.phi_right, (1,self.G))
         
+        self.moment_match = False
+        
 
-    
 def TrueFlux(material, Q, Nx):
     """
     Analytic solution for infinite medium, slab, multigroup problem.

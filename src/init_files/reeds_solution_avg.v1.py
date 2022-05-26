@@ -44,11 +44,13 @@ def reeds_sol(Nx=16*100):
     dx = (RB-LB)/Nx
     left_edges = np.linspace(LB,RB-dx,Nx)
     right_edges = np.linspace(LB+dx,RB,Nx)
+    midpoints = np.linspace(LB+dx/2,RB-dx/2,Nx)
     y = np.zeros(Nx)
     
     for count in range(Nx):
         x1 = np.abs(left_edges[count])
         x2 = np.abs(right_edges[count])
+        x = midpoints[count]
         if (x < -6.0):
             y[count] = 0.5*(y5(x1) + y5(x2))
         elif (-6.0 < x < -5.0):
