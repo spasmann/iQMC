@@ -15,7 +15,7 @@ class MultiGroupInit:
         self.generator = generator
         self.totalDim = 4
         self.RB = 5
-        self.LB = -5
+        self.LB = 0
         self.G = numGroups
         self.right = True
         self.left = True
@@ -45,7 +45,7 @@ def TrueFlux(material, Q, Nx):
     Analytic solution for infinite medium, slab, multigroup problem.
     Returns array of (Nx, G)
     """
-    true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs[0,:]),Q[0,:])
+    true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs[0,:,:]),Q[0,:])
     true_flux = np.tile(true_flux, (Nx,1))
     return true_flux
         
