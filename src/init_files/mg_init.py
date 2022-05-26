@@ -32,7 +32,7 @@ class MultiGroupInit:
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.Q = np.ones(self.G)
         self.material = Material(self.material_code, self.geometry, self.mesh)
-        self.true_flux = TrueFlux(self.material, self.Q, self.Nx)
+        self.true_flux = TrueFlux(self.material, self.source, self.Nx)
         self.phi_left = 0.5*self.true_flux[0,:]
         self.phi_left = np.reshape(self.phi_left, (1,self.G))
         self.phi_right = 0.5*self.true_flux[0,:]
@@ -46,7 +46,7 @@ def TrueFlux(material, Q, Nx):
     Analytic solution for infinite medium, slab, multigroup problem.
     Returns array of (Nx, G)
     """
-    true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs[0,:,:]),Q)
+    true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs[0,:,:]),Q[0,:])
     true_flux = np.tile(true_flux, (Nx,1))
     return true_flux
         
