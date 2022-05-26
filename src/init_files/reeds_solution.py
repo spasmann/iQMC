@@ -7,10 +7,17 @@ Created on Mon Mar 28 13:22:51 2022
 """
 
 import numpy as np
+
+from scipy.integrate import quad
+
 """
-Analytic solution to reeds problem. Returns array and plot.
+Analytic solution to reeds problem. 
+
+This version calculates the solution as the cell average.
+
+Returns numpy array of size (Nx,1).
 """
-def reeds_sol(Nx=1000):
+def reeds_sol(Nx=16*100):
 
     y1 = lambda x: (1 - 5.96168047527760*10**(-47)*np.cosh(52.06761235859028*x) -
     6.78355315350872*10**(-56)*np.cosh(62.76152118553390*x) -
@@ -37,29 +44,34 @@ def reeds_sol(Nx=1000):
     LB = -8
     RB = 8
     dx = (RB-LB)/Nx
-    xspan = np.linspace(LB+dx/2,RB-dx/2,Nx)
+    left_edges = np.linspace(LB,RB-dx,Nx)
+    right_edges = np.linspace(LB+dx,RB,Nx)
+    midpoints = np.linspace(LB+dx/2,RB-dx/2,Nx)
     y = np.zeros(Nx)
-    count = 0
-    for x in xspan:
-        x = np.abs(x)
+    
+    for count in range(Nx):
+        x1 = np.abs(left_edges[count])
+        x2 = np.abs(right_edges[count])
+        x  = midpoints[count]
+        dx = x2-x1
         if (x < -6.0):
-            y[count] = y5(x)
-        elif (-6.0 < x < -5.0):
-            y[count] = y4(x)
-        elif (-5.0 < x < -3.0): #vacuum region 1
-            y[count] = y3(x)
-        elif (-3.0 < x < -2.0):
-            y[count] = y2(x)
-        elif (-2.0 < x < 2.0):
-            y[count] = y1(x)
-        elif (2.0 < x < 3.0):
-            y[count] = y2(x)
-        elif (3.0< x < 5.0): #vacuum region 2
-            y[count] = y3(x)
-        elif (5.0< x < 6.0):
-            y[count] = y4(x)
-        elif (6.0< x):
-            y[count] = y5(x)
-        count += 1
+            y[count] =  quad(y5, x1, x2)[0]/dx
+        elif (x < -5.0):
+            y[count] = quad(y4, x1, x2)[0]/dx
+        elif (x < -3.0): #vacuum region 1
+            y[count] = quad(y3, x1, x2)[0]/dx
+        elif (x < -2.0):
+            y[count] = quad(y2, x1, x2)[0]/dx
+        elif (x < 2.0):
+            y[count] = quad(y1, x1, x2)[0]/dx
+        elif (x < 3.0):
+            y[count] = quad(y2, x1, x2)[0]/dx
+        elif (x < 5.0): #vacuum region 2
+            y[count] = quad(y3, x1, x2)[0]/dx
+        elif (x < 6.0):
+            y[count] = quad(y4, x1, x2)[0]/dx
+        else:
+            y[count] = quad(y5, x1, x2)[0]/dx
+            
     y = np.reshape(y, (Nx,1))
     return y

@@ -27,9 +27,6 @@ class Tallies:
         if (init_data.shannon_entropy):
             self.SE = np.zeros((self.Nr, self.G), self.dtype)
             
-
-        
-        
         self.delta_flux = 1.0
         
     def Tally(self, particle, material, mesh):

@@ -8,7 +8,6 @@ class Particle:
         self.R = self.GetRadius(self.pos)
         self.dir = dir
         self.alive = True
-        self.group = 1
         self.ds = 0.0
         self.zone = 0
         

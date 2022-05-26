@@ -10,8 +10,8 @@ class Mesh:
         self.midpoints = np.linspace(LB+self.dx, RB-self.dx, Nx)
     def GetZone(self, r, mu):
         if (mu > 0):    
-            return np.argmax((r > self.lowR)*(r <= self.highR))
-        else:
             return np.argmax((r >= self.lowR)*(r < self.highR))
+        else:
+            return np.argmax((r > self.lowR)*(r <= self.highR))
 
     
