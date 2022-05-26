@@ -58,7 +58,7 @@ class SourceIteration:
         # calculate source for every cell individually
         q = np.zeros((self.material.Nx, self.material.G))
         for cell in range(self.material.Nx):
-            q[cell,:] = (np.dot(phi_avg[cell,:],self.material.sigs[cell,:,:])+self.source[cell,:]) 
+            q[cell,:] = (np.dot(phi_avg[cell,:],np.transpose(self.material.sigs[cell,:,:]))+self.source[cell,:]) 
         return q
 
     
