@@ -46,7 +46,7 @@ def TrueFlux(material, Q, Nx):
     Analytic solution for infinite medium, slab, multigroup problem.
     Returns array of (Nx, G)
     """
-    true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs),Q)
+    true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs[0,:,:]),Q)
     true_flux = np.tile(true_flux, (Nx,1))
     return true_flux
         

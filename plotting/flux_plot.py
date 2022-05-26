@@ -12,7 +12,7 @@ import h5py
 
 
 path = "../saved_data/"
-fname5 = "12-halton-1024-20"
+fname5 = "12-halton-1024-5"
 files = [fname5]
 
 plt.figure(dpi=200)

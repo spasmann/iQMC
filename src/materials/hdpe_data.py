@@ -18,6 +18,7 @@ def hdpe_data(material_code, Nx):
     siga = np.genfromtxt(abs_file_path+"Siga_{}G_HDPE.csv".format(G), delimiter=",")
     sigs = np.genfromtxt(abs_file_path+"Scat_{}G_HDPE.csv".format(G), delimiter=",")
     sigs = np.flip(sigs,1)
+    sigs = np.tile(sigs,(Nx,1,1))
     sigt = 1/(3*D)
     sigt = np.tile(sigt, (Nx,1))  # repeat sigt so its shape (Nx, G)
     
