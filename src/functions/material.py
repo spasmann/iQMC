@@ -6,12 +6,15 @@ Sigt and Siga cross sections need to be a matrix of size (Nx, G)
 """
 
 def MaterialAvail():
-    return ["garcia_data", 12, 70, 618, "reeds_data"]
+    return ["garcia_data", 12, 70, 618, "reeds_data",
+            "URRb_H2Oa5_2_0_SL_data", "PUa_1_0_SL_data",
+            "Ua_1_0_SL_data", "URRa_2_0_SL", "PUa_H2O_1_0_SL"]
 
 class Material:
     def __init__(self, material_code, geometry, mesh):
         self.mesh = mesh
         self.Nx = mesh.Nx
+        self.material_code = material_code
         
         if (material_code == "garcia_data"):
             from src.materials.garcia_data import garcia_data

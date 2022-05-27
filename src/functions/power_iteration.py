@@ -16,7 +16,8 @@ class PowerIteration:
         self.mesh = init_data.mesh
         self.material = self.init_data.material
         self.itt = 0
-        self.max_iter = 50
+        self.max_SI_iter = 50
+        self.max_PI_iter = 50
         self.k_tol = 1e-5
         self.phi_tol = 1e-5
         #self.norm_hist = np.empty((0,self.init_data.G))
@@ -35,11 +36,11 @@ class PowerIteration:
         print("Number of Spatial Cells: ", self.init_data.Nx)
         print("Initial K: ", self.k)
         # iterate over k effective
-        while (self.itt<self.max_iter) and (self.dk > self.k_tol):
+        while (self.itt<self.max_PI_iter) and (self.dk > self.k_tol):
             self.phi_f[:] = self.tallies.phi_avg[:]
             count = 0
             # iterate over scattering source
-            while (count < self.max_iter) and (self.tallies.delta_flux > self.phi_tol):
+            while (count < self.max_SI_iter) and (self.tallies.delta_flux > self.phi_tol):
                 self.tallies.phi_avg_old[:] = self.tallies.phi_avg[:] # shallow copy
                 self.q = self.GetSource(self.tallies.phi_avg, self.phi_f)
                 self.sweep.Run(self.tallies, self.q)
