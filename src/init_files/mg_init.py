@@ -30,7 +30,6 @@ class MultiGroupInit:
         self.shannon_entropy = False
         self.save_data = True
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
-        self.Q = np.ones(self.G)
         self.material = Material(self.material_code, self.geometry, self.mesh)
         self.true_flux = TrueFlux(self.material, self.source, self.Nx)
         self.phi_left = 0.5*self.true_flux[0,:]

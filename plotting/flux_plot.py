@@ -12,8 +12,9 @@ import h5py
 
 
 path = "../saved_data/"
-fname5 = "12-halton-1024-5"
-files = [fname5]
+fname1 = "12-halton-1024-5"
+files = [fname1]
+
 
 plt.figure(dpi=200)
 count = 0
@@ -25,16 +26,24 @@ for file in files:
     RB = f['RB'][...]
     LB = f['LB'][...]
     Nx = f['Nx'][...]
-    N = f['N'][...]
     generator = f['generator'][...]
-    midpoints = np.linspace(LB,RB,Nx)
+    dx = (RB-LB)/Nx
+    midpoints = np.linspace(LB+dx/2,RB-dx/2,Nx)
     for G in range(phi.shape[1]):
         plt.plot(midpoints, phi[:][:,G], label=files[count])
 
     f.close()
     count += 1
+
 plt.plot(midpoints, true[:],'--', label="true")  
 
 plt.xlabel(r'Spatial Position $x$')
 plt.ylabel(r'Cell Averaged Scalar Flux $\phi$')
 #plt.legend()
+
+plt.plot(midpoints, true[:], '--',label="true")  
+
+plt.xlabel(r'Spatial Position $x$')
+plt.ylabel(r'Cell Averaged Scalar Flux $\phi$')
+#plt.legend()
+

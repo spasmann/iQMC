@@ -10,71 +10,60 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 import h5py
-
+import itertools
+marker = itertools.cycle(('*', 's', '^', 'o', 'P','x','D')) 
 
 path = "../saved_data/"
-fname1 = "reeds_data-halton-32768-80"
-fname2 = "reeds_data-halton-32768-160"
-fname3 = "reeds_data-halton-32768-320"
-fname4 = "reeds_data-halton-32768-640"
-fname5 = "reeds_data-halton-32768-1280"
-fname6 = "reeds_data-halton-32768-2560"
-fname7 = "reeds_data-halton-65536-80"
-fname8 = "reeds_data-halton-65536-160"
-fname9 = "reeds_data-halton-65536-320"
-fname10 = "reeds_data-halton-65536-640"
-fname11 = "reeds_data-halton-65536-1280"
-fname12 = "reeds_data-halton-65536-2560"
-fname13 = "reeds_data-halton-131072-80"
-fname14 = "reeds_data-halton-131072-160"
-fname15 = "reeds_data-halton-131072-320"
-fname16 = "reeds_data-halton-131072-640"
-fname17 = "reeds_data-halton-131072-1280"
-fname18 = "reeds_data-halton-131072-2560"
-fname19 = "reeds_data-halton-262144-80"
-fname20 = "reeds_data-halton-262144-160"
-fname21 = "reeds_data-halton-262144-320"
-fname22 = "reeds_data-halton-262144-640"
-fname23 = "reeds_data-halton-262144-1280"
+gen1 = "halton"
+gen2 = "random"
+generators = [gen2]
+plt.figure(dpi=300)
+for k in generators:
+    generator = k
 
-"""
-files = [fname1,fname2,fname3,fname4,fname5,fname6,fname7,
-         fname8,fname9,fname10,fname11,fname12,fname13,fname14,
-         fname15,fname16,fname17,fname18,fname19,fname20,fname21,
-         fname22,fname23]
-"""
-N32768 = [fname1,fname2,fname3,fname4,fname5,fname6]
-N65536 = [fname7,fname8,fname9,fname10,fname11,fname12]
-N131072 = [fname13,fname14,fname15,fname16,fname17,fname18]
-N262144 = [fname19,fname20,fname21,fname22,fname2]
-
-
-files = [N32768, N65536, N131072, N262144]
-numN = len(files)
-numNx = 5
-N = [32768, 65536, 131072, 262144]
-Nx = [80, 80*2, 80*4, 80*8, 80*16]
-plt.figure(dpi=200,figsize=(8,5))
-
-count = 0
-for i in range(numN):
-    error = np.zeros(numNx)
-    for j in range(numNx):
-        file = files[i][j]
-        f = h5py.File(path+file, 'r')
-        error[j] = f['error'][:][-1]
-        f.close()
-        print(error)
-    plt.plot(Nx, error)
+    #problem = "reeds_data"
+    #N = [2**9, 2**10, 2**11, 2**12, 2**13]
+    #Nx = [16*2, 16*4, 16*8, 16*16, 16*32] 
     
-plt.legend(loc="upper right")
-matplotlib.rcParams.update({'font.size': 16})
-plt.grid()
-plt.xscale('log')
-plt.xlabel('Nx')
-ylabel = r'$||\frac{\phi_i - \phi}{\phi}||_\infty$'
-plt.ylabel(ylabel)
+    problem = "garcia_data"
+    N = [2**10, 2**11, 2**12, 2**13, 2**14]
+    Nx = [50*1, 50*2, 50*4, 50*8, 50*16]
+    diagonal = False
 
 
-
-
+    if (diagonal):
+        diag = np.zeros(len(N))    
+        
+    for i in range(len(Nx)):
+        line = np.zeros(len(N))
+        for j in range(len(N)):
+            try:
+                file = path+problem+"-"+generator+"-"+str(N[j])+"-"+str(Nx[i])
+                f = h5py.File(file, 'r')    
+                line[j] = f['error'][:][-1]
+                if (diagonal):
+                    if (i == j):
+                       diag[j] = f['error'][:][-1]
+                f.close()
+        # theoretical convergence line
+            except:
+                print("File DNE: "+file)
+        # which values of Nx to actually plot
+        if (Nx[i] == 128):# or (Nx[i] == 128) or (Nx[i] == 256):
+            plt.plot(N,line,label="Nx="+str(Nx[i]),marker=next(marker))
+        if (Nx[i] == 128):
+            # 1/sqrt(N) convergence (MC)
+            #plt.plot(N,line[0]*np.sqrt(N[0])/np.sqrt(N),'r-',label=r"$O(N^{-0.5})$")
+            # 1/N convergence (QMC)
+            plt.plot(N,line[0]*N[0]/N,'r-',label=r"$O(N^{-1})$")
+        
+    
+    if (diagonal):
+        plt.plot(N,diag,"k--",label=r'$Nx(n)=16*2^{n}$')
+    plt.yscale('log')
+    plt.xscale('log')
+    plt.xlabel("N")
+    ylabel = r'$||\phi - \phi_t||_\infty$'
+    plt.ylabel(ylabel)
+    plt.legend()
+    plt.title("Reeds Problem Absolute Error")
