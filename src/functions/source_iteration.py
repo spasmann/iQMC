@@ -38,8 +38,9 @@ class SourceIteration:
             print("**********************")
             print("Iteration:", self.itt, "change: ",self.tallies.delta_flux)
             if (self.init_data.true_flux.any()):
-                relError = np.abs(self.tallies.phi_avg - self.init_data.true_flux)/self.init_data.true_flux
-                infNorm = np.linalg.norm(relError, np.inf)
+                #relError = np.abs(self.tallies.phi_avg - self.init_data.true_flux)/self.init_data.true_flux
+                Err = np.abs(self.tallies.phi_avg - self.init_data.true_flux)
+                infNorm = np.linalg.norm(Err, np.inf)
                 self.error = np.append(self.error, infNorm)
         
         if (self.save_data):
@@ -51,14 +52,14 @@ class SourceIteration:
             return (np.dot(phi_avg,np.transpose(self.material.sigs)) + self.source)
         else:
             return (phi_avg*self.material.sigs + self.source)
-    """
     
+    """
     def GetSource(self, phi_avg):
         # calculate source for every cell individually
         q = np.zeros((self.material.Nx, self.material.G))
         for cell in range(self.material.Nx):
-            q[cell,:] = (np.dot(phi_avg[cell,:],np.transpose(self.material.sigs[cell,:,:])) + self.source[cell,:])
+            q[cell,:] = (np.dot(phi_avg[cell,:],np.transpose(self.material.sigs[cell,:,:]))+self.source[cell,:]) 
         return q
-    
+
     
     

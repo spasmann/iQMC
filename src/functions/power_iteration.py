@@ -64,7 +64,6 @@ class PowerIteration:
             SaveData(self.init_data, self)        
 
 
-    #@njit
     def GetSource(self, phi_avg_s, phi_avg_f):
         """
         Calculate source term for every cell individually (loop)
@@ -83,7 +82,7 @@ class PowerIteration:
         for cell in range(self.material.Nx):
             q[cell,:] = (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:]) 
                         + np.dot(phi_avg_f[cell,:]*self.material.sigf[cell,:]*self.material.nu[cell,:],self.material.chi[cell,:])/self.k)
-            assert (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])[0] >=  phi_avg_s[cell,:][0])
+            #assert (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])[0] >=  phi_avg_s[cell,:][0])
             #assert (np.sum(np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])) == np.sum(phi_avg_s[cell,:]))
         return q
     
@@ -92,7 +91,7 @@ class PowerIteration:
         self.k_old = self.k
         self.k = self.k*(np.sum(self.material.nu*self.material.sigf*self.tallies.phi_avg)
                         /np.sum(self.material.nu*self.material.sigf*self.phi_f))
-    #@njit
+
     def DeltaK(self):
         self.dk = abs(self.k-self.k_old)
         

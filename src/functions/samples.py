@@ -64,7 +64,7 @@ class Samples:
         for i in range(self.N):
             randMu = self.rng[i,self.counter]
             pos = np.array((self.RB - 1e-9,))
-            mu = -np.sqrt(randMu) + 1e-9
+            mu = -np.sqrt(randMu) - 1e-9
             weight = self.BoundaryWeight(self.phi_right)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
@@ -122,9 +122,8 @@ class Samples:
         return weight
     
     def BoundaryWeight(self, BV):
-        # BV: boundary value, i.e. phi_left or phi_right
-        weight = BV/self.N*self.geometry.SurfaceArea()
-        return weight
+        # BV: boundary value, i.e. phi_left or phi_right 
+        return (self.geometry.SurfaceArea()*BV/self.N)
  
     def moment_matching(self):
         ## Currently only shifting volumetric particles

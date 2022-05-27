@@ -7,19 +7,12 @@ from src.functions.source_iteration import SourceIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    N = 2**5
-    data1 = GarciaInit(N=N, generator="sobol")
-    #data2 = GarciaInit(N=N, generator="sobol")
-    
+    N = 2**9
+    data = GarciaInit(N=N, generator="halton")
     # initialize source iteration
-    SI = SourceIteration(data1)
+    SI = SourceIteration(data)
     SI.max_iter = 20
     # run source iteration
     SI.Run()
-
-    #SI = SourceIteration(data2)
-    #SI.max_iter = 20
-    # run source iteration
-    #SI.Run()
 
 
