@@ -51,6 +51,10 @@ class Material:
             self.sigt, self.sigs, self.sigf, self.siga, self.chi, self.nu, self.G = PUa_H2O_1_0_SL_data(self.Nx)
             self.media = 2
             
+        elif (material_code == "SHEM_361"):
+            from src.materials.SHEM_361_data import SHEM_361_data
+            self.sigt, self.sigs, self.siga, self.sigf, self.chi, self.nu, self.G = SHEM_361_data(self.Nx)
+            
         elif (material_code == 12 or 70 or 618):
             from src.materials.hdpe_data import hdpe_data
             self.sigt, self.sigs, self.siga, self.G = hdpe_data(material_code,self.Nx)
