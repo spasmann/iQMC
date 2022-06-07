@@ -29,7 +29,7 @@ def SI_Map(phi_in, qmc_data):
     sweep.Run(tallies, source)
     phi_out = tallies.phi_avg
     phi_out = np.reshape(phi_out,Nv,)
-    return phi_out
+    return (phi_out, tallies)
 
 
 def RHS(qmc_data):
@@ -48,7 +48,7 @@ def RHS(qmc_data):
     return bout
 
 
-def MXV_data():
+def MXV_data(qmc_data):
     """
     MXV_data(qmc_data)
     ------------------
@@ -60,7 +60,7 @@ def MXV_data():
     return mxv_data
 
 
-def MXV(phi_in, mxv_data):
+def MXV(mxv_data, phi_in):
     """
     MXV(phi_in, mxv_data)
     ---------------------
