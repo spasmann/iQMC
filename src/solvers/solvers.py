@@ -8,14 +8,15 @@ Created on Tue Jun  7 13:18:01 2022
 import sys
 sys.path.append("/Users/sampasmann/Documents/GitHub/QMC1D/")
 import numpy as np
-from src.solvers.maps import SI_Map, RHS, MXV_data, MXV
+from src.solvers.maps import SI_Map, RHS, MatVec_data, MatVec
 from scipy.sparse.linalg import gmres, LinearOperator
 
 from src.init_files.mg_init import MultiGroupInit
+from src.init_files.garcia_init import GarciaInit
 #from src.functions.save_data import SaveData
 
 
-def Picard(phi0,SI_Map,tol,maxit,qmc_data,report_progress=False):
+def Picard(qmc_data,tol=1e-5,maxit=50,report_progress=False):
     """
     Parameters
     ----------
@@ -39,6 +40,7 @@ def Picard(phi0,SI_Map,tol,maxit,qmc_data,report_progress=False):
         print("Number of Spatial Cells: ", qmc_data.Nx)
     Nx      = qmc_data.Nx
     G       = qmc_data.G
+    phi0    = qmc_data.source
     itc     = 0
     diff    = 1.0
     phic    = np.copy(phi0)
@@ -46,8 +48,8 @@ def Picard(phi0,SI_Map,tol,maxit,qmc_data,report_progress=False):
     reshist = np.empty(0)
     
     while (itc < maxit) and (diff > tol):
-        out     = SI_Map(phic, qmc_data)
-        phi     = np.reshape(out[0],(Nx,G))
+        phi_out = SI_Map(phic, qmc_data)
+        phi     = np.reshape(phi_out,(Nx,G))
         diff    = np.linalg.norm((phic-phi))
         reshist = np.append(reshist, diff)
         phic    = np.copy(phi)
@@ -55,35 +57,33 @@ def Picard(phi0,SI_Map,tol,maxit,qmc_data,report_progress=False):
         if (report_progress):
             print("**********************")
             print("Iteration:", itc, "change: ",diff)
-    tallies = out[1]
-    return [phi, reshist, tallies]
+    #tallies = out[1]
+    return [phi, reshist]
 
 
 
-def GMRES(phi0,SI_Map,tol,maxit,qmc_data):
+def GMRES(qmc_data,tol=1e-5,maxit=50):
     """
     Parameters
     ----------
-    phi0 : TYPE
-        DESCRIPTION.
-    SI_Map : TYPE
-        DESCRIPTION.
-    tol : TYPE
-        DESCRIPTION.
-    maxit : TYPE
-        DESCRIPTION.
     qmc_data : TYPE
         DESCRIPTION.
+    tol : TYPE, optional
+        DESCRIPTION. The default is 1e-5.
+    maxit : TYPE, optional
+        DESCRIPTION. The default is 50.
 
     Returns
     -------
-    None.
+    phi : TYPE
+        DESCRIPTION.
+
     """
     Nx       = qmc_data.Nx
     G        = qmc_data.G
-    mxv_data = MXV_data(qmc_data)
-    A        = LinearOperator((Nx,G), matvec=MXV)
-    b        = mxv_data[0]
+    matvec_data = MatVec_data(qmc_data)
+    A        = LinearOperator((Nx,G), matvec=MatVec) # this line is the problem
+    b        = matvec_data[0]
     phi0     = qmc_data.source
     
     gmres_out = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit)
@@ -94,11 +94,9 @@ def GMRES(phi0,SI_Map,tol,maxit,qmc_data):
 
 
 if (__name__ == "__main__"):
-    
-    qmc_data = MultiGroupInit(generator="halton")
-    tol = 1e-5
-    maxit = 25
-    phi0 = qmc_data.source
-    phi_out = GMRES(phi0,SI_Map,tol,maxit,qmc_data)
-    #out = Picard(phi0,SI_Map,tol,maxit,qmc_data,report_progress=True)
+    Nx = 10
+    qmc_data = MultiGroupInit(Nx=Nx, generator="halton")
+    maxit = 20
+    phi_out = GMRES(qmc_data,maxit=maxit)
+    #out = Picard(qmc_data,maxit=maxit,report_progress=True)
     #tallies = out[2]

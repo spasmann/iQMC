@@ -5,8 +5,8 @@ from src.init_files.reeds_init import ReedsInit
 from src.functions.source_iteration import SourceIteration
 
 if __name__ == "__main__":
-    N = 2**10
-    Nx = 16*4
+    N = 2**11
+    Nx = 16*6
     generator = "halton"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     

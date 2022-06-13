@@ -17,9 +17,7 @@ class SourceIteration:
         self.tol = 1e-6
         self.norm_hist = np.empty((0,self.init_data.G))
         self.tallies = Tallies(self.init_data)
-        self.sweep = Sweep(self.init_data,
-                           self.mesh,
-                           self.material)
+        self.sweep = Sweep(self.init_data)
         self.error = np.empty((0,1))
         self.fname = "default"
     def Run(self):

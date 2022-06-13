@@ -10,6 +10,8 @@ from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource
 
+from src.init_files.mg_init import MultiGroupInit
+
 def SI_Map(phi_in, qmc_data):
     """
     SI_Map(phi_in, qmc_data)
@@ -29,7 +31,7 @@ def SI_Map(phi_in, qmc_data):
     sweep.Run(tallies, source)
     phi_out = tallies.phi_avg
     phi_out = np.reshape(phi_out,Nv,)
-    return (phi_out, tallies)
+    return phi_out
 
 
 def RHS(qmc_data):
@@ -43,40 +45,40 @@ def RHS(qmc_data):
     G   = qmc_data.G
     Nx  = qmc_data.Nx
     Nv  = Nx*G
-    zed = np.zeros(Nv)
+    zed = np.zeros(Nv,)
     bout = SI_Map(zed,qmc_data)
     return bout
 
 
-def MXV_data(qmc_data):
+def MatVec_data(qmc_data):
     """
     MXV_data(qmc_data)
     ------------------
     This function adds the right side of the linear system to Sam's 
     qmc_data structure so I can pass it to the matrix-vector product.
     """
-    b = RHS(qmc_data)
-    mxv_data = (b, qmc_data)
-    return mxv_data
+    b   = RHS(qmc_data)
+    global matvec_data
+    matvec_data = [b, qmc_data]
+    return matvec_data
 
 
-def MXV(mxv_data, phi_in):
+def MatVec(phi_in):
     """
-    MXV(phi_in, mxv_data)
+    MXV(phi_in)
     ---------------------
     We solve A x = b with a Krylov method. This function extracts the
     matrix-vector product A * phi_in from Sam's qmc_data structure by 
     doing a transport sweep with zero boundary conditions and zero external
     source.
     """
-    b           = mxv_data[0]
-    qmc_data    = mxv_data[1]
-    mxvp        = SI_Map(phi_in ,qmc_data)
+    b           = matvec_data[0]
+    qmc_data    = matvec_data[1]
+    mxvp        = SI_Map(phi_in, qmc_data)
     mxv         = mxvp - b
     axv         = phi_in - mxv
+    
     return axv
-
-
 
 
 
