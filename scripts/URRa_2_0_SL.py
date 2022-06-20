@@ -16,7 +16,8 @@ if __name__ == "__main__":
     data = URRa_2_0_SL_init(N=1000, Nx=25, generator="halton")
     data.save_data = False
 
-    SI = PowerIteration(data)
-    SI.max_iter = 10
+    PI = PowerIteration(data)
+    PI.max_SI_iter = 10
+    PI.max_PI_iter = 10
     # run source iteration
-    SI.Run() 
+    PI.Run() 

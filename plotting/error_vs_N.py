@@ -14,6 +14,7 @@ import itertools
 marker = itertools.cycle(('*', 's', '^', 'o', 'P','x','D')) 
 
 path = "../saved_data/"
+problem = "garcia_data"
 gen1 = "halton"
 gen2 = "random"
 generators = [gen2]
@@ -25,7 +26,6 @@ for k in generators:
     #N = [2**9, 2**10, 2**11, 2**12, 2**13]
     #Nx = [16*2, 16*4, 16*8, 16*16, 16*32] 
     
-    problem = "garcia_data"
     N = [2**10, 2**11, 2**12, 2**13, 2**14]
     Nx = [50*1, 50*2, 50*4, 50*8, 50*16]
     diagonal = False

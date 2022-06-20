@@ -60,7 +60,7 @@ def reeds_sol(Nx=80, LB=-8.0, RB=8.0):
                 - 6.336401143340483*10**(-7)*np.exp(1.108937229227813*x) \
                 - 3.528757679361232*10**(-8)*np.exp(1.615640334315550*x) \
                 - 4.405514335746888*10**(-18)*np.exp(4.554850586269065*x)
-    
+
     def f_phi(x1, x2):
         midpoint = (x2+x1)*0.5
         x1 = abs(x1)
@@ -98,6 +98,7 @@ def reeds_sol(Nx=80, LB=-8.0, RB=8.0):
     dx = (RB-LB)/Nx
     left_edges = np.linspace(LB,RB-dx,num=Nx)
     right_edges = left_edges+dx
+    
     for i in range(Nx):
         phi_ref[i] = f_phi(left_edges[i],right_edges[i])
     phi_ref = np.reshape(phi_ref, (Nx,1))
@@ -106,5 +107,7 @@ def reeds_sol(Nx=80, LB=-8.0, RB=8.0):
 
 if (__name__ == "__main__"):
     import matplotlib.pyplot as plt
-    phi = reeds_sol()
-    plt.plot(range(80),phi)
+    Nx  = 16*10
+    phi = reeds_sol(Nx=Nx)
+    plt.plot(range(Nx),phi)
+
