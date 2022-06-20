@@ -24,13 +24,13 @@ def SI_Map(phi_in, qmc_data):
     try:
         (Nv == Nx*G)  
     except Exception as e: print(e) 
-    phi_avg = np.reshape(phi_in, (Nx,G))
-    source  = GetSource(phi_avg, qmc_data)
+    phi_in = np.reshape(phi_in, (Nx,G))
+    source  = GetSource(phi_in, qmc_data)
     tallies = Tallies(qmc_data)
     sweep   = Sweep(qmc_data)
     sweep.Run(tallies, source)
     phi_out = tallies.phi_avg
-    phi_out = np.reshape(phi_out,Nv,)
+    phi_out = np.reshape(phi_out,(Nv,1))
     return phi_out
 
 
@@ -45,7 +45,7 @@ def RHS(qmc_data):
     G   = qmc_data.G
     Nx  = qmc_data.Nx
     Nv  = Nx*G
-    zed = np.zeros(Nv,)
+    zed = np.zeros((Nx,G))
     bout = SI_Map(zed,qmc_data)
     return bout
 
@@ -74,6 +74,15 @@ def MatVec(phi_in):
     """
     b           = matvec_data[0]
     qmc_data    = matvec_data[1]
+    Nx = qmc_data.Nx
+    G = qmc_data.G
+    Nv = Nx*G
+    #try:
+    #    assert(phi_in == (Nv,1))
+    #except:
+            #print(phi_in.shape)
+    phi_in = np.reshape(phi_in,(Nv,1))
+            
     mxvp        = SI_Map(phi_in, qmc_data)
     mxv         = mxvp - b
     axv         = phi_in - mxv

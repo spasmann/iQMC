@@ -19,6 +19,15 @@ def GetSource(phi_avg, qmc_data):
     q : source term, calculated per spatial cell, for source iteration
 
     """
+    """
+    try:
+        assert(phi_avg.size == (Nx,G))
+    except:
+        print(phi_avg.size)
+        Nx = qmc_data.Nx
+        G = qmc_data.G
+        phi_avg = np.reshape(phi_avg,(Nx,G))
+    """
     material = qmc_data.material
     source   = qmc_data.source
     # calculate source for every cell individually
