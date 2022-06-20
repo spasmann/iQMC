@@ -5,7 +5,7 @@ from src.functions.material import Material
 from src.functions.mesh import Mesh
 
 class GarciaInit:
-    def __init__(self, N=2**12, Nx=20, generator="random"):
+    def __init__(self, N=2**12, Nx=20, generator="sobol"):
         self.N = N
         self.Nx = Nx
         self.generator = generator

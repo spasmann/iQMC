@@ -9,14 +9,12 @@ import numpy as np
 
 if __name__ == "__main__":
     # initialize problem data
-    G = 70
+    G = 12
     N = 2**10
     Nx = 5
-    data1 = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator="halton")
-    SI = SourceIteration(data1)
+    data = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator="halton")
+    SI = SourceIteration(data)
     SI.max_iter = 50
     SI.Run()
-    
 
     
-

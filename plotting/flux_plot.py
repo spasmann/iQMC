@@ -12,10 +12,9 @@ import h5py
 
 
 path = "../saved_data/"
-fname1 = "70-halton-1024-5"
-#fname1 = "reeds_data-halton-1024-64"
-#fname2 = "reeds_data-random-4096-64"
+fname1 = "reeds_data-halton-2048-96"
 files = [fname1]
+
 
 plt.figure(dpi=200)
 count = 0
@@ -35,8 +34,10 @@ for file in files:
 
     f.close()
     count += 1
+
 plt.plot(midpoints, true[:], '--',label="true")  
 
 plt.xlabel(r'Spatial Position $x$')
 plt.ylabel(r'Cell Averaged Scalar Flux $\phi$')
-#plt.legend()
+plt.legend()
+

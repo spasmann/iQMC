@@ -21,14 +21,16 @@ def material_test():
     materials = MaterialAvail()
     geometry = "slab"
     Nx = 5
+    LB = 0
     RB = 5
-    mesh = Mesh(Nx, np.array((RB,)))
+    mesh = Mesh(LB,RB,Nx)
     for material_code in materials:
         material = Material(material_code, geometry, mesh)
         # begin tests
         are_numpy_arrays(material)
-        #are_correct_size(material, Nx)
-        #sum_to_sigt(material)
+        are_correct_size(material, Nx)
+        sum_to_sigt(material)
+        matrices_in_correct_order(material)
     return  
     
 def are_numpy_arrays(material):
@@ -38,18 +40,26 @@ def are_numpy_arrays(material):
     
 def are_correct_size(material, Nx):
     assert (material.sigt.shape == (Nx, material.G))
-    assert (material.siga.shape == (Nx, material.G))
-    if (material.G > 1):
-        assert (material.sigs.shape == (material.G, material.G))
-    else:
-        assert (material.sigs.shape == (Nx, material.G))
-    
+    #assert (material.siga.shape == (Nx, material.G))
+    assert (material.sigs.shape == (Nx, material.G, material.G))
+
 def sum_to_sigt(material):
     siga = material.siga
-    sigs = np.sum(material.sigs,axis=0) # if multigroup the groups need to be summed
+    sigs = material.sigs.sum(1) # if multigroup the groups need to be summed
     sigt = material.sigt # need to change how this is done later
-    #assert (siga + sigs == sigt).all()
+    try:
+        assert ((sigt - siga - sigs) <= 1e-9).all()
+    except:
+        print("Siga & Sigs from material ",material.material_code, " does not sum to Sigt")
     return
+
+def matrices_in_correct_order(material):
+    try:
+        assert (material.sigt[0,0] <= material.sigt[0,-1])
+    except:
+        print("Sigt for material ",material.material_code," are not in order")
+    return
+    
 
 if __name__ == "__main__":
     material_test()
