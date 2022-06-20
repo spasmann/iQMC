@@ -12,6 +12,8 @@ class Material:
     def __init__(self, material_code, geometry, mesh):
         self.mesh = mesh
         self.Nx = mesh.Nx
+        self.LB = mesh.LB
+        self.RB = mesh.RB
         
         if (material_code == "garcia_data"):
             from src.materials.garcia_data import garcia_data
@@ -20,7 +22,7 @@ class Material:
             
         elif (material_code == "reeds_data"):
             from src.materials.reeds_data import reeds_data
-            self.sigt, self.sigs, self.siga, self.source, self.G = reeds_data(self.Nx)
+            self.sigt, self.sigs, self.siga, self.source, self.G = reeds_data(self.Nx, LB=self.LB, RB=self.RB)
             self.media = 9
             
         elif (material_code == "URRb_H2Oa5_2_0_SL_data"):

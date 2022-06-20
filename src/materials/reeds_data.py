@@ -8,10 +8,8 @@ Created on Mon Mar 28 13:22:41 2022
 import numpy as np
 from time import process_time
 
-def reeds_data(Nx=1000):
+def reeds_data(Nx=1000, LB=-8.0, RB=8.0):
     G = 1 # number of energy groups
-    LB = -8
-    RB = 8
     sigt = np.empty((Nx,G))
     sigs = np.empty((Nx,G,G))
     source = np.empty((Nx,G))
@@ -51,7 +49,7 @@ def reeds_data(Nx=1000):
             sigt[count,:] = 1.0
             sigs[count,:,:] = 0.9
             source[count,:] = 1.0
-        elif (6< x):
+        elif (6 < x):
             sigt[count,:] = 1.0
             sigs[count,:,:] = 0.9
             source[count,:] = 0.0
