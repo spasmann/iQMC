@@ -82,6 +82,7 @@ def shift_samples(LB, RB, x_values, plot=False):
     
     return x
 
+
 def shift_samples_sympy(LB, RB, x_values, plot=False):
     
     E = (RB+LB)/2
