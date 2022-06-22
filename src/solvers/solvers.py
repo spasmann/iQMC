@@ -127,7 +127,7 @@ def LGMRES(qmc_data,tol=1e-5,maxit=50):
                               rmatvec=MatVec,
                               matmat= MatVec,
                               rmatmat=MatVec,
-                              dtype=float) # this line is the problem
+                              dtype=float)
     b        = matvec_data[0]
     phi0     = qmc_data.source
     phi0 = np.reshape(phi0,(Nv,1))

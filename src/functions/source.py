@@ -7,6 +7,7 @@ Created on Tue Jun  7 14:22:43 2022
 """
 import numpy as np
 
+
 def GetSource(phi_avg, qmc_data):
     """
     Parameters
@@ -52,9 +53,6 @@ def GetSource(phi_avg, qmc_data):
     Returns
     -------
     q : source term
-
-
-
    
     q = np.empty((self.material.Nx, self.material.G), np.float64)
     for cell in range(self.material.Nx):
@@ -65,3 +63,27 @@ def GetSource(phi_avg, qmc_data):
     return q
 
     """
+    """
+if (__name__ == "__main__"):
+    from src.init_files.mg_init import MultiGroupInit
+    import time
+    N = 2**10
+    Nx = 1000
+    G = 12
+    generator = "halton"
+    data = MultiGroupInit(numGroups=G ,N=N, Nx=Nx, generator=generator)
+    phi0 = np.ones((Nx,G))
+    
+    start = time.time()
+    GetSource(phi0, data)
+    stop = time.time()
+    print(stop-start, " seconds")
+    
+    start = time.time()
+    GetSource(phi0, data)
+    stop = time.time()
+    print(stop-start, " seconds")
+    
+    """
+    
+    
