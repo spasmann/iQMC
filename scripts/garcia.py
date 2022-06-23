@@ -3,8 +3,8 @@
 import sys
 sys.path.append("../")
 from src.init_files.garcia_init import GarciaInit
-from src.functions.source_iteration import SourceIteration
-#from src.solvers.solvers import Picard
+from src.solvers.solvers import LGMRES
+
 
 if __name__ == "__main__":
     # initialize problem data

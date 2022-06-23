@@ -2,21 +2,34 @@
 import sys
 sys.path.append("../")
 from src.init_files.reeds_init import ReedsInit
-from src.functions.source_iteration import SourceIteration
+from src.init_files.reeds_solution import reeds_julia_sol
+from src.solvers.solvers import LGMRES
+import matplotlib.pyplot as plt
+from mpi4py import MPI
+import numpy as np
+import time
 
 if __name__ == "__main__":
-    N = 2**11
-    Nx = 16*6
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+    procname = MPI.Get_processor_name()
+    
+    N = 2**12
+    Nx = 80
+    G = 1
     generator = "halton"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
-    
-    SI = SourceIteration(data)
-    SI.max_iter = 100
-    SI.Run()
-    
-        
+    start = time.time()
+    phi = LGMRES(data)
+    stop = time.time()
+    if (rank == 0):
+        print("Time: ",stop-start)
+        julia = reeds_julia_sol()
+        print("Julia-Python Diff: ")
+        print(abs(julia - phi).max())
         
 
     
-
-    
+        
+        

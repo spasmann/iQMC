@@ -5,11 +5,13 @@ Created on Tue Jun  7 13:18:01 2022
 
 @author: sampasmann
 """
-import sys
-sys.path.append("/Users/sampasmann/Documents/GitHub/QMC1D/")
+
 import numpy as np
+import time
+from mpi4py import MPI
 from src.solvers.maps import SI_Map, RHS, MatVec_data, MatVec
-from scipy.sparse.linalg import gmres, bicgstab, LinearOperator
+from src.functions.save_data import SaveData
+from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 
 
 
@@ -29,7 +31,11 @@ def Picard(qmc_data,tol=1e-5,maxit=50,report_progress=False):
     None.
 
     """
-    if (report_progress):
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+    
+    if (report_progress) and (rank==0):
         print("--------- Source Iteration ---------")
         print("Material: ", qmc_data.material_code)
         print("Random Number Generator: ", qmc_data.generator)
@@ -43,7 +49,7 @@ def Picard(qmc_data,tol=1e-5,maxit=50,report_progress=False):
     phic    = np.copy(phi0)
     phi     = np.copy(phi0)
     reshist = np.empty(0)
-    
+    start = time.time()
     while (itc < maxit) and (diff > tol):
         phi_out = SI_Map(phic, qmc_data)
         phi     = np.reshape(phi_out,(Nx,G))
@@ -51,10 +57,14 @@ def Picard(qmc_data,tol=1e-5,maxit=50,report_progress=False):
         reshist = np.append(reshist, diff)
         phic    = np.copy(phi)
         itc += 1
-        if (report_progress):
+        if (report_progress) and (rank==0):
             print("**********************")
             print("Iteration:", itc, "change: ",diff)
-    #tallies = out[1]
+    stop = time.time()
+    run_time = stop-start
+    if (rank==0):
+        sim_data = SimData(phi_out, run_time, tol, nproc)
+        SaveData(qmc_data, sim_data)
     return phi
 
 
@@ -76,11 +86,14 @@ def GMRES(qmc_data,tol=1e-5,maxit=50):
         DESCRIPTION.
 
     """
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+    
     Nx       = qmc_data.Nx
     G        = qmc_data.G
     Nv       = Nx*G
-    global itt
-    itt = 0
+    start = time.time()
     matvec_data = MatVec_data(qmc_data)
     A        = LinearOperator((Nv,Nv), 
                               matvec=MatVec,
@@ -95,11 +108,68 @@ def GMRES(qmc_data,tol=1e-5,maxit=50):
     gmres_out = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit)
     phi = gmres_out[0]
     phi = np.reshape(phi, (Nx,G))
+    stop = time.time()
+    run_time = stop-start
     
-    if (gmres_out[1]>0):
-        print("Convergence to tolerance not achieved: Maximum number of iterations.")
-    elif (gmres_out[1]<0):
-        print("Illegal input or breakdown")
+    if (rank==0):
+        sim_data = SimData(phi, run_time, tol, nproc)
+        SaveData(qmc_data, sim_data)
+        if (gmres_out[1]>0):
+            print("Convergence to tolerance not achieved: Maximum number of iterations.")
+        elif (gmres_out[1]<0):
+            print("Illegal input or breakdown")
+        
+    return phi
+
+def LGMRES(qmc_data,tol=1e-5,maxit=50):
+    """
+    Parameters
+    ----------
+    qmc_data : TYPE
+        DESCRIPTION.
+    tol : TYPE, optional
+        DESCRIPTION. The default is 1e-5.
+    maxit : TYPE, optional
+        DESCRIPTION. The default is 50.
+
+    Returns
+    -------
+    phi : TYPE
+        DESCRIPTION.
+
+    """
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+    
+    Nx       = qmc_data.Nx
+    G        = qmc_data.G
+    Nv       = Nx*G
+    start = time.time()
+    matvec_data = MatVec_data(qmc_data)
+    A        = LinearOperator((Nv,Nv), 
+                              matvec=MatVec,
+                              rmatvec=MatVec,
+                              matmat= MatVec,
+                              rmatmat=MatVec,
+                              dtype=float)
+    b        = matvec_data[0]
+    phi0     = qmc_data.source
+    phi0 = np.reshape(phi0,(Nv,1))
+
+    gmres_out = lgmres(A,b,x0=phi0,atol=tol,maxiter=maxit)
+    phi = gmres_out[0]
+    phi = np.reshape(phi, (Nx,G))
+    stop = time.time()
+    run_time = stop - start
+    
+    if (rank==0):
+        sim_data = SimData(phi, run_time, tol, nproc)
+        SaveData(qmc_data, sim_data)
+        if (gmres_out[1]>0):
+            print("Convergence to tolerance not achieved: Maximum number of iterations.")
+        elif (gmres_out[1]<0):
+            print("Illegal input or breakdown")
         
     return phi
 
@@ -120,11 +190,15 @@ def BICGSTAB(qmc_data,tol=1e-5,maxit=50):
         DESCRIPTION.
 
     """
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    nproc = comm.Get_size()
+    
     Nx       = qmc_data.Nx
     G        = qmc_data.G
     Nv       = Nx*G
-    global itt
-    itt = 0
+    start = time.time()
+    
     matvec_data = MatVec_data(qmc_data)
     A        = LinearOperator((Nv,Nv), 
                               matvec=MatVec,
@@ -139,38 +213,28 @@ def BICGSTAB(qmc_data,tol=1e-5,maxit=50):
     gmres_out = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit)
     phi = gmres_out[0]
     phi = np.reshape(phi, (Nx,G))
+    stop = time.time()
+    run_time = stop - start
     
-    if (gmres_out[1]>0):
-        print("Convergence to tolerance not achieved: Maximum number of iterations.")
-    elif (gmres_out[1]<0):
-        print("Illegal input or breakdown")
+    if (rank==0):
+        sim_data = SimData(phi, run_time, tol, nproc)
+        SaveData(qmc_data, sim_data)
+        if (gmres_out[1]>0):
+            print("Convergence to tolerance not achieved: Maximum number of iterations.")
+        elif (gmres_out[1]<0):
+            print("Illegal input or breakdown")
         
     return phi
 
 
-if (__name__ == "__main__"):
-    from src.init_files.mg_init import MultiGroupInit, TrueFlux
-    import time 
+def SimData(phi, time, tol, nproc):
+    data = {
+        "phi": phi,
+        "run_time": time,
+        "tolerance": tol,
+        "nproc": nproc
+        }
+    return data
+
+
     
-    N = 2**10
-    Nx = 10
-    maxit = 20
-    tol = 1e-5
-    qmc_data = MultiGroupInit(N=N, Nx=Nx, generator="halton")
-    
-    start = time.time()
-    phi_gmres = GMRES(qmc_data,tol=tol,maxit=maxit)
-    stop = time.time()
-    print("GMRES took: ", stop-start, " seconds")
-    
-    start = time.time()
-    phi_bic = BICGSTAB(qmc_data,tol=tol,maxit=maxit)
-    stop = time.time()
-    print("BiCGSTAB took: ", stop-start, " seconds")
-    
-    start = time.time()
-    phi_pic = Picard(qmc_data,tol=tol,maxit=maxit)
-    stop = time.time()
-    print("Picard took: ", stop-start, " seconds")
-    
-    Phi_sol = TrueFlux(qmc_data.material, qmc_data.source, Nx)

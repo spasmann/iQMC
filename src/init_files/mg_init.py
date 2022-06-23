@@ -20,8 +20,6 @@ class MultiGroupInit:
         self.right = True
         self.left = True
         self.source = np.ones((self.Nx,self.G))
-        #self.source = np.zeros((self.Nx,self.G))
-        #self.source[:,0] = np.ones(self.Nx)
         self.material_code = numGroups
         self.geometry = "slab"
         self.avg_scalar_flux = True

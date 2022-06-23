@@ -5,6 +5,7 @@ import math
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
 from src.functions.moment_matching import shift_samples
+from mpi4py import MPI
 
 class Samples:
     """
@@ -31,6 +32,16 @@ class Samples:
             self.phi_left = init_data.phi_left
         if (self.right):
             self.phi_right = init_data.phi_right
+        # use MPI rank and nproc to determine which random numbers to use
+        # each rank will generate the whole matrix, then use "start" and 
+        # "stop" to grab the appropriate section
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        nproc = comm.Get_size()
+        self.rank   = comm.Get_rank()
+        self.nproc  = comm.Get_size()
+        self.start = math.floor((rank/nproc)*self.N)
+        self.stop = math.floor((rank+1)/nproc*self.N)
 
     def GenerateParticles(self, q):
         self.q = q
@@ -50,7 +61,7 @@ class Samples:
             self.moment_matching()
 
     def VolumetricParticles(self):
-        for i in range(self.N):
+        for i in range(self.start,self.stop):
             randPos = self.rng[i,self.counter]
             randMu = self.rng[i,self.counter+1]
             pos = self.GetPos(randPos) 
@@ -61,7 +72,7 @@ class Samples:
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
-        for i in range(self.N):
+        for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
             pos = np.array((self.RB - 1e-9,))
             mu = -np.sqrt(randMu) - 1e-9
@@ -70,7 +81,7 @@ class Samples:
             self.particles.append(particle)
             
     def LeftBoundaryParticles(self):
-        for i in range(self.N):
+        for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
             pos = np.array((self.LB + 1e-9,))
             mu = np.sqrt(randMu) + 1e-9

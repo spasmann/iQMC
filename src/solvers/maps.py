@@ -9,8 +9,8 @@ import numpy as np
 from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource
-
 from src.init_files.mg_init import MultiGroupInit
+from mpi4py import MPI
 
 def SI_Map(phi_in, qmc_data):
     """
@@ -27,10 +27,13 @@ def SI_Map(phi_in, qmc_data):
     phi_in = np.reshape(phi_in, (Nx,G))
     source  = GetSource(phi_in, qmc_data)
     tallies = Tallies(qmc_data)
-    sweep   = Sweep(qmc_data)
-    sweep.Run(tallies, source)
+    sweep   = Sweep(qmc_data) # samples are gneratred with initialization of sweep
+    sweep.Run(tallies, source) # QMC sweep
     phi_out = tallies.phi_avg
     phi_out = np.reshape(phi_out,(Nv,1))
+    # all reduce phi_out here (they automatically wait for each other)
+    comm = MPI.COMM_WORLD
+    phi_out = comm.allreduce(phi_out,op=MPI.SUM)
     return phi_out
 
 
@@ -46,8 +49,8 @@ def RHS(qmc_data):
     Nx  = qmc_data.Nx
     Nv  = Nx*G
     zed = np.zeros((Nx,G))
-    bout = SI_Map(zed,qmc_data)
-    return bout
+    b = SI_Map(zed,qmc_data) # qmc_sweep with phi(0)
+    return b
 
 
 def MatVec_data(qmc_data):
@@ -77,12 +80,9 @@ def MatVec(phi_in):
     Nx = qmc_data.Nx
     G = qmc_data.G
     Nv = Nx*G
-    #try:
-    #    assert(phi_in == (Nv,1))
-    #except:
-            #print(phi_in.shape)
     phi_in = np.reshape(phi_in,(Nv,1))
-            
+         
+    # A* = phi - sweep(phi) - sweep(0)
     mxvp        = SI_Map(phi_in, qmc_data)
     mxv         = mxvp - b
     axv         = phi_in - mxv

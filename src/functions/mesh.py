@@ -4,6 +4,8 @@ import numpy as np
 class Mesh:
     def __init__(self, LB, RB, Nx):
         self.Nx = Nx
+        self.LB = LB
+        self.RB = RB
         self.dx = (RB - LB)/Nx
         self.lowR = np.linspace(LB,(RB-self.dx),Nx)
         self.highR = np.linspace(LB+self.dx,RB,Nx)
