@@ -18,7 +18,7 @@ if __name__ == "__main__":
     N = 2**12
     Nx = 80
     G = 1
-    generator = "halton"
+    generator = "sobol"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     start = time.time()
     phi = LGMRES(data)

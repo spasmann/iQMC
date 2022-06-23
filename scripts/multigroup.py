@@ -12,7 +12,8 @@ if __name__ == "__main__":
     G = 12
     N = 2**10
     Nx = 5
-    data = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator="halton")
+    generator = "halton"
+    data = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator=generator)
     SI = SourceIteration(data)
     SI.max_iter = 50
     SI.Run()
