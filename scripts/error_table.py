@@ -6,8 +6,8 @@ Created on Thu Jun 23 11:48:20 2022
 @author: sampasmann
 """
 
-import sys
-sys.path.append("../")
+import sys, os
+sys.path.append(os.getcwd()+"/../")
 from src.init_files.reeds_init import ReedsInit
 from src.init_files.reeds_solution import reeds_julia_sol
 from src.solvers.solvers import LGMRES

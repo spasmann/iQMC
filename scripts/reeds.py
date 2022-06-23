@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append("../")
+import sys, os
+sys.path.append(os.getcwd()+"/../")
 from src.init_files.reeds_init import ReedsInit
 from src.init_files.reeds_solution import reeds_julia_sol
 from src.solvers.solvers import LGMRES
@@ -18,7 +18,7 @@ if __name__ == "__main__":
     N = 2**12
     Nx = 80
     G = 1
-    generator = "sobol"
+    generator = "halton"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     start = time.time()
     phi = LGMRES(data)
