@@ -9,7 +9,7 @@ Created on Thu Jun 23 11:48:20 2022
 import sys, os
 sys.path.append(os.getcwd()+"/../")
 from src.init_files.reeds_init import ReedsInit
-from src.init_files.reeds_solution import reeds_julia_sol
+from src.init_files.reeds_solution import reeds_mcdc_sol
 from src.solvers.solvers import LGMRES
 import matplotlib.pyplot as plt
 from mpi4py import MPI
@@ -22,9 +22,9 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    Nvals = np.array((2**10,2**11,2**12,2**13,2**14,2**15,2**16,2**17,2**18,2**19,2**20))
+    Nvals = np.array((2**10,2**11,2**12,2**13,2**14))
     Nxvals = 80*np.array((1,2,4))    
-    generator = "halton"
+    generator = "sobol"
     
     for Nx in Nxvals:
         for N in Nvals:

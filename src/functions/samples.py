@@ -102,7 +102,7 @@ class Samples:
     def SobolMatrix(self):
         sampler = Sobol(d=self.totalDim,scramble=self.RQMC)
         m = round(math.log(self.N, 2))
-        #sampler.fast_forward(2**m)
+        sampler.fast_forward(2**m)
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
