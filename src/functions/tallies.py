@@ -18,6 +18,8 @@ class Tallies:
         if (init_data.avg_scalar_flux):
             self.phi_avg = np.random.random(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.random(size=(self.Nr,self.G))
+            #self.phi_avg = np.zeros((self.Nr,self.G))
+            #self.phi_avg_old = np.zeros((self.Nr,self.G))
         if (init_data.edge_scalar_flux):
             self.phi_edge = np.zeros((self.Nr+1, self.G), self.dtype)
         if (init_data.avg_current):

@@ -15,7 +15,7 @@ from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 
 
 
-def Picard(qmc_data,tol=1e-5,maxit=50,report_progress=False):
+def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=False):
     """
     Parameters
     ----------
@@ -63,8 +63,9 @@ def Picard(qmc_data,tol=1e-5,maxit=50,report_progress=False):
     stop = time.time()
     run_time = stop-start
     if (rank==0):
-        sim_data = SimData(phi_out, run_time, tol, nproc)
-        SaveData(qmc_data, sim_data)
+        if (save_data==True):
+            sim_data = SimData(phi_out, run_time, tol, nproc)
+            SaveData(qmc_data, sim_data)
     return phi
 
 
@@ -121,7 +122,7 @@ def GMRES(qmc_data,tol=1e-5,maxit=50):
         
     return phi
 
-def LGMRES(qmc_data,tol=1e-5,maxit=50):
+def LGMRES(qmc_data,tol=1e-5,maxit=50,save_data=True):
     """
     Parameters
     ----------
@@ -164,8 +165,9 @@ def LGMRES(qmc_data,tol=1e-5,maxit=50):
     run_time = stop - start
     
     if (rank==0):
-        sim_data = SimData(phi, run_time, tol, nproc)
-        SaveData(qmc_data, sim_data)
+        if (save_data == True):
+            sim_data = SimData(phi, run_time, tol, nproc)
+            SaveData(qmc_data, sim_data)
         if (gmres_out[1]>0):
             print("Convergence to tolerance not achieved: Maximum number of iterations.")
         elif (gmres_out[1]<0):

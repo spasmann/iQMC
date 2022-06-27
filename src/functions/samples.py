@@ -41,7 +41,7 @@ class Samples:
         self.rank   = comm.Get_rank()
         self.nproc  = comm.Get_size()
         self.start = math.floor((rank/nproc)*self.N)
-        self.stop = math.floor((rank+1)/nproc*self.N)
+        self.stop = math.floor((rank+1)/nproc*self.N) 
 
     def GenerateParticles(self, q):
         self.q = q
@@ -66,6 +66,12 @@ class Samples:
             randMu = self.rng[i,self.counter+1]
             pos = self.GetPos(randPos) 
             mu = self.GetDir(randMu) 
+            if (mu == 0.0):
+                # the sobol sequence likes to start out with 0.0
+                # this fix introduces a little bit of noise but should only
+                # have to used once or twice. the greatest disadvnatge is checking
+                # the if statement every function call
+                mu += (0.5 - np.random.random())
             zone = self.mesh.GetZone(pos, mu)
             weight = self.VolumetricWeight(zone)
             particle = Particle(pos, mu, weight)
@@ -96,10 +102,12 @@ class Samples:
     def SobolMatrix(self):
         sampler = Sobol(d=self.totalDim,scramble=self.RQMC)
         m = round(math.log(self.N, 2))
+        sampler.fast_forward(2**m)
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
         sampler = Halton(d=self.totalDim,scramble=self.RQMC)
+        sampler.fast_forward(1)
         return sampler.random(n=self.N)
     
     def LatinHypercube(self):

@@ -12,12 +12,12 @@ class Geometry:
             return self.SlabEdge(particle)
         
     def SlabEdge(self, particle):
-        if (particle.dir >= 0):
+        assert (particle.dir != 0.0)
+        if (particle.dir > 0.0):
             ds = (self.mesh.highR[particle.zone] - particle.R)/(particle.dir) + 1e-9
-        elif (particle.dir < 0):
+        elif (particle.dir < 0.0):
             ds = (self.mesh.lowR[particle.zone] - particle.R)/(particle.dir) + 1e-9
         return ds 
-
     
     def CellVolume(self, zone):
         if (self.geometry == "slab"):
