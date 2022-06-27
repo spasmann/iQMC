@@ -3,7 +3,7 @@
 from src.functions.geometry import Geometry
 from src.functions.samples import Samples
 import numpy as np
-
+import math
 
 class Sweep:
     def __init__(self, init_data):
@@ -25,21 +25,29 @@ class Sweep:
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.R, particle.dir)
             particle.IsAlive(self.mesh)
+            #print("************************")
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 """
-                print("Particle: ", count+1)
+                print("Particle: ", count)
                 print("zone: ", particle.zone)
                 print("ds: ", particle.ds)
                 print("pos: ",particle.pos)
                 print("dir: ", particle.dir)
+                print("weight: ",particle.weight)
+                print("")
                 """
+                assert (math.isnan(particle.ds) == False)
+                assert (math.isnan(particle.weight) == False)
+            
                 tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)
                 particle.Move()
                 particle.IsAlive(self.mesh)
-                particle.zone = self.mesh.GetZone(particle.R, particle.dir)
+                particle.zone = self.mesh.GetZone(particle.pos, particle.dir)
+                if (particle.weight == 0.0):
+                    particle.alive = False
             count += 1
     
 

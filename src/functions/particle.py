@@ -23,6 +23,8 @@ class Particle:
         
     def UpdateWeight(self, sigt):
         self.weight *= np.exp(-self.ds*sigt)
+        #if (self.weight < 1e-16):
+        #    self.weight = 0.0
         
     def UpdateZone(self, mesh):
         self.zone = Mesh.GetZone(self.R, self.dir)
