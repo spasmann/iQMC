@@ -2,7 +2,7 @@
 import sys, os
 sys.path.append(os.getcwd()+"/../")
 from src.init_files.reeds_init import ReedsInit
-from src.init_files.reeds_solution import reeds_julia_sol
+from src.init_files.reeds_solution import reeds_julia_sol, reeds_mcdc_sol, reeds_sol
 from src.solvers.solvers import LGMRES
 import matplotlib.pyplot as plt
 from mpi4py import MPI
@@ -15,10 +15,10 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N = 2**12
+    N = 2**10
     Nx = 80
     G = 1
-    generator = "halton"
+    generator = "sobol"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     start = time.time()
     phi = LGMRES(data)

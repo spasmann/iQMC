@@ -14,42 +14,42 @@ def reeds_data(Nx=1000, LB=-8.0, RB=8.0):
     sigs = np.empty((Nx,G,G))
     source = np.empty((Nx,G))
     dx = (RB-LB)/Nx
-    xspan = np.linspace(LB+dx/2, RB-dx/2, Nx)
+    xspan = np.linspace(LB+dx/2, RB-dx/2, num=Nx)
     count = 0
     for x in xspan:
         if (x < -6):
             sigt[count,:] = 1.0
             sigs[count,:,:] = 0.9
             source[count,:] = 0.0
-        elif (-6 < x) and (x < -5):
+        elif (-6.0 < x) and (x < -5.0):
             sigt[count,:] = 1.0
             sigs[count,:] = 0.9
             source[count,:] = 1.0
-        elif (-5 < x < -3): #vacuum region 1
+        elif (-5.0 < x < -3.0): #vacuum region 1
             sigt[count,:] = 0.0
             sigs[count,:,:] = 0.0
             source[count,:] = 0.0
-        elif (-3 < x < -2):
+        elif (-3.0 < x < -2.0):
             sigt[count,:] = 5.0
             sigs[count,:,:] = 0.0
             source[count,:] = 0.0
-        elif (-2 < x < 2):
+        elif (-2.0 < x < 2.0):
             sigt[count,:] = 50.0
             sigs[count,:,:] = 0.0
             source[count,:] = 50.0
-        elif (2 < x < 3):
+        elif (2.0 < x < 3.0):
             sigt[count,:] = 5.0
             sigs[count,:,:] = 0.0
             source[count,:] = 0.0
-        elif (3 < x < 5): # vacuum region 2
+        elif (3.0 < x < 5.0): # vacuum region 2
             sigt[count,:] = 0.0
             sigs[count,:,:] = 0.0
             source[count,:] = 0.0
-        elif (5 < x < 6):
+        elif (5.0 < x < 6.0):
             sigt[count,:] = 1.0
             sigs[count,:,:] = 0.9
             source[count,:] = 1.0
-        elif (6 < x):
+        elif (6.0 < x):
             sigt[count,:] = 1.0
             sigs[count,:,:] = 0.9
             source[count,:] = 0.0

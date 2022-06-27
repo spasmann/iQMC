@@ -27,6 +27,13 @@ class Sweep:
             particle.IsAlive(self.mesh)
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
+                """
+                print("Particle: ", count+1)
+                print("zone: ", particle.zone)
+                print("ds: ", particle.ds)
+                print("pos: ",particle.pos)
+                print("dir: ", particle.dir)
+                """
                 tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)

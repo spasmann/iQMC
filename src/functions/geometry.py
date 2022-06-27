@@ -13,9 +13,9 @@ class Geometry:
         
     def SlabEdge(self, particle):
         if (particle.dir >= 0):
-            ds = (self.mesh.highR[particle.zone] - particle.R)/(particle.dir) + 1e-9
+            ds = (self.mesh.highR[particle.zone] - particle.R)/(particle.dir) + 1e-12
         elif (particle.dir < 0):
-            ds = (self.mesh.lowR[particle.zone] - particle.R)/(particle.dir) + 1e-9
+            ds = (self.mesh.lowR[particle.zone] - particle.R)/(particle.dir) + 1e-12
         return ds 
 
     

@@ -9,11 +9,11 @@ class Mesh:
         self.dx = (RB - LB)/Nx
         self.lowR = np.linspace(LB,(RB-self.dx),Nx)
         self.highR = np.linspace(LB+self.dx,RB,Nx)
-        self.midpoints = np.linspace(LB+self.dx, RB-self.dx, Nx)
+        self.midpoints = np.linspace(LB+(self.dx*0.5), RB-(self.dx*0.5), Nx)
     def GetZone(self, r, mu):
-        if (mu > 0):    
-            return np.argmax((r >= self.lowR)*(r < self.highR))
-        else:
-            return np.argmax((r > self.lowR)*(r <= self.highR))
+        #if (mu > 0):    
+        #    return np.argmax((r >= self.lowR)*(r < self.highR))
+        #else:
+        return np.argmax((r > self.lowR)*(r <= self.highR))
 
     

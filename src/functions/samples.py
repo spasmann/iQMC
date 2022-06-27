@@ -41,7 +41,7 @@ class Samples:
         self.rank   = comm.Get_rank()
         self.nproc  = comm.Get_size()
         self.start = math.floor((rank/nproc)*self.N)
-        self.stop = math.floor((rank+1)/nproc*self.N)
+        self.stop = math.floor((rank+1)/nproc*self.N) 
 
     def GenerateParticles(self, q):
         self.q = q
@@ -96,10 +96,12 @@ class Samples:
     def SobolMatrix(self):
         sampler = Sobol(d=self.totalDim,scramble=self.RQMC)
         m = round(math.log(self.N, 2))
+        sampler.fast_forward(2**m)
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):
         sampler = Halton(d=self.totalDim,scramble=self.RQMC)
+        sampler.fast_forward(1)
         return sampler.random(n=self.N)
     
     def LatinHypercube(self):
