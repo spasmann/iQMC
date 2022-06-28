@@ -10,13 +10,11 @@ import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
 import h5py
-import itertools
 
 import sys, os
 sys.path.append(os.getcwd()+"/../")
 from functions.functions import ReduceFlux, RelError, AbsError, PlotLine
 
-import sys, os
 sys.path.append(os.getcwd()+"/../../")
 from src.init_files.reeds_solution import reeds_mcdc_sol, reeds_sol, reeds_julia_sol
 from src.init_files.mg_init import MultiGroupInit
