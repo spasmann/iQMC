@@ -16,7 +16,7 @@ class Samples:
     """
     def __init__(self, init_data, geometry, mesh):
         self.generator = init_data.generator
-        self.RQMC = False
+        self.RQMC = True
         self.geometry = geometry
         self.mesh = mesh
         self.G = init_data.G
@@ -27,11 +27,18 @@ class Samples:
         self.LB = init_data.LB
         self.left = init_data.left
         self.right = init_data.right
+        # split the total number of particles into the different sources
+        #self.Nleft = 0
+        #self.Nright=0
+        #self.Nvolumetric = self.N
         self.moment_match = init_data.moment_match
         if (self.left):
             self.phi_left = init_data.phi_left
+            #self.left = math.floor(0.125*self.N)
         if (self.right):
             self.phi_right = init_data.phi_right
+            #self.right = math.floor(0.125*self.N)
+        #self.Nvolumetric = self.N - self.Nright - self.Nleft
         # use MPI rank and nproc to determine which random numbers to use
         # each rank will generate the whole matrix, then use "start" and 
         # "stop" to grab the appropriate section
@@ -96,13 +103,13 @@ class Samples:
             self.particles.append(particle)
         
     def RandomMatrix(self):
-        np.random.seed(12345)
-        return np.random.uniform(0,1,[self.N,self.totalDim])
+        np.random.seed(56789)
+        return np.random.random((self.N,self.totalDim))
     
     def SobolMatrix(self):
-        sampler = Sobol(d=self.totalDim,scramble=self.RQMC)
+        sampler = Sobol(d=self.totalDim,scramble=self.RQMC, seed=1234)
         m = round(math.log(self.N, 2))
-        sampler.fast_forward(2**m)
+        #sampler.fast_forward(2**m)
         return sampler.random_base2(m=m)
     
     def HaltonMatrix(self):

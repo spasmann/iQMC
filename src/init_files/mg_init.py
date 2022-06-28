@@ -48,4 +48,7 @@ def TrueFlux(material, Q, Nx):
     true_flux = np.dot(np.linalg.inv(np.diag(material.sigt[0,:]) - material.sigs[0,:,:]),Q[0,:])
     true_flux = np.tile(true_flux, (Nx,1))
     return true_flux
+
+
+
         

@@ -15,8 +15,8 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N = 2**12
-    Nx = 80
+    N = 2**9
+    Nx = 10
     G = 12
     generator = "halton"
     data = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator=generator)

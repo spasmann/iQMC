@@ -29,13 +29,18 @@ class Sweep:
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 #assert (math.isnan(particle.ds) == False)
                 #assert (math.isnan(particle.weight) == False)
+                """
+                print("Particle: ",count)
+                print("zone: ", particle.zone)
+                print("ds: ",particle.ds)
+                """
                 tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)
                 particle.Move()
                 particle.IsAlive(self.mesh)
                 particle.zone = self.mesh.GetZone(particle.pos, particle.dir)
-                if (particle.weight == 0.0):
+                if (particle.weight.all() == 0.0):
                     particle.alive = False
             count += 1
     

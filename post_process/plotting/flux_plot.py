@@ -12,7 +12,7 @@ import h5py
 
 
 path = "../saved_data/"
-fname1 = "reeds_data-halton-2048-80-64"
+fname1 = "12-halton-512-10-1"
 files = [fname1]
 plot_max_error_loc = True
 
