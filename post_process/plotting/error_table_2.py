@@ -15,21 +15,18 @@ import sys, os
 sys.path.append(os.getcwd()+"/../")
 from functions.functions import ReduceFlux, RelError, AbsError, PlotLine
 
-sys.path.append(os.getcwd()+"/../../")
-from src.init_files.reeds_solution import reeds_mcdc_sol, reeds_sol, reeds_julia_sol
-from src.init_files.mg_init import MultiGroupInit
 
 
-Nvals = np.array((2**10, 2**11, 2**12,2**13,2**14)) #Reeds
-problem="reeds_data"
-NxBase = 80
-#Nvals = np.array((2**7, 2**8, 2**9, 2**10,2**11)) #multigroup
-#problem = "12"
-#NxBase=10
+#Nvals = np.array((2**11, 2**12,2**13,2**14,2**15,2**16,2**17,2**18,2**19)) #Reeds
+#problem="reeds_data"
+#NxBase = 80
+Nvals = np.array((2**9, 2**10,2**11,2**12,2**13,2**14,2**15,2**16,2**17,2**18,2**19,2**20)) #multigroup
+problem = "12"
+NxBase=10
 
 
 generator="sobol"
-nproc = 4
+nproc = 128
 HaltonNx80 = PlotLine(Nvals=Nvals, Nx=NxBase, generator=generator, problem=problem, nproc=nproc)
 HaltonNx160 = PlotLine(Nvals=Nvals, Nx=NxBase*2, generator=generator, problem=problem, nproc=nproc)
 HaltonNx320 = PlotLine(Nvals=Nvals, Nx=NxBase*4, generator=generator, problem=problem, nproc=nproc)
@@ -37,16 +34,16 @@ O1 = HaltonNx320[0]*(Nvals[0]/Nvals)
 
 
 generator="random"
-nproc=2
+nproc = 128
 RandomNx80 = PlotLine(Nvals=Nvals, Nx=NxBase, generator=generator, problem=problem, nproc=nproc)
 RandomNx160 = PlotLine(Nvals=Nvals, Nx=NxBase*2, generator=generator, problem=problem, nproc=nproc)
 RandomNx320 = PlotLine(Nvals=Nvals, Nx=NxBase*4, generator=generator, problem=problem, nproc=nproc)
 O2 = RandomNx80[0]*np.sqrt(Nvals[0]/Nvals)
 
 plt.figure(dpi=300, figsize=(10,5))
-plt.suptitle("Reeds Problem Absolute Error")
-ylabel = r'$||\phi - \phi_t||_\infty$'
-ylim = [1e-2, 1e1]
+plt.suptitle("MultiGroup Relative Error")
+ylabel = r'$||\frac{\phi - \phi_t}{\phi_t}||_\infty$'
+ylim = [1e-4, 1e1]
 
 plt.subplot(121)
 plt.plot(Nvals, O1, label=r'$N^{-1}$')

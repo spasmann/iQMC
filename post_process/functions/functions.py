@@ -9,7 +9,8 @@ Created on Thu Jun 23 10:46:45 2022
 import numpy as np
 import h5py
 import os
-from src.init_files.reeds_solution import reeds_mcdc_sol
+from src.init_files.reeds_solution import reeds_mcdc_sol, reeds_sol
+from src.init_files.mg_init import MultiGroupInit
 
 def ReduceFlux(phi, NxRef):
     """
@@ -49,9 +50,9 @@ def AbsError(phi, sol, order=np.inf):
     return np.linalg.norm(AbsError, ord=order)
 
 def PlotLine(Nvals=np.array((2**10)), Nx=80, generator="halton", problem = "reeds_data", nproc=64):
-    sol = reeds_mcdc_sol()
-    #data = MultiGroupInit(numGroups=12,Nx=10)
-    #sol = data.true_flux
+    #sol = reeds_mcdc_sol()
+    data = MultiGroupInit(numGroups=12,Nx=10)
+    sol = data.true_flux
     line = np.zeros(len(Nvals))
     path = os.getcwd()+"/../saved_data/"
     NxRef = sol.shape[0]
@@ -64,7 +65,7 @@ def PlotLine(Nvals=np.array((2**10)), Nx=80, generator="halton", problem = "reed
         f.close()
         phi = np.reshape(phi, (Nx,G))
         phi = ReduceFlux(phi, NxRef)
-        error = AbsError(phi, sol)
+        error = RelError(phi, sol)
         line[i] = error
 
     return line

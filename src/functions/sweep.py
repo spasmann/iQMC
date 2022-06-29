@@ -29,11 +29,6 @@ class Sweep:
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 #assert (math.isnan(particle.ds) == False)
                 #assert (math.isnan(particle.weight) == False)
-                """
-                print("Particle: ",count)
-                print("zone: ", particle.zone)
-                print("ds: ",particle.ds)
-                """
                 tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)
