@@ -1,4 +1,5 @@
-# iQMC
+![alt text](https://raw.githubusercontent.com/spasmann/iQMC/main/post_process/figures/github_image.jpg)
+
 Author: Sam Pasmann
 
 iQMC is an iterative Quasi-Monte Carlo (iQMC) code for neutron transport.
