@@ -85,20 +85,20 @@ class Samples:
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
+        pos = np.array((self.RB - 1e-9,))
+        weight = self.BoundaryWeight(self.phi_right)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
-            pos = np.array((self.RB - 1e-9,))
             mu = -np.sqrt(randMu) - 1e-9
-            weight = self.BoundaryWeight(self.phi_right)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
             
     def LeftBoundaryParticles(self):
+        pos = np.array((self.LB + 1e-9,))
+        weight = self.BoundaryWeight(self.phi_left)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
-            pos = np.array((self.LB + 1e-9,))
             mu = np.sqrt(randMu) + 1e-9
-            weight = self.BoundaryWeight(self.phi_left)
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
         
