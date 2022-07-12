@@ -1,12 +1,10 @@
-# 1DQMC
+# iQMC
 Author: Sam Pasmann
 
-QMC1D is a hyrbid Quasi-Monte Carlo (QMC) and deterministic code for neutron transport.
-The theory behind the code is outlined in [1]. QMC1D uses Quasi-Monte Carlo 
+iQMC is an iterative Quasi-Monte Carlo (iQMC) code for neutron transport.
+The theory behind the code is outlined in [1]. iQMC uses Quasi-Monte Carlo 
 methods to solve successive iterations of the standard Source Iteration for 
-neutron transport. In the future, iterative methods like
-Krylov Subspace methods will also be added as the base QMC code allows for 
-plug-and-play compatibility with different solvers.
+neutron transport.
  
 ## Basic Usage 
 
@@ -145,14 +143,6 @@ convention:
 ```
     material_code-generator-N-Nx
 ```
-
-## Citing
-
-## Dependencies
-- Numpy
-- Matplotlib
-- Scipy
-- h5py
 
 ## References 
 
