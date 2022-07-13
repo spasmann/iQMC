@@ -7,7 +7,7 @@ Created on Wed May 11 12:08:53 2022
 """
 
 import sys
-sys.path.append("../")
+sys.path.append("../../")
 import os
 from src.init_files.mg_init import MultiGroupInit
 import numpy as np
@@ -19,7 +19,7 @@ data70 = MultiGroupInit(numGroups=70, Nx=Nx)
 data618 = MultiGroupInit(numGroups=618, Nx=Nx)
 
 script_dir = os.path.dirname(__file__)
-rel_path = "../src/materials/HDPE/"
+rel_path = "../../src/materials/HDPE/"
 abs_file_path = os.path.join(script_dir, rel_path)
 centers12 = np.genfromtxt(abs_file_path+"group_centers_12G_HDPE.csv", delimiter=",")
 centers70 = np.genfromtxt(abs_file_path+"group_centers_70G_HDPE.csv", delimiter=",")
@@ -34,16 +34,18 @@ dE70 = abs(edges70[1:] - edges70[:-1])
 dE618 = abs(edges618[1:] - edges618[:-1])
 
 y12 = (data12.true_flux[0,:]/dE12)
-y12 /= np.sum(y12*dE12)
+y12 /= np.sum(data12.true_flux[0,:])
 y70 = (data70.true_flux[0,:]/dE70)
-y70 /= np.sum(y70*dE70)
+y70 /= np.sum(data70.true_flux[0,:])
 y618 = (data618.true_flux[0,:]/dE618)
-y618 /= np.sum(y618*dE618)
+y618 /= np.sum(data618.true_flux[0,:])
 
 centers12[-1] = np.min(centers618)
 centers70[-1] = np.min(centers618)
 
 plt.figure(dpi=300)
+plt.suptitle('HDPE Group Centers Divided by Energy Bin Width')
+
 size = 3
 where = 'mid'
 drawstyle='steps-mid'
@@ -55,5 +57,5 @@ plt.legend()
 plt.xscale('log')
 plt.yscale('log')
 plt.xlabel('E (MeV)')
-plt.ylabel(r'$\phi(E)$')
+plt.ylabel(r'$\phi(E)/E$')
 

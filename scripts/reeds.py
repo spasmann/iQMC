@@ -16,14 +16,16 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N = 2**14
+    N = 2**12
     Nx = 80
     G = 1
     generator = "sobol"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     start = time.time()
     maxit = 20
+    
     phi = LGMRES(data, maxit=maxit, save_data=False)
+
     stop = time.time()
     if (rank==0):
         print("time: ",stop-start)

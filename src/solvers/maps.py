@@ -81,15 +81,15 @@ def MatVec(phi_in):
     G = qmc_data.G
     Nv = Nx*G
     phi_in = np.reshape(phi_in,(Nv,1))
-         
+
     # A* = phi - sweep(phi) - sweep(0)
     #mxvp        = SI_Map(phi_in, qmc_data)
     #mxv         = mxvp - b
     #axv         = phi_in - mxv
     # A*phi = phi - sweep(phi, zero_source)
-    #qmc_data.source = np.zeros((Nx,G))
+    qmc_data.source = np.zeros((Nx,G))
     axv = phi_in - SI_Map(phi_in, qmc_data)
-    
+
     return axv
 
 

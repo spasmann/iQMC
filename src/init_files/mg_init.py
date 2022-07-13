@@ -13,12 +13,12 @@ class MultiGroupInit:
         self.N = N
         self.Nx = Nx
         self.generator = generator
-        self.totalDim = 4
-        self.RB = 5
+        self.totalDim = 2
         self.LB = 0
+        self.RB = 5
         self.G = numGroups
-        self.right = True
-        self.left = True
+        self.right = False
+        self.left = False
         self.source = np.ones((self.Nx,self.G))
         self.material_code = numGroups
         self.geometry = "slab"
