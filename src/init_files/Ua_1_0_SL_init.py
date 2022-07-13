@@ -18,8 +18,6 @@ class Ua_1_0_SL_init:
         self.totalDim = 2
         self.RB = 2.872934 
         self.LB = -2.872934 
-        #self.RB = 100.0 
-        #self.LB = -100.0 
         self.G = 1
         self.right = False
         self.left = False

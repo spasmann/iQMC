@@ -20,15 +20,6 @@ def GetSource(phi_avg, qmc_data):
     q : source term, calculated per spatial cell, for source iteration
 
     """
-    """
-    try:
-        assert(phi_avg.size == (Nx,G))
-    except:
-        print(phi_avg.size)
-        Nx = qmc_data.Nx
-        G = qmc_data.G
-        phi_avg = np.reshape(phi_avg,(Nx,G))
-    """
     material = qmc_data.material
     source   = qmc_data.source
     # calculate source for every cell individually
@@ -38,9 +29,9 @@ def GetSource(phi_avg, qmc_data):
     return q
 
 
-#def GetSource(phi_avg_s, phi_avg_f, qmc_data):
+def GetCriticalitySource(phi_avg_s, phi_avg_f, qmc_data, k=1):
     """
-    GetSource(self, phi_avg_s, phi_avg_f)
+    GetCriticalitySource(self, phi_avg_s, phi_avg_f)
     --------------------------------------
     Calculate source term for Power Iteration eigenvalue problem
     for every cell individually (loop)
@@ -53,37 +44,20 @@ def GetSource(phi_avg, qmc_data):
     Returns
     -------
     q : source term
-   
-    q = np.empty((self.material.Nx, self.material.G), np.float64)
-    for cell in range(self.material.Nx):
-        q[cell,:] = (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:]) 
-                    + np.dot(phi_avg_f[cell,:]*self.material.sigf[cell,:]*self.material.nu[cell,:],self.material.chi[cell,:])/self.k)
+    """
+    source      = qmc_data.source
+    Nx          = qmc_data.Nx
+    G           = qmc_data.G
+    material    = qmc_data.material 
+    q           = np.empty((Nx,G), np.float64)
+    
+    for cell in range(Nx):
+        q[cell,:] = (np.dot(phi_avg_s[cell,:],np.transpose(material.sigs[cell,:,:])) 
+                    + np.dot(phi_avg_f[cell,:]*material.sigf[cell,:]*material.nu[cell,:],material.chi[cell,:])/k
+                    + source)
         #assert (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])[0] >=  phi_avg_s[cell,:][0])
         #assert (np.sum(np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])) == np.sum(phi_avg_s[cell,:]))
     return q
 
-    """
-    """
-if (__name__ == "__main__"):
-    from src.init_files.mg_init import MultiGroupInit
-    import time
-    N = 2**10
-    Nx = 1000
-    G = 12
-    generator = "halton"
-    data = MultiGroupInit(numGroups=G ,N=N, Nx=Nx, generator=generator)
-    phi0 = np.ones((Nx,G))
-    
-    start = time.time()
-    GetSource(phi0, data)
-    stop = time.time()
-    print(stop-start, " seconds")
-    
-    start = time.time()
-    GetSource(phi0, data)
-    stop = time.time()
-    print(stop-start, " seconds")
-    
-    """
     
     

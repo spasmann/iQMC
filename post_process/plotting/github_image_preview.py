@@ -17,4 +17,5 @@ my_dpi = 300
 plt.figure(figsize=(1280/my_dpi, 640/my_dpi), dpi=my_dpi)
 plt.plot(samples[:,0], samples[:,1],'o',markersize=2)
 plt.axis('off')
+plt.savefig('sobol.png', transparent=True)
 #plt.title('iQMC')
