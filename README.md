@@ -1,4 +1,4 @@
-![alt text](https://raw.githubusercontent.com/spasmann/iQMC/main/post_process/figures/iQMC_logo_2.jpg)
+![alt text](https://raw.githubusercontent.com/spasmann/iQMC/main/post_process/figures/iQMC_logo_2.png)
 
 Author: Sam Pasmann
 
