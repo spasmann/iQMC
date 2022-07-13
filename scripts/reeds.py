@@ -23,7 +23,9 @@ if __name__ == "__main__":
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     start = time.time()
     maxit = 20
-    phi = LGMRES(data,maxit=maxit, save_data=False)
+    
+    phi = LGMRES(data, maxit=maxit, save_data=False)
+
     stop = time.time()
     if (rank==0):
         print("time: ",stop-start)
