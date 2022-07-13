@@ -2,10 +2,10 @@
 
 Author: Sam Pasmann
 
-iQMC is an iterative Quasi-Monte Carlo (iQMC) code for neutron transport.
-The theory behind the code is outlined in [1]. iQMC uses Quasi-Monte Carlo 
-methods to solve successive iterations of the standard Source Iteration for 
-neutron transport.
+iterative Quasi-Monte Carlo (iQMC) code for neutron transport.
+The theory behind iQMC is outlined in [1]. iQMC uses Quasi-Monte Carlo 
+methods to solve successive iterations of the Source Iteration and other advanced
+linear solvers for neutron transport.
  
 ## Basic Usage 
 
