@@ -9,7 +9,6 @@ Created on Mon Apr  4 17:52:36 2022
 import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
-from src.init_files.reeds_solution import reeds_sol
 
 class PUa_1_0_SL_init:
     def __init__(self, N=2**10, Nx=100, generator="halton"):
