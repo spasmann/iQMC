@@ -29,7 +29,7 @@ def GetSource(phi_avg, qmc_data):
     return q
 
 
-def GetCriticalitySource(phi_avg_s, phi_avg_f, qmc_data, k=1):
+def GetCriticalitySource(phi_avg_s, phi_avg_f, qmc_data):
     """
     GetCriticalitySource(self, phi_avg_s, phi_avg_f)
     --------------------------------------
@@ -45,18 +45,20 @@ def GetCriticalitySource(phi_avg_s, phi_avg_f, qmc_data, k=1):
     -------
     q : source term
     """
-    source      = qmc_data.source
     Nx          = qmc_data.Nx
     G           = qmc_data.G
     material    = qmc_data.material 
+    keff        = qmc_data.keff
     q           = np.empty((Nx,G), np.float64)
     
     for cell in range(Nx):
         q[cell,:] = (np.dot(phi_avg_s[cell,:],np.transpose(material.sigs[cell,:,:])) 
-                    + np.dot(phi_avg_f[cell,:]*material.sigf[cell,:]*material.nu[cell,:],material.chi[cell,:])/k
-                    + source)
+                    + np.dot(phi_avg_f[cell,:]*material.sigf[cell,:]*material.nu[cell,:],material.chi[cell,:])/keff)
         #assert (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])[0] >=  phi_avg_s[cell,:][0])
         #assert (np.sum(np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])) == np.sum(phi_avg_s[cell,:]))
+        
+    assert (q.shape == (Nx,G))
+    
     return q
 
     

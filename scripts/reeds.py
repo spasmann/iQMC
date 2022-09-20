@@ -2,8 +2,7 @@
 import sys, os
 sys.path.append(os.getcwd()+"/../")
 from src.init_files.reeds_init import ReedsInit
-#from src.init_files.reeds_solution import reeds_julia_sol, reeds_mcdc_sol, reeds_sol
-from src.solvers.solvers import LGMRES, Picard
+from src.solvers.fixed_source.solvers import LGMRES, Picard
 import matplotlib.pyplot as plt
 from mpi4py import MPI
 import numpy as np

@@ -9,7 +9,7 @@ Created on Tue Jun  7 13:18:01 2022
 import numpy as np
 import time
 from mpi4py import MPI
-from src.solvers.fixed_source import SI_Map, RHS, MatVec_data, MatVec
+from src.solvers.fixed_source.maps import SI_Map, RHS, MatVec_data, MatVec
 from src.functions.save_data import SaveData
 from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 
@@ -142,26 +142,26 @@ def LGMRES(qmc_data,tol=1e-5,maxit=50,save_data=True):
     rank = comm.Get_rank()
     nproc = comm.Get_size()
     
-    Nx       = qmc_data.Nx
-    G        = qmc_data.G
-    Nv       = Nx*G
-    start = time.time()
+    Nx          = qmc_data.Nx
+    G           = qmc_data.G
+    Nv          = Nx*G
+    start       = time.time()
     matvec_data = MatVec_data(qmc_data)
-    A        = LinearOperator((Nv,Nv), 
+    A           = LinearOperator((Nv,Nv), 
                               matvec=MatVec,
                               rmatvec=MatVec,
                               matmat= MatVec,
                               rmatmat=MatVec,
                               dtype=float)
-    b        = matvec_data[0]
-    phi0     = qmc_data.source
-    phi0 = np.reshape(phi0,(Nv,1))
+    b           = matvec_data[0]
+    phi0        = qmc_data.source
+    phi0        = np.reshape(phi0,(Nv,1))
 
-    gmres_out = lgmres(A,b,x0=phi0,atol=tol,maxiter=maxit)
-    phi = gmres_out[0]
-    phi = np.reshape(phi, (Nx,G))
-    stop = time.time()
-    run_time = stop - start
+    gmres_out   = lgmres(A,b,x0=phi0,atol=tol,maxiter=maxit)
+    phi         = gmres_out[0]
+    phi         = np.reshape(phi, (Nx,G))
+    stop        = time.time()
+    run_time    = stop - start
     
     if (rank==0):
         if (save_data):
@@ -238,10 +238,9 @@ def SimData(phi, time, tol, nproc):
         }
     return data
 
+
 def Criticality(qmc_data, solver="LGMRES", PItol=1e-5, PImaxit = 50, 
                 SItol=1e-5, SImaxit=50, save_data=True):
-    
-    
     
     return phi
     
