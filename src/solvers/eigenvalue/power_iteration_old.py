@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from src.functions.tallies import Tallies
-from src.functions.source_iteration import SourceIteration
 from src.functions.sweep import Sweep
 from src.functions.save_data import SaveData
 import numpy as np
 import matplotlib.pyplot as plt
-
-from numba import njit
 
 class PowerIteration:
     def __init__(self, init_data, k = 1.0):
@@ -18,11 +15,11 @@ class PowerIteration:
         self.itt = 0
         self.max_SI_iter = 50
         self.max_PI_iter = 50
-        self.k_tol = 1e-5
-        self.phi_tol = 1e-5
+        self.k_tol = 1e-6
+        self.phi_tol = 1e-6
         #self.norm_hist = np.empty((0,self.init_data.G))
         self.tallies = Tallies(self.init_data)
-        self.sweep = Sweep(self.init_data, self.mesh, self.material)
+        self.sweep = Sweep(self.init_data)
         self.error = np.empty((0,1))
         self.k = k
         self.k_old = k+1e-4

@@ -9,12 +9,11 @@ import numpy as np
 from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource
-from src.init_files.mg_init import MultiGroupInit
 from mpi4py import MPI
 
 def SI_Map(phi_in, qmc_data):
     """
-    SI_Map(phi_in, qmc_data)
+    PI_Map(phi_in, qmc_data)
     -----------------------
     Source Iteration Map
     """
@@ -25,8 +24,8 @@ def SI_Map(phi_in, qmc_data):
         (Nv == Nx*G)  
     except Exception as e: print(e) 
     phi_in = np.reshape(phi_in, (Nx,G))
-    source  = GetSource(phi_in, qmc_data)
     tallies = Tallies(qmc_data)
+    source = GetSource(phi_in, qmc_data)
     sweep   = Sweep(qmc_data) # samples are gneratred with initialization of sweep
     sweep.Run(tallies, source) # QMC sweep
     phi_out = tallies.phi_avg
@@ -49,7 +48,7 @@ def RHS(qmc_data):
     Nx  = qmc_data.Nx
     Nv  = Nx*G
     zed = np.zeros((Nx,G))
-    b = SI_Map(zed,qmc_data) # qmc_sweep with phi(0)
+    b   = SI_Map(zed,qmc_data) # qmc_sweep with phi(0)
     return b
 
 
@@ -77,21 +76,15 @@ def MatVec(phi_in):
     """
     b           = matvec_data[0]
     qmc_data    = matvec_data[1]
-    Nx = qmc_data.Nx
-    G = qmc_data.G
-    Nv = Nx*G
-    phi_in = np.reshape(phi_in,(Nv,1))
+    Nx          = qmc_data.Nx
+    G           = qmc_data.G
+    Nv          = Nx*G
+    phi_in      = np.reshape(phi_in,(Nv,1))
 
-    # A* = phi - sweep(phi) - sweep(0)
-    #mxvp        = SI_Map(phi_in, qmc_data)
-    #mxv         = mxvp - b
-    #axv         = phi_in - mxv
-    # A*phi = phi - sweep(phi, zero_source)
     qmc_data.source = np.zeros((Nx,G))
     axv = phi_in - SI_Map(phi_in, qmc_data)
 
     return axv
-
 
 
 

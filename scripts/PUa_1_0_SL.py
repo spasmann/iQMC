@@ -8,19 +8,16 @@ Created on Mon Apr  4 17:52:16 2022
 
 import sys
 sys.path.append("../")
-from src.init_files.PUa_1_0_SL_init import PUa_1_0_SL_init
-from src.functions.power_iteration import PowerIteration
+from src.input_files.PUa_1_0_SL_init import PUa_1_0_SL_init
+from src.solvers.eigenvalue.solvers import PowerIteration
 
 if __name__ == "__main__":
     
     # initialize problem data
-    data = PUa_1_0_SL_init(N=1000, Nx=25, generator="halton")
+    Nx = 20
+    data = PUa_1_0_SL_init(N=10000, Nx=Nx, generator="random")
     data.save_data = False
     data.RQMC = False
-
     PI = PowerIteration(data)
-    PI.max_iter = 10
-    # run source iteration
-    PI.Run()
     
     
