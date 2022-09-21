@@ -16,7 +16,7 @@ class Samples:
     """
     def __init__(self, init_data, geometry, mesh):
         self.generator = init_data.generator
-        self.RQMC = True
+        self.RQMC = False
         self.geometry = geometry
         self.mesh = mesh
         self.G = init_data.G

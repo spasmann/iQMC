@@ -13,8 +13,22 @@ from src.solvers.fixed_source.maps import SI_Map, RHS, MatVec_data, MatVec
 from src.functions.save_data import SaveData
 from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 
-
-def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=False):
+class gmres_counter(object):
+    def __init__(self, disp=True):
+        self._disp = disp
+        self.iter = 0
+        self.callbacks = []
+    def __call__(self, rk=None):
+        self.callbacks.append(rk.copy())
+        self.iter += 1
+        if self._disp:
+            #print(rk)
+            if (self.iter>1):
+                print("**********************")
+                print("Iteration:", self.iter-1, "change: ",np.linalg.norm((rk - self.callbacks[self.iter-2])))
+            
+            
+def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=True):
     """
     Parameters
     ----------
@@ -30,16 +44,10 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=False):
     None.
 
     """
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    nproc = comm.Get_size()
-    
-    if (report_progress) and (rank==0):
-        print("--------- Source Iteration ---------")
-        print("Material: ", qmc_data.material_code)
-        print("Random Number Generator: ", qmc_data.generator)
-        print("Number of Particles per Iteration: ", qmc_data.N)
-        print("Number of Spatial Cells: ", qmc_data.Nx)
+    comm    = MPI.COMM_WORLD
+    rank    = comm.Get_rank()
+    nproc   = comm.Get_size()
+
     Nx      = qmc_data.Nx
     G       = qmc_data.G
     phi0    = qmc_data.source
@@ -68,8 +76,7 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=False):
     return phi
 
 
-
-def GMRES(qmc_data,tol=1e-5,maxit=50):
+def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, save_data=True):
     """
     Parameters
     ----------
@@ -86,61 +93,17 @@ def GMRES(qmc_data,tol=1e-5,maxit=50):
         DESCRIPTION.
 
     """
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    nproc = comm.Get_size()
-    
-    Nx        = qmc_data.Nx
-    G         = qmc_data.G
-    Nv        = Nx*G
-    start = time.time()
-    matvec_data = MatVec_data(qmc_data)
-    A         = LinearOperator((Nv,Nv), 
-                              matvec=MatVec,
-                              rmatvec=MatVec,
-                              matmat= MatVec,
-                              rmatmat=MatVec,
-                              dtype=float) # this line is the problem
-    b         = matvec_data[0]
-    phi0      = qmc_data.source
-    phi0      = np.reshape(phi0,(Nv,1))
-
-    gmres_out = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit)
-    phi       = gmres_out[0]
-    phi       = np.reshape(phi, (Nx,G))
-    stop      = time.time()
-    run_time  = stop-start
+    comm        = MPI.COMM_WORLD
+    rank        = comm.Get_rank()
+    nproc       = comm.Get_size()
     
     if (rank==0):
-        sim_data = SimData(phi, run_time, tol, nproc)
-        SaveData(qmc_data, sim_data)
-        if (gmres_out[1]>0):
-            print("Convergence to tolerance not achieved: Maximum number of iterations.")
-        elif (gmres_out[1]<0):
-            print("Illegal input or breakdown")
-        
-    return phi
-
-def LGMRES(qmc_data,tol=1e-5,maxit=50,save_data=True):
-    """
-    Parameters
-    ----------
-    qmc_data : TYPE
-        DESCRIPTION.
-    tol : TYPE, optional
-        DESCRIPTION. The default is 1e-5.
-    maxit : TYPE, optional
-        DESCRIPTION. The default is 50.
-
-    Returns
-    -------
-    phi : TYPE
-        DESCRIPTION.
-
-    """
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    nproc = comm.Get_size()
+        print("--------- Fixed Source Problem ---------")
+        print("Solver:",                             solver)
+        print("Material: ",                          qmc_data.material_code)
+        print("Random Number Generator: ",           qmc_data.generator)
+        print("Number of Particles per Iteration: ", qmc_data.N)
+        print("Number of Spatial Cells: ",           qmc_data.Nx)
     
     Nx          = qmc_data.Nx
     G           = qmc_data.G
@@ -156,10 +119,32 @@ def LGMRES(qmc_data,tol=1e-5,maxit=50,save_data=True):
     b           = matvec_data[0]
     phi0        = qmc_data.source
     phi0        = np.reshape(phi0,(Nv,1))
-
-    gmres_out   = lgmres(A,b,x0=phi0,atol=tol,maxiter=maxit)
-    phi         = gmres_out[0]
-    phi         = np.reshape(phi, (Nx,G))
+    if (solver=="LGMRES"):
+        counter     = gmres_counter()
+        gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
+        phi         = gmres_out[0]
+        exitCode    = gmres_out[1]
+        phi         = np.reshape(phi, (Nx,G))
+    elif (solver=="GMRES"):
+        counter     = gmres_counter()
+        gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
+        phi         = gmres_out[0]
+        exitCode    = gmres_out[1]
+        phi         = np.reshape(phi, (Nx,G))
+    elif (solver=="BICGSTAB"):
+        counter     = gmres_counter()
+        gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
+        phi         = gmres_out[0]
+        exitCode    = gmres_out[1]
+        phi         = np.reshape(phi, (Nx,G))
+    elif (solver=="Picard"):
+        phi         = Picard(qmc_data,maxit=maxit,tol=tol,save_data=False)
+        exitCode    = 0
+    else:
+        if (rank==0):
+            print(" Invalid Solver ")
+            Exception
+            
     stop        = time.time()
     run_time    = stop - start
     
@@ -167,64 +152,12 @@ def LGMRES(qmc_data,tol=1e-5,maxit=50,save_data=True):
         if (save_data):
             sim_data = SimData(phi, run_time, tol, nproc)
             SaveData(qmc_data, sim_data)
-        if (gmres_out[1]>0):
+        if (exitCode>0):
             print("Convergence to tolerance not achieved: Maximum number of iterations.")
-        elif (gmres_out[1]<0):
+        elif (exitCode<0):
             print("Illegal input or breakdown")
-        
-    return phi
-
-def BICGSTAB(qmc_data,tol=1e-5,maxit=50,save_data=True):
-    """
-    Parameters
-    ----------
-    qmc_data : TYPE
-        DESCRIPTION.
-    tol : TYPE, optional
-        DESCRIPTION. The default is 1e-5.
-    maxit : TYPE, optional
-        DESCRIPTION. The default is 50.
-
-    Returns
-    -------
-    phi : TYPE
-        DESCRIPTION.
-
-    """
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    nproc = comm.Get_size()
-    
-    Nx       = qmc_data.Nx
-    G        = qmc_data.G
-    Nv       = Nx*G
-    start = time.time()
-    
-    matvec_data = MatVec_data(qmc_data)
-    A        = LinearOperator((Nv,Nv), 
-                              matvec=MatVec,
-                              rmatvec=MatVec,
-                              matmat= MatVec,
-                              rmatmat=MatVec,
-                              dtype=float) # this line is the problem
-    b        = matvec_data[0]
-    phi0     = qmc_data.source
-    phi0 = np.reshape(phi0,(Nv,1))
-
-    gmres_out = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit)
-    phi = gmres_out[0]
-    phi = np.reshape(phi, (Nx,G))
-    stop = time.time()
-    run_time = stop - start
-    
-    if (rank==0):
-        if (save_data):
-            sim_data = SimData(phi, run_time, tol, nproc)
-            SaveData(qmc_data, sim_data)
-        if (gmres_out[1]>0):
-            print("Convergence to tolerance not achieved: Maximum number of iterations.")
-        elif (gmres_out[1]<0):
-            print("Illegal input or breakdown")
+        elif (exitCode==0):
+            print("Successful Convergence.")
         
     return phi
 
@@ -238,9 +171,4 @@ def SimData(phi, time, tol, nproc):
         }
     return data
 
-
-def Criticality(qmc_data, solver="LGMRES", PItol=1e-5, PImaxit = 50, 
-                SItol=1e-5, SImaxit=50, save_data=True):
-    
-    return phi
     

@@ -64,8 +64,8 @@ def PUa_H2O_1_0_SL_data(Nx=10):
     siga = np.zeros((Nx,G))
     chi = np.zeros((Nx,G))
     nu = np.zeros((Nx,G))
-    
-    xspan = np.linspace(-R[-1],R[-1],num=Nx)
+    dx = (2*R[1])/Nx
+    xspan = np.linspace(-R[-1]+dx/2,R[-1]-dx/2,num=Nx)
     count = 0
     for x in xspan:
         if (-R[1] <= x <= -R[0]):
