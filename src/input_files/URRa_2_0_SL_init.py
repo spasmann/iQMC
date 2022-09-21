@@ -19,7 +19,7 @@ class URRa_2_0_SL_init:
         self.generator          = generator
         self.totalDim           = 2
         self.RB                 = 7.566853 
-        self.LB                 = 7.566853 
+        self.LB                 = -7.566853 
         self.right              = False
         self.left               = False
         self.material_code      = "URRa_2_0_SL"

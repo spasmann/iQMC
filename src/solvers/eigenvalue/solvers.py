@@ -16,45 +16,64 @@ from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 from mpi4py import MPI
 
 
-def PowerIteration(qmc_data):
-    solver          = "LGMRES"
+class gmres_counter(object):
+    def __init__(self, disp=True):
+        self._disp = disp
+        self.iter = 0
+        self.callbacks = []
+    def __call__(self, rk=None):
+        self.callbacks.append(rk.copy())
+        self.iter += 1
+        if self._disp:
+            #print(rk)
+            if (self.iter>1):
+                print("     Iteration:", self.iter-1, "change: ",np.linalg.norm((rk - self.callbacks[self.iter-2])))
+                
+def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=10, outter_tol=1e-5, inner_tol=1e-5):
+    comm        = MPI.COMM_WORLD
+    rank        = comm.Get_rank()
+    nproc       = comm.Get_size()
+    
     itt             = 0
-    max_SI_iter     = 10
-    max_PI_iter     = 10
-    k_tol           = 1e-3
-    phi_tol         = 1e-1
     k               = qmc_data.keff
     dk              = 1.0
     phi_old         = qmc_data.phi_f.copy()
-    
-    print("--------- Power Iteration ---------")
-    print("Inner Sovler:",                       solver)
-    print("Material: ",                          qmc_data.material_code)
-    print("Random Number Generator: ",           qmc_data.generator)
-    print("Number of Particles per Iteration: ", qmc_data.N)
-    print("Number of Spatial Cells: ",           qmc_data.Nx)
-    print("Initial K: ",                         qmc_data.keff)
+    khist           = np.array([])
+    if (rank==0):
+        print("--------- K-Effective Eigenvalue Problem ---------")
+        print("Outter Solver: Power Iteration")
+        print("Inner Sovler:",                       solver)
+        print("Material: ",                          qmc_data.material_code)
+        print("Random Number Generator: ",           qmc_data.generator)
+        print("Number of Particles per Iteration: ", qmc_data.N)
+        print("Number of Spatial Cells: ",           qmc_data.Nx)
+        print("Initial K: ",                         qmc_data.keff)
     
     # iterate over k effective
-    while (itt<=max_PI_iter) and (dk>=k_tol):
+    while (itt<=max_outter_itt) and (dk>=outter_tol):
         # iterate over scattering source
-        phi_new         = InnerIteration(qmc_data, solver=solver, maxit=max_SI_iter,tol=phi_tol)
+        phi_new         = InnerIteration(qmc_data, solver=solver, maxit=max_inner_itt,tol=inner_tol)
         k_old           = k
         k               = UpdateK(phi_old, phi_new, qmc_data)
+        khist           = np.append(khist, k)
         qmc_data.keff   = k
         qmc_data.phi_f  = phi_new.copy()
         phi_old         = phi_new.copy()
         dk              = abs(k-k_old)
         itt             += 1
-        
-        print("**********************")
-        print("Iteration:", itt, "dk: ",dk)
-        print("k: ", k)
-    if (itt>=max_PI_iter):
-        print("Power Iteration convergence to tolerance not achieved: Maximum number of iterations.")
-    elif (dk<=k_tol):
-        print("-------------------------------")
-        print("Successful Power Iteration convergence.")
+        if (rank==0):
+            print("**********************")
+            print("Iteration:", itt)
+            print("k: ", k)
+            print("dk: ",dk)
+    if (rank==0):
+        if (itt>=max_outter_itt):
+            print("Power Iteration convergence to tolerance not achieved: Maximum number of iterations.")
+        elif (dk<=outter_tol):
+            print("-------------------------------")
+            print("Successful Power Iteration convergence.")
+            
+    return phi_new, khist
 
 def UpdateK(phi_f, phi_s, qmc_data):
     keff        = qmc_data.keff
@@ -99,17 +118,20 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
     phi0        = qmc_data.source
     phi0        = np.reshape(phi0,(Nv,1))
 
-    print("     Inner Iteration: ")
+    if (rank==0):
+        print("     Inner Iteration: ")
     if (solver=="LGMRES"):
-        gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit)
+        counter     = gmres_counter()
+        gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
     elif (solver=="GMRES"):
-        gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit)
+        counter     = gmres_counter()
+        gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
     elif (solver=="BICGSTAB"):
-        gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit)
+        counter     = gmres_counter()
+        gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
     else:
         print(" Not a valid solver ")
         Exception
-        
     phi         = gmres_out[0]
     exitCode    = gmres_out[1]
     phi         = np.reshape(phi, (Nx,G))

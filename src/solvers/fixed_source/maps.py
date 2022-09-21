@@ -33,6 +33,7 @@ def SI_Map(phi_in, qmc_data):
     # all reduce phi_out here (they automatically wait for each other)
     comm = MPI.COMM_WORLD
     phi_out = comm.allreduce(phi_out,op=MPI.SUM)
+    
     return phi_out
 
 
@@ -83,7 +84,8 @@ def MatVec(phi_in):
 
     qmc_data.source = np.zeros((Nx,G))
     axv = phi_in - SI_Map(phi_in, qmc_data)
-
+    comm = MPI.COMM_WORLD
+    
     return axv
 
 
