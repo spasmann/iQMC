@@ -38,7 +38,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=1
     k               = qmc_data.keff
     dk              = 1.0
     phi_old         = qmc_data.phi_f.copy()
-    
+    khist           = np.array([])
     if (rank==0):
         print("--------- K-Effective Eigenvalue Problem ---------")
         print("Outter Solver: Power Iteration")
@@ -55,6 +55,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=1
         phi_new         = InnerIteration(qmc_data, solver=solver, maxit=max_inner_itt,tol=inner_tol)
         k_old           = k
         k               = UpdateK(phi_old, phi_new, qmc_data)
+        khist           = np.append(khist, k)
         qmc_data.keff   = k
         qmc_data.phi_f  = phi_new.copy()
         phi_old         = phi_new.copy()
@@ -72,7 +73,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=1
             print("-------------------------------")
             print("Successful Power Iteration convergence.")
             
-    return phi_new
+    return phi_new, khist
 
 def UpdateK(phi_f, phi_s, qmc_data):
     keff        = qmc_data.keff

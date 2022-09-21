@@ -19,7 +19,7 @@ class PUa_H2O_1_0_SL_init:
         self.generator          = generator
         self.totalDim           = 2
         self.RB                 = 2.849725 
-        self.LB                 = 2.849725 
+        self.LB                 = -2.849725 
         self.right              = False
         self.left               = False
         self.material_code      = "PUa_H2O_1_0_SL"

@@ -13,6 +13,18 @@ from src.solvers.eigenvalue.solvers import PowerIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    data = URRa_2_0_SL_init(N=1000, Nx=25, generator="halton")
+    Nx = 20
+    N = 2**12
+    generator = "halton"
+    solver = "LGMRES"
+    data = URRa_2_0_SL_init(N=N, Nx=Nx, generator=generator)
     data.save_data = False
-    PI = PowerIteration(data)
+    phi = PowerIteration(data,
+                        solver=solver,
+                        max_outter_itt=10, 
+                        max_inner_itt=10, 
+                        outter_tol=1e-6,
+                        inner_tol=1e-6)
+    
+    if (rank==0):
+        plt.plot(range(Nx),phi)
