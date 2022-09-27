@@ -16,15 +16,12 @@ def URRa_2_0_SL_data(Nx=10):
     Nu      = np.array([(2.5,2.5)])
     Sig_f   = np.array([(0.0010484, 0.050632)])
     Sig_c   = np.array([(0.0010046, 0.025788)])
-    
-    Sig_s   = np.array([(0.0, 0.029227),
-                        (2.44383, 0.62568)])
-    Sig_s   = np.flip(Sig_s,axis=1)
+    Sig_s   = np.array([(0.0, 0.62568),
+                        (2.44383, 0.029227)])
     
     Sig_t   = np.array([(0.65696, 2.52025)])
     Sig_a   = Sig_c + Sig_f
     X       = np.array([(1.0,0.0)])
-    R       = np.array([7.566853])
     
     sigt    = np.tile(Sig_t, (Nx,1))
     sigs    = np.tile(Sig_s, (Nx,1,1))

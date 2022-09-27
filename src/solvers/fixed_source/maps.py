@@ -21,7 +21,7 @@ def SI_Map(phi_in, qmc_data):
     Nx  = qmc_data.Nx
     Nv  = phi_in.size
     try:
-        (Nv == Nx*G)  
+        (Nv == Nx*G)
     except Exception as e: print(e) 
     phi_in = np.reshape(phi_in, (Nx,G))
     tallies = Tallies(qmc_data)
@@ -84,7 +84,6 @@ def MatVec(phi_in):
 
     qmc_data.source = np.zeros((Nx,G))
     axv = phi_in - SI_Map(phi_in, qmc_data)
-    comm = MPI.COMM_WORLD
     
     return axv
 

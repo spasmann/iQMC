@@ -76,7 +76,7 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=True):
     return phi
 
 
-def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, save_data=True):
+def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=True, save_data=True):
     """
     Parameters
     ----------
@@ -97,7 +97,7 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, save_data=True):
     rank        = comm.Get_rank()
     nproc       = comm.Get_size()
     
-    if (rank==0):
+    if (report_progress) and (rank==0):
         print("--------- Fixed Source Problem ---------")
         print("Solver:",                             solver)
         print("Material: ",                          qmc_data.material_code)
@@ -120,25 +120,25 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, save_data=True):
     phi0        = qmc_data.source
     phi0        = np.reshape(phi0,(Nv,1))
     if (solver=="LGMRES"):
-        counter     = gmres_counter()
+        counter     = gmres_counter(disp=report_progress)
         gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
         phi         = gmres_out[0]
         exitCode    = gmres_out[1]
         phi         = np.reshape(phi, (Nx,G))
     elif (solver=="GMRES"):
-        counter     = gmres_counter()
+        counter     = gmres_counter(disp=report_progress)
         gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
         phi         = gmres_out[0]
         exitCode    = gmres_out[1]
         phi         = np.reshape(phi, (Nx,G))
     elif (solver=="BICGSTAB"):
-        counter     = gmres_counter()
+        counter     = gmres_counter(disp=report_progress)
         gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
         phi         = gmres_out[0]
         exitCode    = gmres_out[1]
         phi         = np.reshape(phi, (Nx,G))
     elif (solver=="Picard"):
-        phi         = Picard(qmc_data,maxit=maxit,tol=tol,save_data=False)
+        phi         = Picard(qmc_data,maxit=maxit,tol=tol,report_progress=report_progress,save_data=False)
         exitCode    = 0
     else:
         if (rank==0):
@@ -152,11 +152,11 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, save_data=True):
         if (save_data):
             sim_data = SimData(phi, run_time, tol, nproc)
             SaveData(qmc_data, sim_data)
-        if (exitCode>0):
+        if (exitCode>0) and (report_progress):
             print("Convergence to tolerance not achieved: Maximum number of iterations.")
-        elif (exitCode<0):
+        elif (exitCode<0) and (report_progress):
             print("Illegal input or breakdown")
-        elif (exitCode==0):
+        elif (exitCode==0) and (report_progress):
             print("Successful Convergence.")
         
     return phi

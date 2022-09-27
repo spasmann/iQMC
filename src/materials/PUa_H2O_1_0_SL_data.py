@@ -13,7 +13,7 @@ import numpy as np
 
 def PUa_H2O_1_0_SL_data(Nx=10):    
     G       = 1
-    R       = np.array([1.317862, 2.849725])
+    #R       = np.array([1.317862, 2.849725])
     RB      = 2.849725
     LB      = -2.849725
     sigt    = np.empty((Nx,G))

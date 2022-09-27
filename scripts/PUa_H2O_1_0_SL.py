@@ -13,8 +13,8 @@ from src.solvers.eigenvalue.solvers import PowerIteration
 
 if __name__ == "__main__":
     # initialize problem data
-    Nx = 140
-    N = 2**14
+    Nx = 70
+    N = 2**12
     generator = "halton"
     solver = "LGMRES"
     data = PUa_H2O_1_0_SL_init(N=N, Nx=Nx, generator=generator)
@@ -27,4 +27,4 @@ if __name__ == "__main__":
                         inner_tol=1e-6)
     
     if (rank==0):
-        plt.plot(range(Nx),phi)
+        plt.plot(range(Nx),phi[0])
