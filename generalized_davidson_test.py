@@ -10,6 +10,8 @@ from src.solvers.eigenvalue.maps import SI_Map
 from src.input_files.PUa_1_0_SL_init import PUa_1_0_SL_init
 from src.solvers.fixed_source.solvers import FixedSource
 
+import matplotlib.pyplot as plt
+
 def AxV(V, qmc_data):
     """
     Linear operator for scattering term (I-L^(-1)S)*phi
@@ -41,6 +43,9 @@ def BxV(V, qmc_data):
     return bxv
 
 def PreConditioner(V,qmc_data, solver="GMRES"):
+    """
+    Linear operator approximation of L^(-1)S
+    """
     maxit   = 10
     tol     = 1e-6
     Nx      = qmc_data.Nx
@@ -70,38 +75,45 @@ N           = 2**10
 G           = 1
 Nv          = int(Nx*G)
 generator   = "halton"
-#qmc_data    = PUa_1_0_SL_init(N=N, Nx=Nx, generator=generator)
 qmc_data    = PUa_1_0_SL_init(N=N, Nx=Nx, generator=generator)
 phi0        = qmc_data.source
 phi0        = np.reshape(phi0,(Nv,1))
 
 # Davidson Parameters
+start = time.time()
 u       = phi0.copy()
 V       = np.array(u/np.linalg.norm(u).T) # orthonormalize initial guess
 Lambda0 = 1.0
+k_old   = 0.0
+dk      = 1.0
 r0      = AxV(V, qmc_data) - Lambda0*BxV(V, qmc_data) # (A - keff*B)V_0
 r       = r0
 tol     = 1e-9
 itt     = 1
-maxit   = 4
+maxit   = 30
 l       = 1 # compute "l" largest eigenpairs
-m       = 2 # restart parameter (ie maximum size of V)
+m       = 4 # restart parameter (ie maximum size of V)
 
 # Davidson Routine
-while (itt <= maxit) and (np.linalg.norm(r).T>tol*np.linalg.norm(r0)):
+while (itt <= maxit) and (dk>=tol):
     print(" Davidson Iteration: ", itt)
     AV          = np.dot(V.T, AxV(V, qmc_data)) # Scattering linear operator
     BV          = np.dot(V.T, BxV(V, qmc_data)) # Fission linear operator
     [Lambda, w] = sp.eig(AV, b=BV)  # solve for eigenvalues and vectors
     idx         = Lambda.argsort()  # get indices of eigenvalues from smallest to largest
     Lambda      = Lambda[idx]       # sort eigenvalues from smalles to largest
-    Lambda      = Lambda[:l]        # take the l largest eigenvalues
+    Lambda      = Lambda[:l].real   # take the real component of the l largest eigenvalues
+    k           = 1/Lambda
+    dk          = abs(k - k_old)
+    print("dk: ",dk)
+    print(V.shape)
+    k_old       = k
     w           = w[:,idx]          # sort corresponding eigenvector
-    w           = w[:,:l]           # take the l largest eigenvectors
+    w           = w[:,:l].real      # take the l largest eigenvectors
     u           = np.dot(V,w)       # Ritz vectors
-    r           = AxV(u, qmc_data) - Lambda[0]*BxV(u, qmc_data) # residual
+    r           = AxV(u, qmc_data) - Lambda*BxV(u, qmc_data) # residual
     t           = PreConditioner(r, qmc_data)
-    if (V.shape[1] <= m ):
+    if (V.shape[1] <= m-l ):
         V = Gram(V,t) # appends new orthogonalization to V
     else:
         V = Gram(u,t) # "restarts" by appending to a new array 
@@ -110,17 +122,9 @@ while (itt <= maxit) and (np.linalg.norm(r).T>tol*np.linalg.norm(r0)):
         break
     itt += 1
 
-
+stop = time.time()
+print("Davidson took: ", stop-start)
 keff = 1/Lambda
 phi  = V[:,0]
 
-import matplotlib.pyplot as plt
-plt.plot(range(Nx),V)
-"""
-plt.figure()
-plt.plot(range(20), phi[:,0]/phi[:,0].sum(), label='PI')
-plt.plot(range(20), V[:,0]/V[:,0].sum(), label='Davidson')
-plt.legend()
-
-plt.plot(range(20), V[:,0], label='Davidson')
-"""
+plt.plot(range(Nx),phi)

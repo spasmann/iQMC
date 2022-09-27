@@ -11,6 +11,7 @@ sys.path.append("../")
 from src.input_files.PUa_1_0_SL_init import PUa_1_0_SL_init
 from src.solvers.eigenvalue.solvers import PowerIteration
 import matplotlib.pyplot as plt
+import time
 
 if __name__ == "__main__":
     # initialize problem data
@@ -21,14 +22,16 @@ if __name__ == "__main__":
     
     data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=generator)
     data.save_data = False
+    start = time.time()
     phi, khist = PowerIteration(data,
                         solver=solver,
                         max_outter_itt=25, 
                         max_inner_itt=25, 
                         outter_tol=1e-9,
                         inner_tol=1e-9)
-    
-    plt.plot(range(Nx),phi[:,0])
+    stop = time.time()
+    print("PI took: ", stop-start)
+    plt.plot(range(Nx),phi)
     
     #plt.plot(range(len(phi_hist)), phi_hist)
     plt.yscale('log')
