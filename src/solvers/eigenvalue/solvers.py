@@ -12,6 +12,7 @@ from src.functions.sweep import Sweep
 from src.functions.source import GetCriticalitySource
 from src.functions.save_data import SaveData
 from src.solvers.eigenvalue.maps import SI_Map, RHS, MatVec_data, MatVec
+from src.solvers.fixed_source.solvers import Picard
 from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 from mpi4py import MPI
 
@@ -132,6 +133,8 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
     elif (solver=="BICGSTAB"):
         counter     = gmres_counter()
         gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
+    elif (solver=="Picard"):
+        gmres_out = Picard(qmc_data,tol=tol,maxit=maxit,save_data=False,report_progress=True)
     else:
         print(" Not a valid solver ")
         Exception
