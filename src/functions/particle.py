@@ -3,17 +3,17 @@ import numpy as np
 
 class Particle:
     def __init__(self, pos, dir, weight):
-        self.pos = pos
+        self.pos    = pos
         self.weight = weight
-        self.R = self.GetRadius(self.pos)
-        self.dir = dir
-        self.alive = True
-        self.ds = 0.0
-        self.zone = 0
+        self.R      = self.GetRadius(self.pos)
+        self.dir    = dir
+        self.alive  = True
+        self.ds     = 0.0
+        self.zone   = 0
         
     def GetRadius(self, pos):
-        if (pos.size > 1):
-            return np.sqrt(sum(pos**2))
+        if (pos.size > 1): # dont need this if statement if y,z always exist & =0
+            return np.sqrt((pos**2).sum())
         else:
             return pos
 

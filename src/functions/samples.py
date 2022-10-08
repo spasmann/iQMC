@@ -15,18 +15,19 @@ class Samples:
     sources and sampling distributions.
     """
     def __init__(self, init_data, geometry, mesh):
-        self.generator = init_data.generator
-        self.RQMC = False
-        self.geometry = geometry
-        self.mesh = mesh
-        self.G = init_data.G
-        self.N = init_data.N
-        self.Nx = init_data.Nx
-        self.totalDim = init_data.totalDim
-        self.RB = init_data.RB
-        self.LB = init_data.LB
-        self.left = init_data.left
-        self.right = init_data.right
+        self.generator  = init_data.generator
+        self.RQMC       = False
+        self.geometry   = geometry
+        self.mesh       = mesh
+        self.G          = init_data.G
+        self.N          = init_data.N
+        self.Nx         = init_data.Nx
+        self.totalDim   = init_data.totalDim
+        self.RB         = init_data.RB
+        self.LB         = init_data.LB
+        self.left       = init_data.left
+        self.right      = init_data.right
+        
         # split the total number of particles into the different sources
         #self.Nleft = 0
         #self.Nright=0
@@ -38,17 +39,18 @@ class Samples:
         if (self.right):
             self.phi_right = init_data.phi_right
             #self.right = math.floor(0.125*self.N)
+            
         #self.Nvolumetric = self.N - self.Nright - self.Nleft
         # use MPI rank and nproc to determine which random numbers to use
         # each rank will generate the whole matrix, then use "start" and 
         # "stop" to grab the appropriate section
-        comm = MPI.COMM_WORLD
-        rank = comm.Get_rank()
-        nproc = comm.Get_size()
+        comm        = MPI.COMM_WORLD
+        rank        = comm.Get_rank()
+        nproc       = comm.Get_size()
         self.rank   = comm.Get_rank()
         self.nproc  = comm.Get_size()
-        self.start = math.floor((rank/nproc)*self.N)
-        self.stop = math.floor((rank+1)/nproc*self.N) 
+        self.start  = math.floor((rank/nproc)*self.N)
+        self.stop   = math.floor((rank+1)/nproc*self.N) 
 
     def GenerateParticles(self, q):
         self.q = q
@@ -69,19 +71,21 @@ class Samples:
 
     def VolumetricParticles(self):
         for i in range(self.start,self.stop):
-            randPos = self.rng[i,self.counter]
-            randMu = self.rng[i,self.counter+1]
-            pos = self.GetPos(randPos) 
-            mu = self.GetDir(randMu) 
+            randPos = np.array((self.rng[i,self.counter], 0, 0)) # x, y, z
+            randMu  = self.rng[i,self.counter+1]
+            randPhi = self.rng[i,self.counter+2]
+            pos     = self.GetPos(randPos) 
+            mu      = self.GetDir(randMu) 
+            phi     = self.GetPhi(randPhi)
             if (mu == 0.0):
                 # the sobol sequence likes to start out with 0.0
-                # this fix introduces a little bit of noise but should only
+                # this fix introduces a tiny bit of noise but should only
                 # have to used once or twice. the greatest disadvnatge is checking
                 # the if statement every function call
                 mu += (0.5 - np.random.random())
-            zone = self.mesh.GetZone(pos, mu)
-            weight = self.VolumetricWeight(zone)
-            particle = Particle(pos, mu, weight)
+            zone        = self.mesh.GetZone(pos, mu)
+            weight      = self.VolumetricWeight(zone)
+            particle    = Particle(pos, mu, weight)
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
