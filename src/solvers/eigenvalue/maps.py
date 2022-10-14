@@ -25,7 +25,7 @@ def SI_Map(phi_f, phi_in, qmc_data):
         (Nv == Nx*G)  
     except Exception as e: print(e) 
     phi_in      = np.reshape(phi_in, (Nx,G))
-    
+    phi_f       = np.reshape(phi_f, (Nx,G))
     tallies     = Tallies(qmc_data)
     source      = GetCriticalitySource(phi_f, phi_in, qmc_data)
     sweep       = Sweep(qmc_data) # samples are gneratred with initialization of sweep
