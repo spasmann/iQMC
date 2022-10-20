@@ -12,7 +12,7 @@ class Sweep:
         self.N = self.init_data.N
         self.mesh = init_data.mesh
         self.material = init_data.material
-        self.source = self.init_data.source
+        #self.source = self.init_data.source
         self.totalDim = self.init_data.totalDim 
         self.geometry = Geometry(init_data.geometry, self.mesh)
         self.samples = Samples(self.init_data, self.geometry, self.mesh)
