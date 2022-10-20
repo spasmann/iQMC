@@ -7,59 +7,38 @@ Created on Tue Jun  7 14:22:43 2022
 """
 import numpy as np
 
+def scattering_source(cell, phi, material):
+    source = np.dot(phi[cell,:],np.transpose(material.sigs[cell,:,:]))
+    return source
 
-def GetSource(phi_avg, qmc_data):
+def fission_source(cell, phi, keff, material):
+    source = np.dot(phi[cell,:]*material.sigf[cell,:]*material.nu[cell,:],material.chi[cell,:])/keff
+    return source
+
+def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
     """
     Parameters
     ----------
-    phi_avg : scalar flux matrix of size (Nx,G)
-    qmc_data : an object from one of the init_files
+    phi_avg_s : scalar flux for calculating scattering source
+    qmc_data : qmc data structure
+    phi_avg_f : scalar flux for calculating fission source
 
     Returns
     -------
-    q : source term, calculated per spatial cell, for source iteration
+    q : source in every cell, shape (Nx,G)
 
     """
-    material = qmc_data.material
-    source   = qmc_data.source
-    # calculate source for every cell individually
-    q = np.zeros((material.Nx, material.G))
-    for cell in range(material.Nx):
-        q[cell,:] = (np.dot(phi_avg[cell,:],np.transpose(material.sigs[cell,:,:]))+source[cell,:]) 
+    material        = qmc_data.material
+    fixed_source    = qmc_data.source
+    q               = np.zeros((material.Nx, material.G))
+    if (phi_avg_f is None):
+        for cell in range(material.Nx):
+            q[cell,:] = (scattering_source(cell, phi_avg_s, material)  
+                         + fixed_source[cell,:]) 
+    else:
+        keff = qmc_data.keff
+        for cell in range(material.Nx):
+            q[cell,:] = (scattering_source(cell, phi_avg_s, material) 
+                         + fission_source(cell, phi_avg_f, keff, material) 
+                         + fixed_source[cell,:]) 
     return q
-
-
-def GetCriticalitySource(phi_avg_s, phi_avg_f, qmc_data):
-    """
-    GetCriticalitySource(self, phi_avg_s, phi_avg_f)
-    --------------------------------------
-    Calculate source term for Power Iteration eigenvalue problem
-    for every cell individually (loop)
-    
-    Parameters
-    ----------
-    phi_avg_s : scalar flux for inner scatter source iteration
-    phi_avg_f : scalar flux for outter fission source iteration
-
-    Returns
-    -------
-    q : source term
-    """
-    Nx          = qmc_data.Nx
-    G           = qmc_data.G
-    material    = qmc_data.material 
-    keff        = qmc_data.keff
-    q           = np.empty((Nx,G), np.float64)
-    
-    for cell in range(Nx):
-        q[cell,:] = (np.dot(phi_avg_s[cell,:],np.transpose(material.sigs[cell,:,:])) 
-                    + np.dot(phi_avg_f[cell,:]*material.sigf[cell,:]*material.nu[cell,:],material.chi[cell,:])/keff)
-        #assert (np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])[0] >=  phi_avg_s[cell,:][0])
-        #assert (np.sum(np.dot(phi_avg_s[cell,:],self.material.sigs[cell,:,:])) == np.sum(phi_avg_s[cell,:]))
-        
-    assert (q.shape == (Nx,G))
-    
-    return q
-
-    
-    

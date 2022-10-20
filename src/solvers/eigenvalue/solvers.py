@@ -5,16 +5,13 @@ Created on Tue Jun  7 13:18:01 2022
 
 @author: sampasmann
 """
-import numpy as np
 import time
-from src.functions.tallies import Tallies
-from src.functions.sweep import Sweep
-from src.functions.source import GetCriticalitySource
-from src.functions.save_data import SaveData
-from src.solvers.eigenvalue.maps import SI_Map, RHS, MatVec_data, MatVec
-from src.solvers.fixed_source.solvers import Picard
-from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
+import numpy as np
 from mpi4py import MPI
+from src.functions.save_data import SaveData
+from src.solvers.fixed_source.solvers import Picard
+from src.solvers.eigenvalue.maps import MatVec_data, MatVec
+from scipy.sparse.linalg import gmres, lgmres, bicgstab, LinearOperator
 
 
 class gmres_counter(object):
