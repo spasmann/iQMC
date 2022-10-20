@@ -9,18 +9,24 @@ sys.path.append("../../")
 from src.input_files.reeds_init import ReedsInit
 from src.input_files.Ua_1_0_SL_init import Ua_1_0_SL_init
 from src.solvers.fixed_source.maps import RHS as fixed_source_RHS
+from src.solvers.eigenvalue.davidson import AxV, BxV
 from src.solvers.eigenvalue.davidson import PreConditioner
+from src.solvers.eigenvalue.maps import SI_Map
+from src.solvers.eigenvalue.maps import RHS as eigenval_RHS
+from src.solvers.eigenvalue.solvers import UpdateK
 from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource, GetCriticalitySource
 import numpy as np
 import scipy.linalg as sp
 
-from src.solvers.eigenvalue.davidson import AxV, BxV
+
+# =============================================================================
+# Mapping Functions
+# =============================================================================
 
 def fixed_source_sweep(phi_in, data):
     tallies         = Tallies(data)
-    #tallies.phi_avg = phi_in
     sweep           = Sweep(data)
     source          = GetSource(phi_in, data)    
     sweep.Run(tallies, source)
@@ -28,13 +34,11 @@ def fixed_source_sweep(phi_in, data):
     return phi_out
 
 def fixed_source_mat_mul(phi_in, data, b):
-    mmul = fixed_source_sweep(phi_in, data) - b
-    return mmul
+    res = phi_in - (fixed_source_sweep(phi_in, data) - b)
+    return res
 
 def eigenval_sweep(phi_f_in, phi_s_in, data):
     tallies     = Tallies(data)
-    # tallies.phi_avg ?
-    data.phi_f  = phi_f_in
     source      = GetCriticalitySource(phi_f_in, phi_s_in, data)
     sweep       = Sweep(data) 
     sweep.Run(tallies, source) # QMC sweep
@@ -42,14 +46,23 @@ def eigenval_sweep(phi_f_in, phi_s_in, data):
     return phi_out
 
 def eigenval_mat_mul(phi_in, data):
+    phi_in   = PreConditioner(phi_in, data, numSweeps=30)
     axv      = AxV(phi_in, data)
     bxv      = BxV(phi_in, data)
     AV       = np.dot(phi_in.T, axv) # Scattering linear operator
     BV       = np.dot(phi_in.T, bxv) # Fission linear operator
     [Lambda, w] = sp.eig(AV, b=BV)
     Lambda   = Lambda.real
-    mmul = AV - Lambda*BV
-    return mmul
+    res = axv - Lambda*bxv
+    return res
+
+def eigenval_mat_mul_2(phi_in, data, b):
+    res = phi_in - (eigenval_sweep(phi_in, phi_in, data) - b)
+    return res
+
+# =============================================================================
+# Linearity Tests
+# =============================================================================
 
 def test_fixed_source_linearity():
     """
@@ -66,8 +79,9 @@ def test_fixed_source_linearity():
     mv1     = fixed_source_mat_mul(v1, data, b)
     mphi0   = fixed_source_mat_mul(phi0, data, b)
     mr0     = fixed_source_mat_mul(r0, data, b)
-    linerr  = mv1 - (mphi0 + mr0)
-    assert(np.isclose(np.linalg.norm(linerr), 0.0))
+    linerr  = np.linalg.norm(mv1 - (mphi0 + mr0))
+    print(linerr)
+    assert(np.isclose(linerr, 0.0))
 
 def test_eigenval_linearity():
     """
@@ -79,21 +93,34 @@ def test_eigenval_linearity():
     G           = data.G
     Nx          = data.Nx
     phi0        = np.ones((Nx,G))
-    data.phi_f  = phi0
     phi1        = eigenval_sweep(phi0, phi0, data)
     r0          = phi1 - phi0
     v1          = phi0 + r0
     mv1         = eigenval_mat_mul(v1, data)
     mphi0       = eigenval_mat_mul(phi0, data)
     mr0         = eigenval_mat_mul(r0, data)
-    linerr      = mv1 - (mphi0 + mr0)
-    assert(np.isclose(np.linalg.norm(linerr), 0.0))
+    linerr  = np.linalg.norm(mv1 - (mphi0 + mr0))
+    print(linerr)
+    assert(np.isclose(linerr, 0.0))
     
-#def test_davidson_preconditioner_liearity():
-    # should match structure of fixed_source_linearity
-    # since it is a series of scattering source sweeps
+def test_davidson_preconditioner_liearity():
+    data    = Ua_1_0_SL_init(N=2**7, Nx=10, generator="halton")
+    sweeps  = 1
+    G       = data.G
+    Nx      = data.Nx
+    phi0    = np.ones((Nx,G))
+    phi1    = PreConditioner(phi0, data, numSweeps=sweeps)
+    r0      = phi1 - phi0
+    v1      = phi0 + r0
+    mv1     = PreConditioner(v1, data, numSweeps=sweeps)
+    mphi0   = PreConditioner(phi0, data, numSweeps=sweeps)
+    mr0     = PreConditioner(r0, data, numSweeps=sweeps)
+    linerr  = np.linalg.norm(mv1 - (mphi0 + mr0))
+    print(linerr)
+    assert(np.isclose(linerr, 0.0))
 
 if (__name__ == "__main__"):
     test_fixed_source_linearity()
     test_eigenval_linearity()
+    test_davidson_preconditioner_liearity()
     
