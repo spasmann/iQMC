@@ -6,20 +6,16 @@ Created on Wed Oct 19 10:43:20 2022
 """
 import sys
 sys.path.append("../../")
-from src.input_files.reeds_init import ReedsInit
-from src.input_files.Ua_1_0_SL_init import Ua_1_0_SL_init
-from src.solvers.fixed_source.maps import RHS as fixed_source_RHS
-from src.solvers.eigenvalue.davidson import AxV, BxV
-from src.solvers.eigenvalue.davidson import PreConditioner
-from src.solvers.eigenvalue.maps import SI_Map
-from src.solvers.eigenvalue.maps import RHS as eigenval_RHS
-from src.solvers.eigenvalue.solvers import UpdateK
-from src.functions.tallies import Tallies
-from src.functions.sweep import Sweep
-from src.functions.source import GetSource, GetCriticalitySource
 import numpy as np
 import scipy.linalg as sp
-
+from src.functions.sweep import Sweep
+from src.functions.tallies import Tallies
+from src.input_files.reeds_init import ReedsInit
+from src.input_files.Ua_1_0_SL_init import Ua_1_0_SL_init
+from src.solvers.eigenvalue.davidson import AxV, BxV
+from src.solvers.eigenvalue.davidson import PreConditioner
+from src.solvers.fixed_source.maps import RHS as fixed_source_RHS
+from src.functions.source import GetSource, GetCriticalitySource
 
 # =============================================================================
 # Mapping Functions
