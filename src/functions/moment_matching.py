@@ -7,9 +7,9 @@ Created on Mon Apr 11 12:20:37 2022
 """
 
 import numpy as np
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
-import sympy as sym
+#import sympy as sym
 
 
 def shift_samples(LB, RB, x_values, plot=False):
@@ -82,7 +82,7 @@ def shift_samples(LB, RB, x_values, plot=False):
     
     return x
 
-
+"""
 def shift_samples_sympy(LB, RB, x_values, plot=False):
     
     E = (RB+LB)/2
@@ -142,7 +142,7 @@ def get_answer(f,LB,RB):
     A = F.evalf(subs={x: RB}) - F.evalf(subs={x: LB})
     
     return F
-
+"""
 
 
 def bisection(f,a,b,tol=1e-6):
@@ -164,13 +164,13 @@ def bisection(f,a,b,tol=1e-6):
 
 
 
-def MC_plotting(F,f,LB,RB,Ns,A,sols,sols_shift):
+#def MC_plotting(F,f,LB,RB,Ns,A,sols,sols_shift):
     """
     Plots:
         - function and area under the curve given bounds
         - standard deviation of estimate
         - mean absolute error of estimate
-    """
+    
     fig, ax = plt.subplots(1,3,figsize=(18,6), dpi=500)
     
     ########################################
@@ -231,10 +231,10 @@ def MC_plotting(F,f,LB,RB,Ns,A,sols,sols_shift):
     ax[2].legend()
     
     return
+"""
 
 
-
-def monte_carlo_test(F, A, LB, RB, Ns=[1000], times=30, sympy=False):
+#def monte_carlo_test(F, A, LB, RB, Ns=[1000], times=30, sympy=False):
     """
     Parameters
     ----------
@@ -251,7 +251,7 @@ def monte_carlo_test(F, A, LB, RB, Ns=[1000], times=30, sympy=False):
     -------
     None.
 
-    """
+ 
     x = sym.symbols("x")
     f = sym.lambdify(x, F, "numpy")
     
@@ -281,7 +281,7 @@ def monte_carlo_test(F, A, LB, RB, Ns=[1000], times=30, sympy=False):
     return 
     
     
-    
+    """
     
     
     
