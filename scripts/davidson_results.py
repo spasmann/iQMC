@@ -10,17 +10,18 @@ import sys
 sys.path.append("../")
 import numpy as np
 from src.input_files.PUa_1_0_SL_init import PUa_1_0_SL_init
-from src.solvers.eigenvalue.solvers import PowerIteration
+from src.solvers.eigenvalue.davidson import Davidson
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     # initialize problem data
-    NList   = [2**7]
+    NList   = [2**7, 2**8, 2**9, 2**10, 2**11, 2**12, 2**13]
     Nx      = 20
     tol     = 1e-6
     maxit   = 25
+    preC    = 6
     solver  = "LGMRES"
-    QMC     = "sobol"
+    QMC     = "halton"
     MC      = "random"
     k_QMC_list = []
     k_MC_list = []
@@ -31,23 +32,13 @@ if __name__ == "__main__":
         N = NList[i]
         data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=QMC)
         data.save_data = False
-        phi_QMC, k_hist_QMC = PowerIteration(data,
-                                             solver         = solver,
-                                             max_outter_itt = maxit, 
-                                             max_inner_itt  = maxit, 
-                                             outter_tol     = tol,
-                                             inner_tol      = tol)
-        k_QMC_list.append(k_hist_QMC[-1])
+        QMCphi, QMCkeff, QMCitt = Davidson(data, k0=1.0, l=1, m=maxit, numSweeps=preC, tol=tol, maxit=maxit)
+        k_QMC_list.append(QMCkeff)
         
         data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=MC)
         data.save_data = False
-        phi_MC, k_hist_MC = PowerIteration(data,
-                                           solver         = solver,
-                                           max_outter_itt = maxit, 
-                                           max_inner_itt  = maxit, 
-                                           outter_tol     = tol,
-                                           inner_tol      = tol)
-        k_MC_list.append(k_hist_MC[-1])
+        MCphi, MCkeff, MCitt = Davidson(data, k0=1.0, l=1, m=maxit, numSweeps=preC, tol=tol, maxit=maxit)
+        k_MC_list.append(MCkeff)
         print(abs(1.0-k_MC_list[-1]), "   ", abs(1.0-k_QMC_list[-1]))
 
 
@@ -64,8 +55,8 @@ plt.legend()
 plt.title('K-Effective Error')
 
 plt.figure(dpi=300)
-plt.plot(range(Nx), phi_QMC, label="QMC")
-plt.plot(range(Nx), phi_MC, label="MC")
+plt.plot(range(Nx), QMCphi, label="QMC")
+plt.plot(range(Nx), MCphi, label="MC")
 plt.legend()
 plt.ylabel('Scalar Flux')
 plt.xlabel('x')

@@ -78,7 +78,7 @@ class Samples:
                 # this fix introduces a little bit of noise but should only
                 # have to used once or twice. the greatest disadvnatge is checking
                 # the if statement every function call
-                mu += (0.5 - np.random.random())
+                mu += 0.234#(0.5 - np.random.random())
             zone = self.mesh.GetZone(pos, mu)
             weight = self.VolumetricWeight(zone)
             particle = Particle(pos, mu, weight)
