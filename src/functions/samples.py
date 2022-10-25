@@ -4,7 +4,6 @@ import numpy as np
 import math
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
-from src.functions.moment_matching import shift_samples
 from mpi4py import MPI
 
 class Samples:
@@ -151,37 +150,3 @@ class Samples:
         # BV: boundary value, i.e. phi_left or phi_right 
         return (self.geometry.SurfaceArea()*BV/self.N)
  
-    def moment_matching(self):
-        ## Currently only shifting volumetric particles
-        ## could shift boundary particle angle in the future
-        x = np.zeros(self.N)
-        mu = np.zeros(self.N)
-        # we only want to shift the volumetric particles not the boundary
-        start = 0
-        end = self.N
-        if (self.left):
-            start += self.N
-            end += self.N
-        if (self.right):
-            start += self.N
-            end += self.N
-        # take angle and position from voluemtric particles into new arrays
-        count = 0
-        for i in range(start,end):
-            x[count] = self.particles[i].pos
-            mu[count] = self.particles[i].dir
-            count += 1
-        # shift new arrays
-        shifted_x = shift_samples(self.LB, self.RB, x)
-        shifted_mu = shift_samples(-1.0, 1.0, mu)
-        # put shifted values back into particles
-        count = 0
-        for j in range(start, end):
-            self.particles[j].pos = shifted_x[count]
-            self.particles[j].dir = shifted_mu[count]
-            count += 1
-
-        
-        
-    
-        
