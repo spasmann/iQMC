@@ -74,7 +74,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=1
             print("-------------------------------")
             print("Successful Power Iteration convergence.")
             
-    return phi_new, k_hist #, res_hist
+    return phi_new, k_hist, itt #, res_hist
 
 def UpdateK(phi_f, phi_s, qmc_data):
     keff        = qmc_data.keff
