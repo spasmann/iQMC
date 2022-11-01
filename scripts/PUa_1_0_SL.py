@@ -27,8 +27,8 @@ if __name__ == "__main__":
                         solver=solver,
                         max_outter_itt=25, 
                         max_inner_itt=25, 
-                        outter_tol=1e-9,
-                        inner_tol=1e-9)
+                        outter_tol=1e-6,
+                        inner_tol=1e-6)
     stop = time.time()
     print("PI took: ", stop-start)
     plt.plot(range(Nx),phi)

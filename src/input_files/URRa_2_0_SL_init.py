@@ -36,5 +36,5 @@ class URRa_2_0_SL_init:
         self.mesh               = Mesh(self.LB, self.RB, self.Nx)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
-        self.source             = np.ones((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
+        self.source             = np.zeros((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
         self.phi_f              = np.ones((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))

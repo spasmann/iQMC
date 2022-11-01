@@ -28,7 +28,7 @@ def PUa_1_0_SL_data(Nx=100):
     sigf = np.tile(sigf,(Nx,G))
     siga = np.tile(siga, (Nx,G))
     nu = np.tile(nu,(Nx,G))
-    chi = np.tile(chi,(Nx,G))
+    chi = np.tile(chi,(Nx,G,G))
     
     """
     G = 2

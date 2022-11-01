@@ -8,11 +8,17 @@ Created on Tue Jun  7 14:22:43 2022
 import numpy as np
 
 def scattering_source(cell, phi, material):
-    source = np.dot(phi[cell,:],np.transpose(material.sigs[cell,:,:]))
+    # source = np.dot((material.sigs[cell,:,:]), phi[cell,:])
+    source = np.zeros(material.G)
+    for i in range(material.G):
+        source[i] = np.dot(material.sigs[cell,i,:], phi[cell,:])
     return source
 
 def fission_source(cell, phi, keff, material):
-    source = np.dot(phi[cell,:]*material.sigf[cell,:]*material.nu[cell,:],material.chi[cell,:])/keff
+    #source = np.dot(material.nu[cell,:]*material.chi[cell,:,:]*material.sigf[cell,:]/keff, phi[cell,:])
+    source = np.zeros(material.G)
+    for i in range(material.G):
+        source[i] = np.dot(material.chi[cell,i]*material.nu[cell,:]*material.sigf[cell,:]/keff, phi[cell,:])
     return source
 
 def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
