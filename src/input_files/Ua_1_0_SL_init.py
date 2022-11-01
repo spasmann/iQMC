@@ -22,7 +22,7 @@ class Ua_1_0_SL_init:
         self.LB                 = -2.872934 
         self.right              = False
         self.left               = False
-        self.material_code      = "Ua_1_0_SL_data"
+        self.material_code      = "Ua_1_0"
         self.geometry           = "slab"
         self.avg_scalar_flux    = True
         self.edge_scalar_flux   = False

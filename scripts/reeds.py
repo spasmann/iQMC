@@ -16,14 +16,14 @@ if __name__ == "__main__":
     procname = MPI.Get_processor_name()
     
     N = 2**12
-    Nx = 160
+    Nx = 64
     G = 1
-    generator = "halton"
+    generator = "sobol"
     solver = "LGMRES"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
     start = time.time()
     maxit = 25
-    tol = 1e-12
+    tol = 1e-6
     phi = FixedSource(data,solver=solver, maxit=maxit, tol=tol, save_data=False)
 
     stop = time.time()
