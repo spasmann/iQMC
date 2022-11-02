@@ -22,7 +22,7 @@ tmp*
 *.core
 .DS_Store # for mac users
 **/.DS_Store
-
+**/.pyc
 # test cache
 .pytest_cache
 pytestdebug.log
