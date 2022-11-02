@@ -8,26 +8,26 @@ Created on Tue Jun  7 13:17:55 2022
 import numpy as np
 from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
-from src.functions.source import GetCriticalitySource
+from src.functions.source import GetSource
 from mpi4py import MPI
 
 
-def SI_Map(phi_f, phi_in, qmc_data):
+def SI_Map(phi_f, phi_s, qmc_data):
     """
-    PI_Map(phi_in, qmc_data)
+    PI_Map(phi_f, phi_s, qmc_data)
     -----------------------
-    Source Iteration Map
+
     """
     G   = qmc_data.G
     Nx  = qmc_data.Nx
-    Nv  = phi_in.size
+    Nv  = phi_s.size
     try:
         (Nv == Nx*G)  
     except Exception as e: print(e) 
-    phi_in      = np.reshape(phi_in, (Nx,G))
-    
+    phi_s      = np.reshape(phi_s, (Nx,G))
+    phi_f       = np.reshape(phi_f, (Nx,G))
     tallies     = Tallies(qmc_data)
-    source      = GetCriticalitySource(phi_f, phi_in, qmc_data)
+    source      = GetSource(phi_s, qmc_data, phi_avg_f=phi_f)
     sweep       = Sweep(qmc_data) # samples are gneratred with initialization of sweep
     #print("         QMC Sweep ")
     sweep.Run(tallies, source) # QMC sweep

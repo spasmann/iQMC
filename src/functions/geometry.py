@@ -11,10 +11,8 @@ class Geometry:
     def DistanceToEdge(self, particle):
         if (self.geometry == "slab"):
             return self.SlabEdge(particle)
-        elif (self.geometry == "cylinder"):
-            return self.CylinderEdge(particle)
-        elif (self.geometry == "sphere"):
-            return self.SphereEdge(particle)
+        elif (self.geometry == "cylinder") or (self.geometry == "sphere"):
+            return self.CurviLinearEdge(particle, self.mesh)
         
     def SlabEdge(self, particle):
         assert (particle.dir != 0.0)
@@ -39,17 +37,19 @@ class Geometry:
             return 0.5
 
 # for now, not making this part of the class so that I can use numba later
-def CylinderEdge(particle):
+def CurviLinearEdge(particle, mesh, geometry):
     x,y,z   = particle.pos[:]
     mu,phi  = particle.dir[:]
     r       = particle.r
-    
     muSin   = math.sqrt(1-mu**2)
-    a       = muSin*math.cos(phi)**2 + muSin*math.sin(phi)**2
-    k       = (z*muSin*math.cos(phi) + y*muSin*math.sin(phi))
     zone    = mesh.GetZone(r, mu)
     IB      = mesh.lowR[zone]   # inner cell boundary
     OB      = mesh.highR[zone]  # outter cell boundary
+    
+    if (geometry == "cylinder"):
+        a,k = cylinder_parameters(x,y,z,mu,muSin,phi)
+    elif (geometry == "sphere"):
+        a,k = sphere_parameters(x,y,z,mu,muSin,phi)
     
     # need to check both boundaries 
     for R in [IB,OB]:
@@ -69,4 +69,14 @@ def CylinderEdge(particle):
                     distance_to_edge = d1
     return (distance_to_edge + 1e-9)
 
-#def SphereEdge():
+
+def cylinder_parameters(x,y,z,mu,muSin,phi):
+    a = muSin*math.cos(phi)**2 + muSin*math.sin(phi)**2
+    k = (z*muSin*math.cos(phi) + y*muSin*math.sin(phi))
+    return a,k
+
+def sphere_parameters(x,y,z,mu,muSin,phi):
+    k = (x*muSin*math.cos(phi) + y*muSin*math.sin(phi) + z*mu)
+    a = 1
+    return a,k
+

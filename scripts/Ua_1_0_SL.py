@@ -10,11 +10,29 @@ import sys
 sys.path.append("../")
 from src.input_files.Ua_1_0_SL_init import Ua_1_0_SL_init
 from src.solvers.eigenvalue.solvers import PowerIteration
+import matplotlib.pyplot as plt
+import time
 
 if __name__ == "__main__":
     
     # initialize problem data
-    data = Ua_1_0_SL_init(N=1000, Nx=25, generator="halton")
+    Nx = 20
+    N = 2**10
+    solver = "LGMRES"
+    generator = "halton"
+    
+    data = Ua_1_0_SL_init(N=N, Nx=Nx, generator=generator)
     data.save_data = False
-    data.RQMC = False
-    PI = PowerIteration(data)
+    start = time.time()
+    phi, khist = PowerIteration(data,
+                        solver=solver,
+                        max_outter_itt=25, 
+                        max_inner_itt=25, 
+                        outter_tol=1e-6,
+                        inner_tol=1e-6)
+    stop = time.time()
+    print("PI took: ", stop-start)
+    plt.plot(range(Nx),phi)
+    
+    #plt.plot(range(len(phi_hist)), phi_hist)
+    #plt.yscale('log')

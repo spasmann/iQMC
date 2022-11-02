@@ -8,41 +8,47 @@ Created on Mon Sep 26 14:25:02 2022
 
 import sys
 sys.path.append("../")
+import numpy as np
 from src.input_files.PUa_1_0_SL_init import PUa_1_0_SL_init
 from src.solvers.eigenvalue.solvers import PowerIteration
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     # initialize problem data
-    NList   = [2**10, 2**11, 2**12, 2**13, 2**14, 2**15, 2**16]
-    Nx      = 40
+    NList   = [2**7]
+    Nx      = 20
+    tol     = 1e-6
+    maxit   = 25
     solver  = "LGMRES"
-    QMC     = "halton"
+    QMC     = "sobol"
     MC      = "random"
     k_QMC_list = []
     k_MC_list = []
-    
+    print("    Keff Error    ")
+    print("------------------")
+    print("   MC        QMC   ")
     for i in range(len(NList)):
         N = NList[i]
         data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=QMC)
         data.save_data = False
         phi_QMC, k_hist_QMC = PowerIteration(data,
-                    solver=solver,
-                    max_outter_itt=25, 
-                    max_inner_itt=25, 
-                    outter_tol=1e-9,
-                    inner_tol=1e-9)
+                                             solver         = solver,
+                                             max_outter_itt = maxit, 
+                                             max_inner_itt  = maxit, 
+                                             outter_tol     = tol,
+                                             inner_tol      = tol)
         k_QMC_list.append(k_hist_QMC[-1])
         
         data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=MC)
         data.save_data = False
         phi_MC, k_hist_MC = PowerIteration(data,
-                    solver=solver,
-                    max_outter_itt=25, 
-                    max_inner_itt=25, 
-                    outter_tol=1e-9,
-                    inner_tol=1e-9)
+                                           solver         = solver,
+                                           max_outter_itt = maxit, 
+                                           max_inner_itt  = maxit, 
+                                           outter_tol     = tol,
+                                           inner_tol      = tol)
         k_MC_list.append(k_hist_MC[-1])
+        print(abs(1.0-k_MC_list[-1]), "   ", abs(1.0-k_QMC_list[-1]))
 
 
 QMC = np.array(k_QMC_list)
