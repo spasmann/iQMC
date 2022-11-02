@@ -69,6 +69,7 @@ class Samples:
             self.moment_matching()
 
     def VolumetricParticles(self):
+        geo = self.geometry.geometry
         for i in range(self.start,self.stop):
             randX   = self.rng[i,self.counter]
             randMu  = self.rng[i,self.counter+1]
@@ -76,7 +77,7 @@ class Samples:
             mu      = self.GetMu(randMu)
             if (mu == 0.0):
                 mu += 0.01
-            if (self.geometry == "cylinder") or (self.geometry == "sphere"):
+            if (geo == "cylinder") or (geo == "sphere"):
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)

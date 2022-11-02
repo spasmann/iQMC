@@ -22,7 +22,7 @@ class Sweep:
         #print("New Sweep ****************************************")
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.pos[0], particle.angles[0])
-            particle.IsAlive(self.mesh)
+            particle.IsAlive(self.mesh, self.geometry.geometry)
             #print("New Particle ################################")
             while (particle.alive):
                 #print("-------------------")
@@ -34,7 +34,7 @@ class Sweep:
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)
                 particle.Move(self.mesh)
-                particle.IsAlive(self.mesh)
+                particle.IsAlive(self.mesh, self.geometry.geometry)
                 if (particle.weight.all() == 0.0):
                     particle.alive = False
             count += 1

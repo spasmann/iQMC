@@ -34,10 +34,14 @@ class Particle:
     def GetZone(self, mesh):
         return mesh.GetZone(self.pos[0], self.angles[0])
         
-    def IsAlive(self, mesh):
-        if (self.angles[0] > 0):
-            if (self.R >= mesh.RB):
-                self.alive = False
+    def IsAlive(self, mesh, geometry):
+        if (geometry == "slab"):
+            if (self.angles[0] > 0):
+                if (self.R >= mesh.RB):
+                    self.alive = False
+            else:
+                if (self.R >= abs(mesh.LB)):
+                    self.alive = False
         else:
-            if (self.R >= abs(mesh.LB)):
+            if(self.R >= mesh.RB):
                 self.alive = False

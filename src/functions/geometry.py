@@ -12,7 +12,7 @@ class Geometry:
         if (self.geometry == "slab"):
             return self.SlabEdge(particle)
         elif (self.geometry == "cylinder") or (self.geometry == "sphere"):
-            return self.CurviLinearEdge(particle, self.mesh, self.geometry)
+            return CurviLinearEdge(particle, self.mesh, self.geometry)
         
     def SlabEdge(self, particle):
         assert (particle.angles[0] != 0.0)
@@ -42,7 +42,7 @@ class Geometry:
 def CurviLinearEdge(particle, mesh, geometry):
     x,y,z         = particle.pos[:]
     mu,muSin,phi  = particle.angles[:]
-    r             = particle.r
+    r             = particle.R
     zone          = mesh.GetZone(r, mu)
     IB            = mesh.lowR[zone]   # inner cell boundary
     OB            = mesh.highR[zone]  # outter cell boundary
@@ -77,6 +77,6 @@ def cylinder_parameters(x,y,z,mu,muSin,phi):
     return a,k
 
 def sphere_parameters(x,y,z,mu,muSin,phi):
-    k = (x*muSin*math.cos(phi) + y*muSin*math.sin(phi) + z*mu)
+    k = (x*mu + y*muSin*math.sin(phi) + z*muSin*math.cos(phi))
     a = 1
     return a,k
