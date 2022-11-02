@@ -12,7 +12,6 @@ class Sweep:
         self.N = self.init_data.N
         self.mesh = init_data.mesh
         self.material = init_data.material
-        #self.source = self.init_data.source
         self.totalDim = self.init_data.totalDim 
         self.geometry = Geometry(init_data.geometry, self.mesh)
         self.samples = Samples(self.init_data, self.geometry, self.mesh)
@@ -23,7 +22,7 @@ class Sweep:
         tallies.ResetPhiAvg()
         self.samples.GenerateParticles(self.q)
         for particle in self.samples.particles:
-            particle.zone = self.mesh.GetZone(particle.R, particle.dir)
+            particle.zone = self.mesh.GetZone(particle.R, particle.angles[0])
             particle.IsAlive(self.mesh)
             while (particle.alive):
                 particle.ds = self.geometry.DistanceToEdge(particle)
@@ -34,7 +33,7 @@ class Sweep:
                 particle.UpdateWeight(sigt)
                 particle.Move()
                 particle.IsAlive(self.mesh)
-                particle.zone = self.mesh.GetZone(particle.pos, particle.dir)
+                particle.zone = self.mesh.GetZone(particle.R, particle.angles[0])
                 if (particle.weight.all() == 0.0):
                     particle.alive = False
             count += 1
