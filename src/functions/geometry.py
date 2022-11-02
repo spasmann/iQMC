@@ -16,10 +16,12 @@ class Geometry:
         
     def SlabEdge(self, particle):
         assert (particle.angles[0] != 0.0)
+        x   = particle.pos[0]
+        mu  = particle.angles[0]
         if (particle.angles[0] > 0.0):
-            ds = (self.mesh.highR[particle.zone] - particle.R)/(particle.angles[0]) + 1e-9
-        elif (particle.angles[0] < 0.0):
-            ds = (self.mesh.lowR[particle.zone] - particle.R)/(particle.angles[0]) + 1e-9
+            ds = (self.mesh.highR[particle.zone] - x)/mu + 1e-9
+        else:
+            ds = (self.mesh.lowR[particle.zone] - x)/mu + 1e-9
         return ds 
     
     def CellVolume(self, zone):

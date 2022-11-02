@@ -74,6 +74,8 @@ class Samples:
             randMu  = self.rng[i,self.counter+1]
             x       = self.GetPos(randX) 
             mu      = self.GetMu(randMu)
+            if (mu == 0.0):
+                mu += 0.01
             if (self.geometry == "cylinder") or (self.geometry == "sphere"):
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
@@ -84,7 +86,7 @@ class Samples:
             pos      = np.array((x,0,0))
             zone     = self.mesh.GetZone(x, mu)
             weight   = self.VolumetricWeight(zone)
-            particle = Particle(pos, angle, weight)
+            particle = Particle(pos, angle, weight, zone)
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
@@ -113,8 +115,7 @@ class Samples:
         sampler = Sobol(d=self.totalDim,scramble=self.RQMC, seed=1234)
         m = round(math.log(self.N, 2))
         samples = sampler.random_base2(m=m)
-        samples[samples == 0.0] = 0.001 # replace samples that = 0
-        return 
+        return samples
     
     def HaltonMatrix(self):
         sampler = Halton(d=self.totalDim,scramble=self.RQMC)
@@ -147,7 +148,6 @@ class Samples:
     def GetR(self,pos):
         return np.sqrt(sum(pos**2))
 
-    
     def VolumetricWeight(self, zone):
         weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
         return weight

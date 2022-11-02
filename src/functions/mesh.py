@@ -3,17 +3,26 @@ import numpy as np
 
 class Mesh:
     def __init__(self, LB, RB, Nx):
-        self.Nx = Nx
-        self.LB = LB
-        self.RB = RB
-        self.dx = (RB - LB)/Nx
-        self.lowR = np.linspace(LB,(RB-self.dx),Nx)
-        self.highR = np.linspace(LB+self.dx,RB,Nx)
-        self.midpoints = np.linspace(LB+(self.dx*0.5), RB-(self.dx*0.5), Nx)
+        self.Nx         = Nx
+        self.LB         = LB
+        self.RB         = RB
+        self.dx         = (RB - LB)/Nx
+        self.lowR       = np.linspace(LB,(RB-self.dx),Nx)
+        self.highR      = np.linspace(LB+self.dx,RB,Nx)
+        self.midpoints  = np.linspace(LB+(self.dx*0.5), RB-(self.dx*0.5), Nx)
+        self.edges      = np.linspace(LB,RB,Nx+1)
+        
     def GetZone(self, r, mu):
         if (mu > 0):    
             return np.argmax((r >= self.lowR)*(r < self.highR)) 
         else:
             return np.argmax((r > self.lowR)*(r <= self.highR)) 
+        
+    def GetEdge(self, r, mu):
+        if (mu > 0):
+            return np.argmax((r<self.edges))
+        else:
+            return np.argmax((r>self.edges))
+        
 
     

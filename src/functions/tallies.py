@@ -4,16 +4,15 @@ import numpy as np
 class Tallies:
     def __init__(self, init_data):
         
-        self.avg_scalar_flux = init_data.avg_scalar_flux
-        self.edge_scalar_flux = init_data.edge_scalar_flux
-        self.avg_angular_flux = init_data.avg_angular_flux
-        self.avg_current = init_data.avg_current
-        self.edge_current = init_data.edge_current
-        self.shannon_entropy = init_data.shannon_entropy
-        
-        self.Nr = init_data.Nx
-        self.G = init_data.G
-        self.dtype = np.float64
+        self.avg_scalar_flux    = init_data.avg_scalar_flux
+        self.edge_scalar_flux   = init_data.edge_scalar_flux
+        self.avg_angular_flux   = init_data.avg_angular_flux
+        self.avg_current        = init_data.avg_current
+        self.edge_current       = init_data.edge_current
+        self.shannon_entropy    = init_data.shannon_entropy
+        self.Nr                 = init_data.Nx
+        self.G                  = init_data.G
+        self.dtype              = np.float64
         
         if (init_data.avg_scalar_flux):
             self.phi_avg = np.random.random(size=(self.Nr,self.G))
@@ -47,13 +46,13 @@ class Tallies:
         """
         
     def AvgScalarFlux(self, particle, material, geometry):
-        zone = particle.zone
-        G = material.G
-        weight = particle.weight
-        ds = particle.ds
-        sigt = material.sigt[zone,:]
-        sigt = np.reshape(sigt, (1,G))
-        dV = geometry.CellVolume(zone)
+        zone    = particle.zone
+        G       = material.G
+        weight  = particle.weight
+        ds      = particle.ds
+        sigt    = material.sigt[zone,:]
+        sigt    = np.reshape(sigt, (1,G))
+        dV      = geometry.CellVolume(zone)
         if (sigt.all() > 1e-12):
             self.phi_avg[zone,:] += (weight*(1-np.exp(-(ds*sigt)))/(sigt*dV))[0,:]
         else:
