@@ -25,7 +25,8 @@ def U_2_0_data(Nx=10):
     ###########################################
     Sig_t   = np.array([(0.3456, 0.2160)])
     ###########################################
-    X       = np.array([(0.425, 0.575)])
+    X       = np.array([(0.425, 0.425),
+                        (0.575, 0.575)])
     ###########################################
     Sig_a   = Sig_c + Sig_f
     
@@ -33,7 +34,7 @@ def U_2_0_data(Nx=10):
     sigs    = np.tile(Sig_s, (Nx,1,1))
     sigf    = np.tile(Sig_f, (Nx,1))
     siga    = np.tile(Sig_a, (Nx,1))
-    chi     = np.tile(X, (Nx,1))
+    chi     = np.tile(X, (Nx,1,1))
     nu      = np.tile(Nu, (Nx,1))
     
     return sigt, sigs, sigf, siga, chi, nu, G
