@@ -31,3 +31,4 @@ pytestdebug.log
 
 # old functions
 ./src/functions/moment_matching.py
+src/functions/__pycache__/
