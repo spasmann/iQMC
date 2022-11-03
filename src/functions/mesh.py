@@ -18,11 +18,5 @@ class Mesh:
         else:
             return np.argmax((r > self.lowR)*(r <= self.highR)) 
         
-    def GetEdge(self, r, mu):
-        if (mu > 0):
-            return np.argmax((r<self.edges))
-        else:
-            return np.argmax((r>self.edges))
-        
 
     
