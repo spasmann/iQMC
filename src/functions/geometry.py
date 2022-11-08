@@ -43,10 +43,10 @@ def CurviLinearEdge(particle, mesh, geometry):
     x,y,z         = particle.pos[:]
     mu,muSin,phi  = particle.angles[:]
     r             = particle.R
-    zone          = mesh.GetZone(r, mu)
+    zone          = particle.zone
     IB            = mesh.lowR[zone]   # inner cell boundary
     OB            = mesh.highR[zone]  # outter cell boundary
-    
+    assert (IB < r < OB)
     if (geometry == "cylinder"):
         a,k = cylinder_parameters(x,y,z,mu,muSin,phi)
     elif (geometry == "sphere"):
@@ -68,6 +68,13 @@ def CurviLinearEdge(particle, mesh, geometry):
                     distance_to_edge = d2
                 else:
                     distance_to_edge = d1
+    assert(distance_to_edge >= 0)
+    distance_to_edge += 1e-9
+    x           += distance_to_edge*mu 
+    y           += distance_to_edge*muSin*np.sin(phi)
+    z           += distance_to_edge*muSin*np.cos(phi)
+    R            = np.sqrt(x**2 + y**2 + z**2)
+    assert(R<IB or R>OB)
     return (distance_to_edge + 1e-9)
 
 
