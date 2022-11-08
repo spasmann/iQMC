@@ -83,9 +83,9 @@ class Samples:
                 muSin   = math.sqrt(1-mu**2)
                 angle   = np.array((mu, muSin, phi))
             else:
-                angle   = np.array((mu, 0, 0)) # x, y, z
-            pos      = np.array((x,0,0))
-            zone     = self.mesh.GetZone(x, mu)
+                angle   = np.array((mu, 0, 0)) # mu, muSin, phi
+            pos      = np.array((x,0,0)) # x, y, z
+            zone     = self.mesh.GetZone(pos, angle)
             weight   = self.VolumetricWeight(zone)
             particle = Particle(pos, angle, weight, zone)
             self.particles.append(particle)

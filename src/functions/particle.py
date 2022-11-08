@@ -29,10 +29,10 @@ class Particle:
         self.weight *= np.exp(-self.ds*sigt)
         
     def UpdateZone(self, mesh):
-        self.zone = mesh.GetZone(self.pos[0], self.angles[0])
+        self.zone = mesh.GetZone(self.pos, self.angles)
     
     def GetZone(self, mesh):
-        return mesh.GetZone(self.pos[0], self.angles[0])
+        return mesh.GetZone(self.pos, self.angles)
         
     def IsAlive(self, mesh, geometry):
         if (geometry == "slab"):
