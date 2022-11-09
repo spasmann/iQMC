@@ -19,11 +19,11 @@ class Sweep:
         self.q = q
         tallies.ResetPhiAvg()
         self.samples.GenerateParticles(self.q)
-        print("New Sweep ****************************************")
+        #print("New Sweep ****************************************")
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.pos, particle.angles)
             particle.IsAlive(self.mesh, self.geometry.geometry)
-            print("New Particle ################################")
+            #print("New Particle ################################")
             while (particle.alive):
                 #print("-------------------")
                 #print("Pos: ", particle.pos)
