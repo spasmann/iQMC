@@ -77,14 +77,21 @@ class Samples:
             mu      = self.GetMu(randMu)
             if (mu == 0.0):
                 mu += 0.01
-            if (geo == "cylinder") or (geo == "sphere"):
+            if (geo == "slab"):
+                angle   = np.array((mu, 0, 0)) # mu, muSin, phi
+                pos     = np.array((x,0,0)) # x, y, z
+            if (geo == "cylinder"):
+                randPhi = self.rng[i,self.counter+2]
+                phi     = self.GetPhi(randPhi)
+                muSin   = math.sqrt(1-mu**2)
+                angle   = np.array((0, muSin, phi))
+                pos     = np.array((0,0,x)) # x, y, z
+            if (geo =="sphere"):
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)
                 angle   = np.array((mu, muSin, phi))
-            else:
-                angle   = np.array((mu, 0, 0)) # mu, muSin, phi
-            pos      = np.array((x,0,0)) # x, y, z
+                pos      = np.array((x,0,0)) # x, y, z
             zone     = self.mesh.GetZone(pos, angle)
             weight   = self.VolumetricWeight(zone)
             particle = Particle(pos, angle, weight, zone)
@@ -141,7 +148,7 @@ class Samples:
         return ((self.RB-self.LB)*randPos + self.LB)
     
     def GetMu(self, randMu):
-        return (randMu - 1)
+        return (2*randMu - 1)
     
     def GetPhi(self, randPhi):
         return (2*math.pi*randPhi)

@@ -15,18 +15,19 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     # initialize problem data
-    Nx = 20
+    Nx = 10
     N = 2**10
+    maxit = 10
     generator = "halton"
     solver = "LGMRES"
     data = U_2_0_SL_init(N=N, Nx=Nx, generator=generator)
     data.save_data = False
-    #phi = PowerIteration(data,
-    #                    solver=solver,
-    #                    max_outter_itt=10, 
-    #                    max_inner_itt=10, 
-    #                    outter_tol=1e-5,
-    #                    inner_tol=1e-5)
-    phi = Davidson(data, tol=1e-5, maxit=10)
+    phi = PowerIteration(data,
+                        solver=solver,
+                        max_outter_itt=maxit, 
+                        max_inner_itt=maxit, 
+                        outter_tol=1e-6,
+                        inner_tol=1e-6)
+    #phi = Davidson(data, tol=1e-5, maxit=10)
   
     plt.plot(range(Nx),phi[0])

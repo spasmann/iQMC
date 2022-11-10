@@ -49,7 +49,6 @@ def CurviLinearEdge(particle, mesh, geometry):
     ds            = np.Inf
     distance_to_edge = np.Inf
     
-    assert (IB < r < OB)
     if (geometry == "cylinder"):
         a,k = cylinder_parameters(x,y,z,mu,muSin,phi)
     elif (geometry == "sphere"):
@@ -74,13 +73,6 @@ def CurviLinearEdge(particle, mesh, geometry):
                     distance_to_edge = d1
         if (distance_to_edge < ds):
             ds = distance_to_edge
-    assert(ds >= 0)
-    #distance_to_edge += 1e-9
-    #x           += distance_to_edge*mu 
-    #y           += distance_to_edge*muSin*np.sin(phi)
-    #z           += distance_to_edge*muSin*np.cos(phi)
-    #R            = np.sqrt(x**2 + y**2 + z**2)
-    #assert(R<=IB or R>=OB)
     return (ds + 1e-9)
 
 

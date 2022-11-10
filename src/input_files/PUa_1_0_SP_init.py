@@ -10,27 +10,27 @@ import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
 
-class PUa_1_0_SL_init:
+class PUa_1_0_SP_init:
     def __init__(self, N=2**10, Nx=100, generator="halton"):
         np.random.seed(123456)
         self.keff               = 1.0
         self.N                  = N
         self.Nx                 = Nx
         self.generator          = generator
-        self.totalDim           = 2
-        self.RB                 = 2.256751
-        self.LB                 = -2.256751
+        self.totalDim           = 3
+        self.RB                 = 6.082547
+        self.LB                 = 0.0
         self.right              = False
         self.left               = False
         self.material_code      = "PUa_1_0"
-        self.geometry           = "slab"
+        self.geometry           = "sphere"
         self.avg_scalar_flux    = True
         self.edge_scalar_flux   = False
         self.avg_angular_flux   = False
         self.avg_current        = False
         self.edge_current       = False
         self.shannon_entropy    = False
-        self.save_data          = True
+        self.save_data          = False
         self.moment_match       = False
         self.true_flux          = np.array((False))
         self.mesh               = Mesh(self.LB, self.RB, self.Nx)
