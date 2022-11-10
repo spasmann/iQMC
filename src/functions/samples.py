@@ -14,18 +14,19 @@ class Samples:
     sources and sampling distributions.
     """
     def __init__(self, init_data, geometry, mesh):
-        self.generator = init_data.generator
-        self.RQMC = False
-        self.geometry = geometry
-        self.mesh = mesh
-        self.G = init_data.G
-        self.N = init_data.N
-        self.Nx = init_data.Nx
-        self.totalDim = init_data.totalDim
-        self.RB = init_data.RB
-        self.LB = init_data.LB
-        self.left = init_data.left
-        self.right = init_data.right
+        self.generator  = init_data.generator
+        self.RQMC       = False
+        self.geometry   = geometry
+        self.mesh       = mesh
+        self.G          = init_data.G
+        self.N          = init_data.N
+        self.Nx         = init_data.Nx
+        self.totalDim   = init_data.totalDim
+        self.RB         = init_data.RB
+        self.LB         = init_data.LB
+        self.left       = init_data.left
+        self.right      = init_data.right
+        
         # split the total number of particles into the different sources
         #self.Nleft = 0
         #self.Nright=0
@@ -37,17 +38,18 @@ class Samples:
         if (self.right):
             self.phi_right = init_data.phi_right
             #self.right = math.floor(0.125*self.N)
+            
         #self.Nvolumetric = self.N - self.Nright - self.Nleft
         # use MPI rank and nproc to determine which random numbers to use
         # each rank will generate the whole matrix, then use "start" and 
         # "stop" to grab the appropriate section
-        comm = MPI.COMM_WORLD
-        rank = comm.Get_rank()
-        nproc = comm.Get_size()
+        comm        = MPI.COMM_WORLD
+        rank        = comm.Get_rank()
+        nproc       = comm.Get_size()
         self.rank   = comm.Get_rank()
         self.nproc  = comm.Get_size()
-        self.start = math.floor((rank/nproc)*self.N)
-        self.stop = math.floor((rank+1)/nproc*self.N) 
+        self.start  = math.floor((rank/nproc)*self.N)
+        self.stop   = math.floor((rank+1)/nproc*self.N) 
 
     def GenerateParticles(self, q):
         self.q = q
@@ -67,20 +69,32 @@ class Samples:
             self.moment_matching()
 
     def VolumetricParticles(self):
+        geo = self.geometry.geometry
         for i in range(self.start,self.stop):
-            randPos = self.rng[i,self.counter]
-            randMu = self.rng[i,self.counter+1]
-            pos = self.GetPos(randPos) 
-            mu = self.GetDir(randMu) 
+            randX   = self.rng[i,self.counter]
+            randMu  = self.rng[i,self.counter+1]
+            x       = self.GetPos(randX) 
+            mu      = self.GetMu(randMu)
             if (mu == 0.0):
-                # the sobol sequence likes to start out with 0.0
-                # this fix introduces a little bit of noise but should only
-                # have to used once or twice. the greatest disadvnatge is checking
-                # the if statement every function call
-                mu += 0.234#(0.5 - np.random.random())
-            zone = self.mesh.GetZone(pos, mu)
-            weight = self.VolumetricWeight(zone)
-            particle = Particle(pos, mu, weight)
+                mu += 0.01
+            if (geo == "slab"):
+                angle   = np.array((mu, 0, 0)) # mu, muSin, phi
+                pos     = np.array((x,0,0)) # x, y, z
+            if (geo == "cylinder"):
+                randPhi = self.rng[i,self.counter+2]
+                phi     = self.GetPhi(randPhi)
+                muSin   = math.sqrt(1-mu**2)
+                angle   = np.array((0, muSin, phi))
+                pos     = np.array((0,0,x)) # x, y, z
+            if (geo =="sphere"):
+                randPhi = self.rng[i,self.counter+2]
+                phi     = self.GetPhi(randPhi)
+                muSin   = math.sqrt(1-mu**2)
+                angle   = np.array((mu, muSin, phi))
+                pos      = np.array((x,0,0)) # x, y, z
+            zone     = self.mesh.GetZone(pos, angle)
+            weight   = self.VolumetricWeight(zone)
+            particle = Particle(pos, angle, weight, zone)
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
@@ -108,8 +122,8 @@ class Samples:
     def SobolMatrix(self):
         sampler = Sobol(d=self.totalDim,scramble=self.RQMC, seed=1234)
         m = round(math.log(self.N, 2))
-        #sampler.fast_forward(2**m)
-        return sampler.random_base2(m=m)
+        samples = sampler.random_base2(m=m)
+        return samples
     
     def HaltonMatrix(self):
         sampler = Halton(d=self.totalDim,scramble=self.RQMC)
@@ -133,15 +147,15 @@ class Samples:
     def GetPos(self, randPos):
         return ((self.RB-self.LB)*randPos + self.LB)
     
-    def GetDir(self, randMu):
+    def GetMu(self, randMu):
         return (2*randMu - 1)
     
-    def GetR(self,pos):
-        if (pos.size > 1):
-            return np.sqrt(sum(pos**2))
-        else:
-            return np.abs(pos)
+    def GetPhi(self, randPhi):
+        return (2*math.pi*randPhi)
     
+    def GetR(self,pos):
+        return np.sqrt(sum(pos**2))
+
     def VolumetricWeight(self, zone):
         weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
         return weight
@@ -149,4 +163,3 @@ class Samples:
     def BoundaryWeight(self, BV):
         # BV: boundary value, i.e. phi_left or phi_right 
         return (self.geometry.SurfaceArea()*BV/self.N)
- 

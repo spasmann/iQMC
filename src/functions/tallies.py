@@ -4,20 +4,19 @@ import numpy as np
 class Tallies:
     def __init__(self, init_data):
         
-        self.avg_scalar_flux = init_data.avg_scalar_flux
-        self.edge_scalar_flux = init_data.edge_scalar_flux
-        self.avg_angular_flux = init_data.avg_angular_flux
-        self.avg_current = init_data.avg_current
-        self.edge_current = init_data.edge_current
-        self.shannon_entropy = init_data.shannon_entropy
-        
-        self.Nr = init_data.Nx
-        self.G = init_data.G
-        self.dtype = np.float64
+        self.avg_scalar_flux    = init_data.avg_scalar_flux
+        self.edge_scalar_flux   = init_data.edge_scalar_flux
+        self.avg_angular_flux   = init_data.avg_angular_flux
+        self.avg_current        = init_data.avg_current
+        self.edge_current       = init_data.edge_current
+        self.shannon_entropy    = init_data.shannon_entropy
+        self.Nr                 = init_data.Nx
+        self.G                  = init_data.G
+        self.dtype              = np.float64
         
         if (init_data.avg_scalar_flux):
-            self.phi_avg = np.random.random(size=(self.Nr,self.G))
-            self.phi_avg_old = np.random.random(size=(self.Nr,self.G))
+            self.phi_avg = np.random.uniform(size=(self.Nr,self.G))
+            self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))
             #self.phi_avg = np.zeros((self.Nr,self.G))
             #self.phi_avg_old = np.zeros((self.Nr,self.G))
         if (init_data.edge_scalar_flux):
@@ -33,7 +32,7 @@ class Tallies:
         
     def Tally(self, particle, material, mesh):
         if (self.avg_scalar_flux):
-            self.AvgScalarFlux(particle, material, mesh)
+            AvgScalarFlux(self.phi_avg, particle, material, mesh)
             
         #if (self.avg_angular_flux):
         #    self.AvgAngularFlux()
@@ -45,24 +44,25 @@ class Tallies:
         if (self.edge_current):
             self.EdgeCurrent()
         """
-        
-    def AvgScalarFlux(self, particle, material, geometry):
-        zone = particle.zone
-        G = material.G
-        weight = particle.weight
-        ds = particle.ds
-        sigt = material.sigt[zone,:]
-        sigt = np.reshape(sigt, (1,G))
-        dV = geometry.CellVolume(zone)
-        if (sigt.all() > 1e-12):
-            self.phi_avg[zone,:] += (weight*(1-np.exp(-(ds*sigt)))/(sigt*dV))[0,:]
-        else:
-            self.phi_avg[zone,:] += (weight*ds/dV)    
-
     def DeltaFlux(self):
         self.delta_flux = np.linalg.norm(self.phi_avg - self.phi_avg_old, np.inf)
         
     def ResetPhiAvg(self):
         self.phi_avg = np.zeros((self.Nr, self.G))
         return self.phi_avg
+        
+def AvgScalarFlux(phi_avg, particle, material, geometry):
+    zone    = particle.zone
+    G       = material.G
+    weight  = particle.weight
+    ds      = particle.ds
+    sigt    = material.sigt[zone,:]
+    sigt    = np.reshape(sigt, (1,G))
+    dV      = geometry.CellVolume(zone)
+    if (sigt.all() > 1e-12):
+        phi_avg[zone,:] += (weight*(1-np.exp(-(ds*sigt)))/(sigt*dV))[0,:]
+    else:
+        phi_avg[zone,:] += (weight*ds/dV)    
+
+
         
