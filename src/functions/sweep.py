@@ -19,16 +19,16 @@ class Sweep:
         self.q = q
         tallies.ResetPhiAvg()
         self.samples.GenerateParticles(self.q)
-        print("New Sweep ****************************************")
+        #print("New Sweep ****************************************")
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.pos, particle.angles)
             particle.IsAlive(self.mesh, self.geometry.geometry)
-            print("New Particle ################################")
+            #print("New Particle ################################")
             while (particle.alive):
                 #print("-------------------")
                 #print("Pos: ", particle.pos)
                 #print("Angles: ", particle.angles)
-                print("Zone: ", particle.zone, "|  Radius: ", particle.R, " | ", particle.pos)
+                #print("Zone: ", particle.zone, "|  Radius: ", particle.R, " | ", particle.pos)
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 tallies.Tally(particle, self.material, self.geometry)
                 sigt = self.material.sigt[particle.zone,:]

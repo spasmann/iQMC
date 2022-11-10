@@ -141,7 +141,7 @@ class Samples:
         return ((self.RB-self.LB)*randPos + self.LB)
     
     def GetMu(self, randMu):
-        return (2*randMu - 1)
+        return (randMu - 1)
     
     def GetPhi(self, randPhi):
         return (2*math.pi*randPhi)
