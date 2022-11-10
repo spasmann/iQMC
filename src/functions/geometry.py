@@ -3,6 +3,9 @@
 import numpy as np
 import math
 
+# =============================================================================
+# Geometry class
+# =============================================================================
 class Geometry:
     def __init__(self, geometry, mesh):
         self.geometry = geometry
@@ -27,7 +30,10 @@ class Geometry:
     def SurfaceArea(self):
         if (self.geometry == "slab"):
             return 0.5
-
+        
+# =============================================================================
+# Distance to Edge functions
+# =============================================================================
 def SlabEdge(particle, mesh):
     assert (particle.angles[0] != 0.0)
     x   = particle.pos[0]

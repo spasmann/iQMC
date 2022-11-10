@@ -6,6 +6,9 @@ from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
 from mpi4py import MPI
 
+# =============================================================================
+# Class Initialization and Splitting for MPI
+# =============================================================================
 class Samples:
     """
     Class for generating list of Particles given various initial conditions.
@@ -50,7 +53,10 @@ class Samples:
         self.nproc  = comm.Get_size()
         self.start  = math.floor((rank/nproc)*self.N)
         self.stop   = math.floor((rank+1)/nproc*self.N) 
-
+        
+# =============================================================================
+# Generate Particles
+# =============================================================================
     def GenerateParticles(self, q):
         self.q = q
         self.counter = 0
@@ -114,7 +120,10 @@ class Samples:
             mu = np.sqrt(randMu) + 1e-9
             particle = Particle(pos, mu, weight)
             self.particles.append(particle)
-        
+
+# =============================================================================
+# Generate LDS Matrix
+# =============================================================================
     def RandomMatrix(self):
         np.random.seed(56789)
         return np.random.random((self.N,self.totalDim))
@@ -143,7 +152,10 @@ class Samples:
             self.rng = self.HaltonMatrix()
         elif (self.generator == "latin_hypercube"):
             self.rng = self.LatinHypercube()
-    
+            
+# =============================================================================
+# Map Random Numbers to Physical Quantities
+# =============================================================================
     def GetPos(self, randPos):
         return ((self.RB-self.LB)*randPos + self.LB)
     
