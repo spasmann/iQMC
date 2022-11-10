@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
     # initialize problem data
     Nx = 9
-    N = 2
+    N = 4
     maxit = 1
     generator = "halton"
     solver = "LGMRES"
