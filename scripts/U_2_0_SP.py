@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
     # initialize problem data
-    Nx = 10
-    N = 1000
-    maxit = 10
+    Nx = 9
+    N = 2
+    maxit = 1
     generator = "halton"
     solver = "LGMRES"
     data = U_2_0_SP_init(N=N, Nx=Nx, generator=generator)
