@@ -22,13 +22,10 @@ class GarciaInit:
         self.material_code = "garcia_data"
         self.geometry = "slab"
         self.true_flux = np.array((False)) # no analytic solution for scalar flux
-        self.avg_scalar_flux = True
-        self.edge_scalar_flux = False
-        self.avg_angular_flux = False
-        self.avg_current = False
-        self.edge_current = False
-        self.shannon_entropy = False
-        self.save_data = True
+        self.flux               = True
+        self.flux_derivative    = False
+        self.save_data          = False
+        self.moment_match       = False
         self.mesh = Mesh(self.LB, self.RB, self.Nx)
         self.material = Material(self.material_code, self.geometry, self.mesh)
         

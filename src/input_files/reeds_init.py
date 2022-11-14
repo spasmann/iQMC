@@ -26,15 +26,11 @@ class ReedsInit:
         self.left               = False
         self.material_code      = "reeds_data"
         self.geometry           = "slab"
-        self.avg_scalar_flux    = True
-        self.edge_scalar_flux   = False
-        self.avg_angular_flux   = False
-        self.avg_current        = False
-        self.edge_current       = False
-        self.shannon_entropy    = False
-        self.save_data          = True
+        self.flux               = True
+        self.flux_derivative    = True
+        self.source_tilt        = True
+        self.save_data          = False
         self.moment_match       = False
-        self.RQMC               = False
         self.true_flux          = reeds_sol(self.Nx,LB=LB,RB=RB)
         self.mesh               = Mesh(self.LB, self.RB, self.Nx)
         self.material           = Material(self.material_code, self.geometry, self.mesh)

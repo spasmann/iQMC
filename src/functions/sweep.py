@@ -30,7 +30,7 @@ class Sweep:
                 #print("Angles: ", particle.angles)
                 #print("Zone: ", particle.zone, "|  Radius: ", particle.R, " | ", particle.pos)
                 particle.ds = self.geometry.DistanceToEdge(particle)
-                tallies.Tally(particle, self.material, self.geometry)
+                tallies.Tally(particle, self.material, self.geometry, self.mesh)
                 sigt = self.material.sigt[particle.zone,:]
                 particle.UpdateWeight(sigt)
                 particle.Move(self.mesh)

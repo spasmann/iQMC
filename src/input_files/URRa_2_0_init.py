@@ -24,12 +24,8 @@ class URRa_2_0_SL_init:
         self.left               = False
         self.material_code      = "URRa_2_0_SL"
         self.geometry           = "slab"
-        self.avg_scalar_flux    = True
-        self.edge_scalar_flux   = False
-        self.avg_angular_flux   = False
-        self.avg_current        = False
-        self.edge_current       = False
-        self.shannon_entropy    = False
+        self.flux               = True
+        self.flux_derivative    = False
         self.save_data          = False
         self.moment_match       = False
         self.true_flux          = np.array((False))

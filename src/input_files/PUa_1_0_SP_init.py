@@ -24,12 +24,9 @@ class PUa_1_0_SP_init:
         self.left               = False
         self.material_code      = "PUa_1_0"
         self.geometry           = "sphere"
-        self.avg_scalar_flux    = True
-        self.edge_scalar_flux   = False
-        self.avg_angular_flux   = False
-        self.avg_current        = False
-        self.edge_current       = False
-        self.shannon_entropy    = False
+        self.flux               = True
+        self.flux_derivative    = True
+        self.source_tilt        = True
         self.save_data          = False
         self.moment_match       = False
         self.true_flux          = np.array((False))

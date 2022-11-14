@@ -15,12 +15,13 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N = 2**12
-    Nx = 64
+    N = 2**13
+    Nx = 128
     G = 1
-    generator = "sobol"
+    generator = "halton"
     solver = "LGMRES"
     data = ReedsInit(N=N, Nx=Nx, generator=generator)
+    data.source_tilt = True
     start = time.time()
     maxit = 25
     tol = 1e-6
