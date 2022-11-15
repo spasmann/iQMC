@@ -23,15 +23,15 @@ def SI_Map(phi_in, qmc_data):
     try:
         (Nv == Nx*G)
     except Exception as e: print(e) 
-    phi_in = np.reshape(phi_in, (Nx,G))
-    tallies = Tallies(qmc_data)
-    source = GetSource(phi_in, qmc_data)
-    sweep   = Sweep(qmc_data) # samples are gneratred with initialization of sweep
+    phi_in  = np.reshape(phi_in, (Nx,G))
+    tallies = Tallies(qmc_data) # object of new tally arrays and functions
+    source  = GetSource(phi_in, qmc_data) # array 
+    sweep   = Sweep(qmc_data) # samples are generated with initialization of sweep
     sweep.Run(tallies, source) # QMC sweep
     phi_out = tallies.phi_avg
     phi_out = np.reshape(phi_out,(Nv,1))
     # all reduce phi_out here (they automatically wait for each other)
-    comm = MPI.COMM_WORLD
+    comm    = MPI.COMM_WORLD
     phi_out = comm.allreduce(phi_out,op=MPI.SUM)
     
     return phi_out
@@ -83,7 +83,7 @@ def MatVec(phi_in):
     phi_in      = np.reshape(phi_in,(Nv,1))
 
     qmc_data.source = np.zeros((Nx,G))
-    axv = phi_in - SI_Map(phi_in, qmc_data)
+    axv = phi_in - SI_Map(phi_in, qmc_data) 
     
     return axv
 

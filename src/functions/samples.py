@@ -168,8 +168,12 @@ class Samples:
     def GetR(self,pos):
         return np.sqrt(sum(pos**2))
 
-    def VolumetricWeight(self, zone):
-        weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
+    def VolumetricWeight(self, zone, pos, mesh):
+        x = pos[0]
+        Q = self.q[zone,:]
+        if (self.source_tilt):
+            Q +=  self.q_m[zone,:]*(x - mesh.midpoints[zone])
+        weight = Q*self.geometry.CellVolume(zone)/self.N*self.Nx
         return weight
     
     def BoundaryWeight(self, BV):

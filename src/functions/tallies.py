@@ -19,14 +19,14 @@ class Tallies:
         if (self.flux):
             self.phi_avg = np.random.uniform(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))
-        if (self.flux_derivative):
+        if (self.source_tilt):
             self.dphi = np.zeros((self.Nr, self.G), self.dtype)
             
     def Tally(self, particle, material, geometry, mesh):
         if (self.flux):
             avg_scalar_flux(self.phi_avg, particle, material, geometry)
         if (self.source_tilt):
-            avg_scalar_flux_derivative(self.phi_avg, particle, material, geometry, mesh)
+            avg_scalar_flux_derivative(self.dphi, particle, material, geometry, mesh)
         #if (self.source_tilt):
         #    self.phi_avg += self.dphi#*(particle.pos[0] - mesh.midpoints[particle.zone])
             
@@ -54,7 +54,7 @@ def avg_scalar_flux(phi_avg, particle, material, geometry):
     else:
         phi_avg[zone,:] += (weight*ds/dV)    
         
-def avg_scalar_flux_derivative(phi, particle, material, geometry, mesh):
+def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
     zone    = particle.zone
     mu      = particle.angles[0]
     x       = particle.pos[0]
@@ -67,10 +67,10 @@ def avg_scalar_flux_derivative(phi, particle, material, geometry, mesh):
     sigt    = np.reshape(sigt, (1,G))
     dV      = geometry.CellVolume(zone)
     if (sigt.all() > 1e-12):
-        phi[zone,:] += ((mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
+        dphi[zone,:] += ((mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
                         + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/sigt)))[0,:]
     else:
-        phi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
+        dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
     
 
         

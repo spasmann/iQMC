@@ -15,6 +15,23 @@ def fission_source(cell, phi, keff, material):
     source = np.dot(material.nu[cell,:]*material.chi[cell,:,:]*material.sigf[cell,:]/keff, phi[cell,:])
     return source
 
+def GetLinearSource(qmc_data):
+    dphi_s       = qmc_data.dphi_s
+    dphi_f       = qmc_data.dphi_f
+    material     = qmc_data.material
+    fixed_source = qmc_data.source
+    qdot         = np.zeros((material.Nx, material.G))
+    
+    for cell in range(material.Nx):
+        qdot[cell,:] = (scattering_source(cell, dphi_s, material)  
+                     + fixed_source[cell,:])         
+    if (dphi_f is not None):
+        keff = qmc_data.keff
+        for cell in range(material.Nx):
+            qdot[cell,:] += fission_source(cell, dphi_f, keff, material)
+            
+    qmc_data.qdot = qdot
+
 def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
     """
     Parameters
@@ -31,14 +48,16 @@ def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
     material        = qmc_data.material
     fixed_source    = qmc_data.source
     q               = np.zeros((material.Nx, material.G))
-    if (phi_avg_f is None):
-        for cell in range(material.Nx):
-            q[cell,:] = (scattering_source(cell, phi_avg_s, material)  
-                         + fixed_source[cell,:]) 
-    else:
+    if (qmc_data.source_tilt):
+        GetLinearSource(qmc_data)
+            
+    for cell in range(material.Nx):
+        q[cell,:] = (scattering_source(cell, phi_avg_s, material)  
+                     + fixed_source[cell,:]) 
+            
+    if (phi_avg_f is not None):
         keff = qmc_data.keff
         for cell in range(material.Nx):
-            q[cell,:] = (scattering_source(cell, phi_avg_s, material) 
-                         + fission_source(cell, phi_avg_f, keff, material) 
-                         + fixed_source[cell,:]) 
+            q[cell,:] += fission_source(cell, phi_avg_f, keff, material) 
+            
     return q
