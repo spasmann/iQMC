@@ -9,10 +9,10 @@ Created on Mon Apr  4 17:52:36 2022
 import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
+from src.functions.tallies import Tallies
 
 class PUa_1_0_SL_init:
     def __init__(self, N=2**10, Nx=100, generator="halton"):
-        np.random.seed(123456)
         self.keff               = 1.0
         self.N                  = N
         self.Nx                 = Nx
@@ -20,18 +20,20 @@ class PUa_1_0_SL_init:
         self.totalDim           = 2
         self.RB                 = 2.256751
         self.LB                 = -2.256751
-        self.right              = False
-        self.left               = False
+        self.rng_seed           = 123456
         self.material_code      = "PUa_1_0"
         self.geometry           = "slab"
+        self.mode               = "eigenvalue"
         self.flux               = True
         self.flux_derivative    = True
         self.source_tilt        = True
         self.save_data          = False
-        self.moment_match       = False
+        self.right              = False
+        self.left               = False
+        self.RQMC               = False
         self.true_flux          = np.array((False))
+        self.fixed_source       = np.zeros((self.Nx,self.G))
+        self.tallies            = Tallies(self)
         self.mesh               = Mesh(self.LB, self.RB, self.Nx)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
-        self.source             = np.zeros((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
-        self.phi_f              = np.ones((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))

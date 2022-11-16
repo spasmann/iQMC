@@ -1,46 +1,55 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 
-
 # =============================================================================
-# Tally class
+# Talies class
 # =============================================================================
 class Tallies:
-    def __init__(self, init_data):
+    def __init__(self, qmc_data):
         
-        self.flux               = init_data.flux
-        self.flux_derivative    = init_data.flux_derivative
-        self.source_tilt        = init_data.source_tilt
-        self.Nr                 = init_data.Nx
-        self.G                  = init_data.G
-        self.dtype              = np.float64
+        self.flux               = qmc_data.flux
+        self.flux_derivative    = qmc_data.flux_derivative
+        self.source_tilt        = qmc_data.source_tilt
+        self.Nr                 = qmc_data.Nx
+        self.G                  = qmc_data.G
+        self.q                  = qmc_data.source
+        self.qdot               = None
         self.delta_flux         = 1.0
-        
+
+        if (qmc_data.mode == "eigenvalue"):
+            self.phi_f       = np.random.uniform(size=(self.Nx,self.G))
         if (self.flux):
-            self.phi_avg = np.random.uniform(size=(self.Nr,self.G))
+            self.phi_avg     = np.random.uniform(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))
         if (self.source_tilt):
-            self.dphi = np.zeros((self.Nr, self.G), self.dtype)
-            
+            self.dphi_s      = np.zeros((self.Nr, self.G))
+            self.qdot        = np.random.uniform(size=(self.Nr, self.G))
+            if (qmc_data.mode == "eigenvalue"):
+                self.dphi_f      = np.zeros((self.Nr, self.G))
+
+# =============================================================================
+# Tallies class functions
+# =============================================================================
+
     def Tally(self, particle, material, geometry, mesh):
         if (self.flux):
             avg_scalar_flux(self.phi_avg, particle, material, geometry)
         if (self.source_tilt):
             avg_scalar_flux_derivative(self.dphi, particle, material, geometry, mesh)
-        #if (self.source_tilt):
-        #    self.phi_avg += self.dphi#*(particle.pos[0] - mesh.midpoints[particle.zone])
             
     def DeltaFlux(self):
         self.delta_flux = np.linalg.norm(self.phi_avg - self.phi_avg_old, np.inf)
         
     def ResetPhiAvg(self):
-        self.phi_avg = np.zeros((self.Nr, self.G))
-        self.dphi    = np.zeros((self.Nr, self.G))
-        return self.phi_avg
+        self.phi_avg     = np.zeros((self.Nr, self.G))
+        if (self.source_tilt):
+            self.dphi_s  = np.zeros((self.Nr, self.G))
+            self.dphi_f  = np.zeros((self.Nr, self.G))
 
 # =============================================================================
-# Tally Functions
+# Tallies
 # =============================================================================
+
 def avg_scalar_flux(phi_avg, particle, material, geometry):
     zone    = particle.zone
     G       = material.G

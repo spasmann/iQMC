@@ -16,30 +16,32 @@ class Samples:
     This will need to become more complex to return samples for different
     sources and sampling distributions.
     """
-    def __init__(self, init_data, geometry, mesh):
-        self.generator  = init_data.generator
-        self.RQMC       = False
-        self.geometry   = geometry
-        self.mesh       = mesh
-        self.G          = init_data.G
-        self.N          = init_data.N
-        self.Nx         = init_data.Nx
-        self.totalDim   = init_data.totalDim
-        self.RB         = init_data.RB
-        self.LB         = init_data.LB
-        self.left       = init_data.left
-        self.right      = init_data.right
+    def __init__(self, qmc_data, geometry, mesh):
+        self.geometry       = geometry
+        self.mesh           = mesh
+        self.generator      = qmc_data.generator
+        self.source_tilt    = qmc_data.source_tilt
+        self.RQMC           = qmc_data.RQMC
+        self.rng_seed       = qmc_data.rng_seed
+        self.G              = qmc_data.G
+        self.N              = qmc_data.N
+        self.Nx             = qmc_data.Nx
+        self.totalDim       = qmc_data.totalDim
+        self.RB             = qmc_data.RB
+        self.LB             = qmc_data.LB
+        self.left           = qmc_data.left
+        self.right          = qmc_data.right
         
         # split the total number of particles into the different sources
         #self.Nleft = 0
         #self.Nright=0
         #self.Nvolumetric = self.N
-        self.moment_match = init_data.moment_match
+        self.moment_match = qmc_data.moment_match
         if (self.left):
-            self.phi_left = init_data.phi_left
+            self.phi_left = qmc_data.phi_left
             #self.left = math.floor(0.125*self.N)
         if (self.right):
-            self.phi_right = init_data.phi_right
+            self.phi_right = qmc_data.phi_right
             #self.right = math.floor(0.125*self.N)
             
         #self.Nvolumetric = self.N - self.Nright - self.Nleft
@@ -57,8 +59,9 @@ class Samples:
 # =============================================================================
 # Generate Particles
 # =============================================================================
-    def GenerateParticles(self, q):
-        self.q = q
+    def GenerateParticles(self, q, qdot):
+        self.q       = q
+        self.qdot    = qdot
         self.counter = 0
         self.GetRnMatrix()
         self.particles = []
@@ -70,9 +73,6 @@ class Samples:
             self.counter += 1
         self.VolumetricParticles()
         self.counter += 2 # used  to index the random number matrix 
-        
-        if (self.moment_match):
-            self.moment_matching()
 
     def VolumetricParticles(self):
         geo = self.geometry.geometry

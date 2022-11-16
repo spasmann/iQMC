@@ -16,10 +16,10 @@ def fission_source(cell, phi, keff, material):
     return source
 
 def GetLinearSource(qmc_data):
-    dphi_s       = qmc_data.dphi_s
-    dphi_f       = qmc_data.dphi_f
+    dphi_s       = qmc_data.tallies.dphi_s
+    dphi_f       = qmc_data.tallies.dphi_f
     material     = qmc_data.material
-    fixed_source = qmc_data.source
+    fixed_source = qmc_data.fixed_source
     qdot         = np.zeros((material.Nx, material.G))
     
     for cell in range(material.Nx):
@@ -30,7 +30,7 @@ def GetLinearSource(qmc_data):
         for cell in range(material.Nx):
             qdot[cell,:] += fission_source(cell, dphi_f, keff, material)
             
-    qmc_data.qdot = qdot
+    qmc_data.tallies.qdot = qdot
 
 def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
     """

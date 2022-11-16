@@ -6,7 +6,6 @@ Created on Tue Jun  7 13:17:55 2022
 @author: sampasmann
 """
 import numpy as np
-from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource
 from mpi4py import MPI
@@ -24,18 +23,16 @@ def SI_Map(phi_f, phi_s, qmc_data):
     try:
         (Nv == Nx*G)  
     except Exception as e: print(e) 
-    phi_s      = np.reshape(phi_s, (Nx,G))
-    phi_f       = np.reshape(phi_f, (Nx,G))
-    tallies     = Tallies(qmc_data)
-    source      = GetSource(phi_s, qmc_data, phi_avg_f=phi_f)
-    sweep       = Sweep(qmc_data) # samples are gneratred with initialization of sweep
-    #print("         QMC Sweep ")
-    sweep.Run(tallies, source) # QMC sweep
-    phi_out     = tallies.phi_avg
-    phi_out     = np.reshape(phi_out,(Nv,1))
+    phi_s               = np.reshape(phi_s, (Nx,G))
+    phi_f               = np.reshape(phi_f, (Nx,G))
+    qmc_data.tallies.q  = GetSource(phi_s, qmc_data, phi_avg_f=phi_f)
+    sweep               = Sweep(qmc_data) # samples are gneratred with initialization of sweep
+    sweep.Run(qmc_data) # QMC sweep
+    phi_out             = qmc_data.tallies.phi_avg
+    phi_out             = np.reshape(phi_out,(Nv,1))
     # all reduce phi_out here (they automatically wait for each other)
-    comm        = MPI.COMM_WORLD
-    phi_out     = comm.allreduce(phi_out,op=MPI.SUM)
+    comm                = MPI.COMM_WORLD
+    phi_out             = comm.allreduce(phi_out,op=MPI.SUM)
     
     return phi_out
 
@@ -51,7 +48,7 @@ def RHS(qmc_data):
     G       = qmc_data.G
     Nx      = qmc_data.Nx
     Nv      = Nx*G
-    phi_f   = qmc_data.phi_f
+    phi_f   = qmc_data.tallies.phi_f
     zed     = np.zeros((Nx,G))
     b       = SI_Map(phi_f, zed, qmc_data) # qmc_sweep with phi(0)
     
@@ -82,13 +79,12 @@ def MatVec(phi_in):
     """
     b           = matvec_data[0]
     qmc_data    = matvec_data[1]
-    phi_f       = qmc_data.phi_f
+    phi_f       = qmc_data.tallies.phi_f
     Nx          = qmc_data.Nx
     G           = qmc_data.G
     Nv          = Nx*G
     phi_in      = np.reshape(phi_in,(Nv,1))
-
     #qmc_data.source = np.zeros((Nx,G))
-    axv             = phi_in - (SI_Map(phi_f, phi_in, qmc_data) - b)
+    axv         = phi_in - (SI_Map(phi_f, phi_in, qmc_data) - b)
 
     return axv
