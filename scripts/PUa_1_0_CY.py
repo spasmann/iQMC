@@ -18,12 +18,12 @@ if __name__ == "__main__":
     Nx = 11
     N = 2**10
     solver = "LGMRES"
-    generator = "halton"
+    generator = "sobol"
     
     data = PUa_1_0_CY_init(N=N, Nx=Nx, generator=generator)
     data.save_data = False
     start = time.time()
-    phi, khist = PowerIteration(data,
+    phi, khist, itt = PowerIteration(data,
                         solver=solver,
                         max_outter_itt=25, 
                         max_inner_itt=25, 
@@ -34,4 +34,4 @@ if __name__ == "__main__":
     plt.plot(range(Nx),phi)
     
     #plt.plot(range(len(phi_hist)), phi_hist)
-    plt.yscale('log')
+    #plt.yscale('log')
