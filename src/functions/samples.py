@@ -36,7 +36,6 @@ class Samples:
         #self.Nleft = 0
         #self.Nright=0
         #self.Nvolumetric = self.N
-        self.moment_match = qmc_data.moment_match
         if (self.left):
             self.phi_left = qmc_data.phi_left
             #self.left = math.floor(0.125*self.N)
@@ -99,7 +98,7 @@ class Samples:
                 angle   = np.array((mu, muSin, phi))
                 pos      = np.array((x,0,0)) # x, y, z
             zone     = self.mesh.GetZone(pos, angle)
-            weight   = self.VolumetricWeight(zone)
+            weight   = self.VolumetricWeight(zone, pos, self.mesh)
             particle = Particle(pos, angle, weight, zone)
             self.particles.append(particle)
             

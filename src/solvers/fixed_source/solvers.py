@@ -50,7 +50,7 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=True):
 
     Nx      = qmc_data.Nx
     G       = qmc_data.G
-    phi0    = qmc_data.source
+    phi0    = qmc_data.fixed_source
     itc     = 0
     diff    = 1.0
     phic    = np.copy(phi0)
@@ -117,7 +117,7 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=
                               rmatmat=MatVec,
                               dtype=float)
     b           = matvec_data[0]
-    phi0        = qmc_data.source
+    phi0        = qmc_data.fixed_source
     phi0        = np.reshape(phi0,(Nv,1))
     if (solver=="LGMRES"):
         counter     = gmres_counter(disp=report_progress)

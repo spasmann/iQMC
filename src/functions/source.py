@@ -46,7 +46,7 @@ def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
 
     """
     material        = qmc_data.material
-    fixed_source    = qmc_data.source
+    fixed_source    = qmc_data.fixed_source
     q               = np.zeros((material.Nx, material.G))
     if (qmc_data.source_tilt):
         GetLinearSource(qmc_data)

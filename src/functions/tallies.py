@@ -11,13 +11,13 @@ class Tallies:
         self.flux_derivative    = qmc_data.flux_derivative
         self.source_tilt        = qmc_data.source_tilt
         self.Nr                 = qmc_data.Nx
-        self.G                  = qmc_data.G
-        self.q                  = qmc_data.source
+        self.G                  = qmc_data.material.G
+        self.q                  = qmc_data.fixed_source
         self.qdot               = None
         self.delta_flux         = 1.0
 
         if (qmc_data.mode == "eigenvalue"):
-            self.phi_f       = np.random.uniform(size=(self.Nx,self.G))
+            self.phi_f       = np.random.uniform(size=(self.Nr,self.G))
         if (self.flux):
             self.phi_avg     = np.random.uniform(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))

@@ -12,7 +12,7 @@ class Sweep:
         self.material   = qmc_data.material
         self.totalDim   = qmc_data.totalDim 
         self.geometry   = Geometry(qmc_data.geometry, self.mesh)
-        self.samples    = Samples(self.qmc_data, self.geometry, self.mesh)
+        self.samples    = Samples(qmc_data, self.geometry, self.mesh)
     
     def Run(self, qmc_data):
         count = 0

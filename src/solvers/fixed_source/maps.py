@@ -6,7 +6,6 @@ Created on Tue Jun  7 13:17:55 2022
 @author: sampasmann
 """
 import numpy as np
-from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource
 from mpi4py import MPI
@@ -23,16 +22,15 @@ def SI_Map(phi_in, qmc_data):
     try:
         (Nv == Nx*G)
     except Exception as e: print(e) 
-    phi_in  = np.reshape(phi_in, (Nx,G))
-    tallies = Tallies(qmc_data) # object of new tally arrays and functions
-    source  = GetSource(phi_in, qmc_data) # array 
-    sweep   = Sweep(qmc_data) # samples are generated with initialization of sweep
-    sweep.Run(tallies, source) # QMC sweep
-    phi_out = tallies.phi_avg
-    phi_out = np.reshape(phi_out,(Nv,1))
+    phi_in              = np.reshape(phi_in, (Nx,G))
+    qmc_data.tallies.q  = GetSource(phi_in, qmc_data)
+    sweep               = Sweep(qmc_data) # samples are generated with initialization of sweep
+    sweep.Run(qmc_data) # QMC sweep
+    phi_out             = qmc_data.tallies.phi_avg
+    phi_out             = np.reshape(phi_out,(Nv,1))
     # all reduce phi_out here (they automatically wait for each other)
-    comm    = MPI.COMM_WORLD
-    phi_out = comm.allreduce(phi_out,op=MPI.SUM)
+    comm                = MPI.COMM_WORLD
+    phi_out             = comm.allreduce(phi_out,op=MPI.SUM)
     
     return phi_out
 
