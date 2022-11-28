@@ -28,8 +28,7 @@ class ReedsInit:
         self.geometry           = "slab"
         self.mode               = "fixed_source"
         self.flux               = True
-        self.flux_derivative    = False
-        self.source_tilt        = False
+        self.source_tilt        = True
         self.save_data          = False
         self.moment_match       = False
         self.true_flux          = reeds_sol(self.Nx,LB=LB,RB=RB)
@@ -37,5 +36,8 @@ class ReedsInit:
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.fixed_source       = self.material.source
         self.tallies            = Tallies(self)
+        self.Nt                 = int(self.Nx*self.G)
+        if (self.source_tilt):
+            self.Nt = int(self.Nt*2)
         
         

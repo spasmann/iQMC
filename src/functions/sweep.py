@@ -23,12 +23,9 @@ class Sweep:
         for particle in self.samples.particles:
             particle.zone = self.mesh.GetZone(particle.pos, particle.angles)
             particle.IsAlive(self.mesh, self.geometry.geometry)
-            #print("New Particle ################################")
+            #print("Particle ", count+1, " ################################")
             while (particle.alive):
-                #print("-------------------")
-                #print("Pos: ", particle.pos)
-                #print("Angles: ", particle.angles)
-                #print("Zone: ", particle.zone, "|  Radius: ", particle.R, " | ", particle.pos)
+                #print("Zone: ", particle.zone, "|  Weight: ", particle.pos)
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 self.tallies.Tally(particle, self.material, self.geometry, self.mesh)
                 sigt = self.material.sigt[particle.zone,:]

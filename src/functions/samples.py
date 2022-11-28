@@ -103,21 +103,25 @@ class Samples:
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
-        pos = np.array((self.RB - 1e-9,))
+        pos = np.array((self.RB - 1e-9,0,0))
+        zone = self.self.mesh.GetZone(pos, [0])
         weight = self.BoundaryWeight(self.phi_right)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
             mu = -np.sqrt(randMu) - 1e-9
-            particle = Particle(pos, mu, weight)
+            angles = np.array((mu,0,0))
+            particle = Particle(pos, angles, weight, zone)
             self.particles.append(particle)
             
     def LeftBoundaryParticles(self):
-        pos = np.array((self.LB + 1e-9,))
+        pos = np.array((self.LB + 1e-9,0,0))
+        zone = self.mesh.GetZone(pos, [0])
         weight = self.BoundaryWeight(self.phi_left)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
             mu = np.sqrt(randMu) + 1e-9
-            particle = Particle(pos, mu, weight)
+            angles = np.array((mu,0,0))
+            particle = Particle(pos, angles, weight, zone)
             self.particles.append(particle)
 
 # =============================================================================
@@ -171,7 +175,7 @@ class Samples:
         x = pos[0]
         Q = self.q[zone,:]
         if (self.source_tilt):
-            Q +=  self.q_m[zone,:]*(x - mesh.midpoints[zone])
+            Q +=  self.qdot[zone,:]*(x - mesh.midpoints[zone])
         weight = Q*self.geometry.CellVolume(zone)/self.N*self.Nx
         return weight
     

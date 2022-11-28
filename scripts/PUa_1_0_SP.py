@@ -17,14 +17,13 @@ import time
 if __name__ == "__main__":
     # initialize problem data
     Nx = 20
-    N = 2**12
+    N = 2**11
     solver = "LGMRES"
-    generator = "halton"
+    generator = "sobol"
     
     data = PUa_1_0_SP_init(N=N, Nx=Nx, generator=generator)
-    data.save_data = False
     start = time.time()
-    #phi = Davidson(data, tol=1e-5, maxit=10)
+    phi = Davidson(data, tol=1e-5, maxit=10)
     
     phi, khist, itt = PowerIteration(data,
                         solver=solver,

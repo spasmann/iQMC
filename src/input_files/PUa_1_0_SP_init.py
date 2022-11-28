@@ -9,6 +9,7 @@ Created on Mon Apr  4 17:52:36 2022
 import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
+from src.functions.tallies import Tallies
 
 class PUa_1_0_SP_init:
     def __init__(self, N=2**10, Nx=100, generator="halton"):
@@ -20,18 +21,20 @@ class PUa_1_0_SP_init:
         self.totalDim           = 3
         self.RB                 = 6.082547
         self.LB                 = 0.0
-        self.right              = False
-        self.left               = False
+        self.rng_seed           = 12345
         self.material_code      = "PUa_1_0"
         self.geometry           = "sphere"
+        self.mode               = "eigenvalue"
         self.flux               = True
-        self.flux_derivative    = True
-        self.source_tilt        = True
+        self.flux_derivative    = False
+        self.source_tilt        = False
         self.save_data          = False
-        self.moment_match       = False
+        self.right              = False
+        self.left               = False
+        self.RQMC               = False
         self.true_flux          = np.array((False))
         self.mesh               = Mesh(self.LB, self.RB, self.Nx)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
-        self.source             = np.zeros((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
-        self.phi_f              = np.ones((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
+        self.fixed_source       = np.zeros((self.Nx,self.G))
+        self.tallies            = Tallies(self)

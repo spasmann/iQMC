@@ -35,7 +35,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=1
     itt             = 0
     k               = qmc_data.keff
     dk              = 1.0
-    phi_old         = qmc_data.phi_f.copy()
+    phi_old         = qmc_data.tallies.phi_f.copy()
     #res_hist        = []
     k_hist          = []
     if (rank==0):
@@ -51,15 +51,16 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, max_inner_itt=1
     # iterate over k effective
     while (itt<=max_outter_itt) and (dk>=outter_tol):
         # iterate over scattering source
-        phi_new         = InnerIteration(qmc_data, solver=solver, maxit=max_inner_itt,tol=inner_tol)
+        phi_new                 = InnerIteration(qmc_data, solver=solver, 
+                                                 maxit=max_inner_itt,tol=inner_tol)
         #phi_hist.append(phi_new)
-        k_old           = k
-        k               = UpdateK(phi_old, phi_new, qmc_data)
+        k_old                   = k
+        k                       = UpdateK(phi_old, phi_new, qmc_data)
         k_hist.append(k)
-        qmc_data.keff   = k
+        qmc_data.keff           = k
         #res_hist.append(np.linalg.norm(phi_new-phi_old))
-        qmc_data.phi_f  = phi_new.copy()
-        phi_old         = phi_new.copy() # /norm(phi_new)
+        qmc_data.tallies.phi_f  = phi_new.copy()
+        phi_old                 = phi_new.copy() # /norm(phi_new)
         dk              = abs(k-k_old)
         itt             += 1
         if (rank==0):
@@ -116,7 +117,7 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
                               rmatmat=MatVec,
                               dtype=float)
     b           = matvec_data[0]
-    phi0        = qmc_data.source
+    phi0        = qmc_data.fixed_source
     phi0        = np.reshape(phi0,(Nv,1))
 
     if (rank==0):

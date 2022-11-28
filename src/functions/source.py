@@ -17,7 +17,6 @@ def fission_source(cell, phi, keff, material):
 
 def GetLinearSource(qmc_data):
     dphi_s       = qmc_data.tallies.dphi_s
-    dphi_f       = qmc_data.tallies.dphi_f
     material     = qmc_data.material
     fixed_source = qmc_data.fixed_source
     qdot         = np.zeros((material.Nx, material.G))
@@ -25,8 +24,9 @@ def GetLinearSource(qmc_data):
     for cell in range(material.Nx):
         qdot[cell,:] = (scattering_source(cell, dphi_s, material)  
                      + fixed_source[cell,:])         
-    if (dphi_f is not None):
-        keff = qmc_data.keff
+    if (qmc_data.mode == "eigenvalue"):
+        keff    = qmc_data.keff
+        dphi_f  = qmc_data.tallies.dphi_f
         for cell in range(material.Nx):
             qdot[cell,:] += fission_source(cell, dphi_f, keff, material)
             

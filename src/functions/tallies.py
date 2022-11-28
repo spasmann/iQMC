@@ -8,23 +8,27 @@ class Tallies:
     def __init__(self, qmc_data):
         
         self.flux               = qmc_data.flux
-        self.flux_derivative    = qmc_data.flux_derivative
         self.source_tilt        = qmc_data.source_tilt
         self.Nr                 = qmc_data.Nx
         self.G                  = qmc_data.material.G
         self.q                  = qmc_data.fixed_source
+        self.mode               = qmc_data.mode
         self.qdot               = None
         self.delta_flux         = 1.0
+        
+        self.left               = qmc_data.left
+        self.phi_left           = qmc_data.phi_left
 
-        if (qmc_data.mode == "eigenvalue"):
+        if (self.mode == "eigenvalue"):
             self.phi_f       = np.random.uniform(size=(self.Nr,self.G))
         if (self.flux):
             self.phi_avg     = np.random.uniform(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))
         if (self.source_tilt):
-            self.dphi_s      = np.zeros((self.Nr, self.G))
-            self.qdot        = np.random.uniform(size=(self.Nr, self.G))
-            if (qmc_data.mode == "eigenvalue"):
+            self.dphi_s      = np.random.uniform(size=(self.Nr, self.G))
+            self.dphi_f      = None
+            self.qdot        = np.zeros((self.Nr, self.G))
+            if (self.mode == "eigenvalue"):
                 self.dphi_f      = np.zeros((self.Nr, self.G))
 
 # =============================================================================
@@ -35,7 +39,9 @@ class Tallies:
         if (self.flux):
             avg_scalar_flux(self.phi_avg, particle, material, geometry)
         if (self.source_tilt):
-            avg_scalar_flux_derivative(self.dphi, particle, material, geometry, mesh)
+            avg_scalar_flux_derivative(self.dphi_s, particle, material, geometry, mesh)
+        if (self.left):
+            self.phi_avg[0] = self.phi_left
             
     def DeltaFlux(self):
         self.delta_flux = np.linalg.norm(self.phi_avg - self.phi_avg_old, np.inf)
@@ -44,7 +50,8 @@ class Tallies:
         self.phi_avg     = np.zeros((self.Nr, self.G))
         if (self.source_tilt):
             self.dphi_s  = np.zeros((self.Nr, self.G))
-            self.dphi_f  = np.zeros((self.Nr, self.G))
+            if (self.mode == "eigenvalue"):
+                self.dphi_f  = np.zeros((self.Nr, self.G))
 
 # =============================================================================
 # Tallies

@@ -15,16 +15,17 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N = 2**11
-    Nx = 64
-    G = 1
-    generator = "halton"
-    solver = "LGMRES"
-    data = ReedsInit(N=N, Nx=Nx, generator=generator)
-    start = time.time()
-    maxit = 25
-    tol = 1e-6
-    phi = FixedSource(data,solver=solver, maxit=maxit, tol=tol, save_data=False)
+    N           = 2**13
+    Nx          = 128
+    G           = 1
+    generator   = "sobol"
+    solver      = "LGMRES"
+    data        = ReedsInit(N=N, Nx=Nx, generator=generator)
+    start       = time.time()
+    maxit       = 100
+    tol         = 1e-4
+    phi         = FixedSource(data,solver=solver, maxit=maxit, tol=tol, 
+                              save_data=False)
 
     stop = time.time()
     if (rank==0):

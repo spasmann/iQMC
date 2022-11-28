@@ -25,8 +25,8 @@ class PUa_1_0_SL_init:
         self.geometry           = "slab"
         self.mode               = "eigenvalue"
         self.flux               = True
-        self.flux_derivative    = False
-        self.source_tilt        = False
+        self.flux_derivative    = True
+        self.source_tilt        = True
         self.save_data          = False
         self.right              = False
         self.left               = False

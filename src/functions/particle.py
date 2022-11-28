@@ -37,10 +37,10 @@ class Particle:
     def IsAlive(self, mesh, geometry):
         if (geometry == "slab"):
             if (self.angles[0] > 0):
-                if (self.R >= mesh.RB):
+                if (self.pos[0] >= mesh.RB):
                     self.alive = False
             else:
-                if (self.R >= abs(mesh.LB)):
+                if (self.pos[0] <= abs(mesh.LB)):
                     self.alive = False
         else:
             if(self.R >= mesh.RB):
