@@ -12,11 +12,12 @@ from src.functions.mesh import Mesh
 from src.functions.tallies import Tallies
 
 class PUa_1_0_SL_init:
-    def __init__(self, N=2**10, Nx=100, generator="halton"):
+    def __init__(self, N=2**10, Nx=100, generator="halton", source_tilt=False):
         self.keff               = 1.0
         self.N                  = N
         self.Nx                 = Nx
         self.generator          = generator
+        self.source_tilt        = source_tilt
         self.totalDim           = 2
         self.RB                 = 2.256751
         self.LB                 = -2.256751
@@ -25,8 +26,6 @@ class PUa_1_0_SL_init:
         self.geometry           = "slab"
         self.mode               = "eigenvalue"
         self.flux               = True
-        self.flux_derivative    = True
-        self.source_tilt        = True
         self.save_data          = False
         self.right              = False
         self.left               = False
@@ -37,3 +36,7 @@ class PUa_1_0_SL_init:
         self.G                  = self.material.G
         self.fixed_source       = np.zeros((self.Nx,self.G))
         self.tallies            = Tallies(self)
+        self.Nt                 = int(self.Nx*self.G)
+        if (self.source_tilt):
+            self.Nt = int(self.Nt*2)
+        

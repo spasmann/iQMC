@@ -14,12 +14,12 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     # initialize problem data
-    N           = 2**11
-    Nx          = 10
+    N           = 2**8
+    Nx          = 60
     G           = 1
-    generator   = "sobol"
-    solver      = "LGMRES"
-    data = GarciaInit(N=N, Nx=Nx, generator=generator)
+    generator   = "random"
+    solver      = "Picard"
+    data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=True)
     start       = time.time()
     maxit       = 10
     tol         = 1e-4

@@ -23,7 +23,6 @@ def SI_Map(phi_in, qmc_data):
     if (qmc_data.source_tilt):
         qmc_data.tallies.dphi_s = np.reshape(phi_in[Nv:], (Nx,G))
         phi_in = phi_in[:Nv]
-        
     phi_in              = np.reshape(phi_in, (Nx,G))
     qmc_data.tallies.q  = GetSource(phi_in, qmc_data)
     sweep               = Sweep(qmc_data) # samples are generated with initialization of sweep
@@ -53,7 +52,12 @@ def RHS(qmc_data):
     """
     Nt  = qmc_data.Nt
     zed = np.zeros((Nt,1))
+    if (qmc_data.source_tilt):
+        dphi = qmc_data.tallies.dphi_s
+        qmc_data.tallies.dphi_s = zed
     b   = SI_Map(zed,qmc_data) # qmc_sweep with phi(0)
+    if (qmc_data.source_tilt):
+        qmc_data.tallies.dphi_s = dphi
     return b
 
 

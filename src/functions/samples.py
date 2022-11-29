@@ -96,7 +96,7 @@ class Samples:
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)
                 angle   = np.array((mu, muSin, phi))
-                pos      = np.array((x,0,0)) # x, y, z
+                pos     = np.array((x,0,0)) # x, y, z
             zone     = self.mesh.GetZone(pos, angle)
             weight   = self.VolumetricWeight(zone, pos, self.mesh)
             particle = Particle(pos, angle, weight, zone)
@@ -114,7 +114,8 @@ class Samples:
             self.particles.append(particle)
             
     def LeftBoundaryParticles(self):
-        pos = np.array((self.LB + 1e-9,0,0))
+        x = self.LB + 1e-9
+        pos = np.array((x,0,0))
         zone = self.mesh.GetZone(pos, [0])
         weight = self.BoundaryWeight(self.phi_left)
         for i in range(self.start,self.stop):
@@ -180,5 +181,5 @@ class Samples:
         return weight
     
     def BoundaryWeight(self, BV):
-        # BV: boundary value, i.e. phi_left or phi_right 
+        # BV: boundary value, a.k.a phi_left or phi_right 
         return (self.geometry.SurfaceArea()*BV/self.N)

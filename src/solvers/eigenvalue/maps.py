@@ -19,10 +19,11 @@ def SI_Map(phi_f, phi_s, qmc_data):
     """
     G   = qmc_data.G
     Nx  = qmc_data.Nx
-    Nv  = phi_s.size
-    try:
-        (Nv == Nx*G)  
-    except Exception as e: print(e) 
+    Nt  = qmc_data.Nt
+    Nv  = int(Nx*G)
+    if (qmc_data.source_tilt):
+        qmc_data.tallies.dphi_s = np.reshape(phi_s[Nv:], (Nx,G))
+        phi_s = phi_s[:Nv]
     phi_s               = np.reshape(phi_s, (Nx,G))
     phi_f               = np.reshape(phi_f, (Nx,G))
     qmc_data.tallies.q  = GetSource(phi_s, qmc_data, phi_avg_f=phi_f)
@@ -30,6 +31,11 @@ def SI_Map(phi_f, phi_s, qmc_data):
     sweep.Run(qmc_data) # QMC sweep
     phi_out             = qmc_data.tallies.phi_avg
     phi_out             = np.reshape(phi_out,(Nv,1))
+    if (qmc_data.source_tilt):
+        dphi            = qmc_data.tallies.dphi_s
+        dphi            = np.reshape(dphi,(Nv,1))
+        phi_out         = np.append(phi_out, dphi)    
+        phi_out         = np.reshape(phi_out, (Nt,1))
     # all reduce phi_out here (they automatically wait for each other)
     comm                = MPI.COMM_WORLD
     phi_out             = comm.allreduce(phi_out,op=MPI.SUM)
@@ -45,12 +51,18 @@ def RHS(qmc_data):
     b from Sam's qmc_data structure by doing a transport sweep with
     zero scattering term.
     """
-    G       = qmc_data.G
-    Nx      = qmc_data.Nx
-    Nv      = Nx*G
+    #G       = qmc_data.G
+    Nt      = qmc_data.Nt
     phi_f   = qmc_data.tallies.phi_f
-    zed     = np.zeros((Nx,G))
+    zed     = np.zeros((Nt,1))
+    if (qmc_data.source_tilt):
+        dphi = qmc_data.tallies.dphi_s
+        qmc_data.tallies.dphi_s = zed
+        
     b       = SI_Map(phi_f, zed, qmc_data) # qmc_sweep with phi(0)
+    
+    if (qmc_data.source_tilt):
+        qmc_data.tallies.dphi_s = dphi
     
     return b
 

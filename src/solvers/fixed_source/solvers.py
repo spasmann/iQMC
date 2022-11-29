@@ -51,7 +51,7 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=False,report_progress=True):
     if (qmc_data.source_tilt):
         phi0 = np.append(qmc_data.tallies.phi_avg, qmc_data.tallies.dphi_s)
     else:
-        phi0    = qmc_data.tallies.phi_avg
+        phi0 = qmc_data.tallies.phi_avg
     itc     = 0
     diff    = 1.0
     phic    = np.copy(phi0)

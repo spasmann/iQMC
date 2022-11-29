@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+from scipy.integrate import quadrature
 
 # =============================================================================
 # Talies class
@@ -17,8 +18,11 @@ class Tallies:
         self.delta_flux         = 1.0
         
         self.left               = qmc_data.left
-        self.phi_left           = qmc_data.phi_left
-
+        if (self.left):
+            self.phi_left       = qmc_data.phi_left
+        self.right              = qmc_data.right
+        if (self.right):
+            self.phi_right      = qmc_data.phi_right
         if (self.mode == "eigenvalue"):
             self.phi_f       = np.random.uniform(size=(self.Nr,self.G))
         if (self.flux):
@@ -29,7 +33,7 @@ class Tallies:
             self.dphi_f      = None
             self.qdot        = np.zeros((self.Nr, self.G))
             if (self.mode == "eigenvalue"):
-                self.dphi_f      = np.zeros((self.Nr, self.G))
+                self.dphi_f  = np.random.uniform(size=(self.Nr, self.G))
 
 # =============================================================================
 # Tallies class functions
@@ -40,8 +44,6 @@ class Tallies:
             avg_scalar_flux(self.phi_avg, particle, material, geometry)
         if (self.source_tilt):
             avg_scalar_flux_derivative(self.dphi_s, particle, material, geometry, mesh)
-        if (self.left):
-            self.phi_avg[0] = self.phi_left
             
     def DeltaFlux(self):
         self.delta_flux = np.linalg.norm(self.phi_avg - self.phi_avg_old, np.inf)
@@ -71,6 +73,21 @@ def avg_scalar_flux(phi_avg, particle, material, geometry):
         phi_avg[zone,:] += (weight*ds/dV)    
         
 def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
+    if (geometry.geometry == "slab"):
+        slab_integral(dphi, particle, material, geometry, mesh)
+    if (geometry.geometry == "cylinder"):
+        cylinder_integral(dphi, particle, material, geometry, mesh)
+        dphi[0,:] = 0
+    if (geometry.geometry == "sphere"):
+        sphere_integral(dphi, particle, material, geometry, mesh)
+        dphi[0,:] = 0
+
+        
+# =============================================================================
+# Geometry dependent functions
+# =============================================================================
+        
+def slab_integral(dphi, particle, material, geometry, mesh):
     zone    = particle.zone
     mu      = particle.angles[0]
     x       = particle.pos[0]
@@ -81,12 +98,41 @@ def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
     ds      = particle.ds
     sigt    = material.sigt[zone,:]
     sigt    = np.reshape(sigt, (1,G))
-    dV      = geometry.CellVolume(zone)
     if (sigt.all() > 1e-12):
         dphi[zone,:] += ((mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
-                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/sigt)))[0,:]
+                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt))))[0,:]
+        #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
     else:
         dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
-    
 
+def cylinder_integral(dphi, particle, material, geometry, mesh):
+    (mu,muSin,phi)  = particle.angles
+    (x,y,z)         = particle.pos
+    zone            = particle.zone
+    R_mid           = mesh.midpoints[zone]
+    dx              = mesh.dx
+    w               = particle.weight[0]
+    ds              = particle.ds
+    sigt            = material.sigt[zone,:][0]
+    f = lambda s: (w*np.exp(-sigt*s)*(np.sqrt((y+muSin*np.sin(phi)*s)**2 +
+                                              (z+muSin*np.cos(phi)*s)**2)-R_mid))
+    F = quadrature(f, 0, ds)
+    dphi[zone,:] += F[0]
+    
+def sphere_integral(dphi, particle, material, geometry, mesh):    
+    (mu,muSin,phi)  = particle.angles
+    (x,y,z)         = particle.pos
+    zone            = particle.zone
+    R_mid           = mesh.midpoints[zone]
+    dx              = mesh.dx
+    w               = particle.weight[0]
+    ds              = particle.ds
+    sigt            = material.sigt[zone,:][0]
+    f = lambda s: (w*np.exp(-sigt*s)*(np.sqrt((x+mu*s)**2 +
+                                              (y+muSin*np.sin(phi)*s)**2 +
+                                              (z+muSin*np.cos(phi)*s)**2)-R_mid))
+    print(ds)
+    F = quadrature(f, 0.0, ds)
+    dphi[zone,:] += F[0]
+    
         

@@ -6,10 +6,11 @@ from src.functions.mesh import Mesh
 from src.functions.tallies import Tallies
 
 class GarciaInit:
-    def __init__(self, N=2**12, Nx=20, generator="sobol"):        
+    def __init__(self, N=2**12, Nx=20, generator="sobol", source_tilt=False):        
         self.N                  = N
         self.Nx                 = Nx
         self.generator          = generator
+        self.source_tilt        = source_tilt
         self.totalDim           = 3
         self.RB                 = 5.0
         self.LB                 = 0.0
@@ -24,7 +25,6 @@ class GarciaInit:
         self.geometry           = "slab"
         self.mode               = "fixed_source"
         self.flux               = True
-        self.source_tilt        = True
         self.save_data          = False
         self.moment_match       = False
         self.true_flux          = np.array((False))

@@ -21,7 +21,7 @@ class Particle:
         x           += ds*mu 
         y           += ds*muSin*np.sin(phi)
         z           += ds*muSin*np.cos(phi)
-        self.pos[:]  = (x,y,z)
+        self.pos    = np.array((x,y,z))
         self.R       = self.GetRadius(self.pos)
         self.zone    = self.GetZone(mesh)
 
@@ -40,7 +40,7 @@ class Particle:
                 if (self.pos[0] >= mesh.RB):
                     self.alive = False
             else:
-                if (self.pos[0] <= abs(mesh.LB)):
+                if (self.pos[0] <= mesh.LB):
                     self.alive = False
         else:
             if(self.R >= mesh.RB):
