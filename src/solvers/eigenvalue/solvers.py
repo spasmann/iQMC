@@ -153,12 +153,12 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
             Exception
         phi         = gmres_out[0]
         exitCode    = gmres_out[1]
-    phi         = np.reshape(phi, (Nx,G))
     stop        = time.time()
     run_time    = stop - start
     if (qmc_data.source_tilt):
         phi = phi[:Nv]
-        
+    phi = np.reshape(phi, (Nx,G))
+    
     if (rank==0):
         if (save_data):
             sim_data = SimData(phi, run_time, tol, nproc)

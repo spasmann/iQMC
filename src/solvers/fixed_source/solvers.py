@@ -80,7 +80,7 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=False,report_progress=True):
     return phi_out
 
 
-def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=True, save_data=True):
+def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=True, save_data=False):
     """
     Parameters
     ----------

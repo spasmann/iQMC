@@ -20,16 +20,16 @@ if __name__ == "__main__":
     solver = "LGMRES"
     generator = "sobol"
     
-    data = PUa_1_0_SP_init(N=N, Nx=Nx, generator=generator, source_tilt=True)
+    data = PUa_1_0_SP_init(N=N, Nx=Nx, generator=generator, source_tilt=False)
     start = time.time()
-    #phi = Davidson(data, tol=1e-5, maxit=10)
+    phi, keff, itt = Davidson(data, tol=1e-5, maxit=10)
     
-    phi, khist, itt = PowerIteration(data,
-                        solver=solver,
-                        max_outter_itt=10, 
-                        max_inner_itt=10, 
-                        outter_tol=1e-4,
-                        inner_tol=1e-4)
+    # phi, khist, itt = PowerIteration(data,
+    #                     solver=solver,
+    #                     max_outter_itt=10, 
+    #                     max_inner_itt=10, 
+    #                     outter_tol=1e-4,
+    #                     inner_tol=1e-4)
     stop = time.time()
     print("PI took: ", stop-start)
-    plt.plot(data.mesh.midpoints, phi)
+    plt.plot(data.mesh.midpoints, phi[0])

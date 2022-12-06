@@ -131,7 +131,7 @@ def sphere_integral(dphi, particle, material, geometry, mesh):
     f = lambda s: (w*np.exp(-sigt*s)*(np.sqrt((x+mu*s)**2 +
                                               (y+muSin*np.sin(phi)*s)**2 +
                                               (z+muSin*np.cos(phi)*s)**2)-R_mid))
-    print(ds)
+    #print(ds)
     F = quadrature(f, 0.0, ds)
     dphi[zone,:] += F[0]
     

@@ -80,18 +80,22 @@ class Samples:
             randMu  = self.rng[i,self.counter+1]
             x       = self.GetPos(randX) 
             mu      = self.GetMu(randMu)
-            if (mu == 0.0):
-                mu += 0.01
             if (geo == "slab"):
+                if (mu == 0.0):
+                    mu += 0.01
                 angle   = np.array((mu, 0, 0)) # mu, muSin, phi
                 pos     = np.array((x,0,0)) # x, y, z
             if (geo == "cylinder"):
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)
+                if (muSin == 0.0):
+                    muSin += 0.01
                 angle   = np.array((0, muSin, phi))
                 pos     = np.array((0,0,x)) # x, y, z
             if (geo =="sphere"):
+                if (mu == 0.0):
+                    mu += 0.01
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)

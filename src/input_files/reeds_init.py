@@ -33,7 +33,7 @@ class ReedsInit:
         self.right              = False
         self.left               = False
         self.true_flux          = reeds_sol(self.Nx,LB=LB,RB=RB)
-        self.mesh               = Mesh(self.LB, self.RB, self.Nx)
+        self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.fixed_source       = self.material.source
         self.tallies            = Tallies(self)

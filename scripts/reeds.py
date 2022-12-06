@@ -8,6 +8,8 @@ from mpi4py import MPI
 import time
 import numpy as np
 
+from src.input_files.reeds_solution import reeds_mcdc_sol, reeds_sol
+
 if __name__ == "__main__":
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -15,19 +17,29 @@ if __name__ == "__main__":
     procname = MPI.Get_processor_name()
     
     N           = 2**11
-    Nx          = 64
+    Nx          = 32
     generator   = "sobol"
     solver      = "LGMRES"
-    data        = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=True, LB=-8.0, RB=8.0)
+    data1       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=False)
+    data2       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=True)
     start       = time.time()
     maxit       = 10
     tol         = 1e-4
-    phi2         = FixedSource(data,solver=solver, maxit=maxit, tol=tol, 
+    phi1         = FixedSource(data1,solver=solver, maxit=maxit, tol=tol, 
                               save_data=False)
+    phi2         = FixedSource(data2,solver=solver, maxit=maxit, tol=tol, 
+                              save_data=False)
+    
+    sol = reeds_mcdc_sol()
+    sol = reeds_sol(Nx=32)
+    
+    err1 = np.linalg.norm(sol-phi1)
+    err2 = np.linalg.norm(sol-phi2)
+    print("Constant Source Error: ",err1)
+    print("Linear Source Error: ",err2)
 
     stop = time.time()
     if (rank==0):
         print("time: ",stop-start)
-        plt.plot(data.mesh.midpoints, phi2)
-        #plt.plot(data.mesh.midpoints, data.tallies.phi_avg[:,0] + data.tallies.dphi_s[:,0]*data.mesh.midpoints)
-        #plt.plot(data.mesh.midpoints, np.ones(Nx), 'o')
+        plt.plot(data1.mesh.midpoints, phi1)
+        plt.plot(data1.mesh.midpoints, sol)
