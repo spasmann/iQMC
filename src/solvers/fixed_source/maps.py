@@ -85,7 +85,7 @@ def MatVec(phi_in):
     """
     b           = matvec_data[0]
     qmc_data    = matvec_data[1]
-    G          = qmc_data.G
+    G           = qmc_data.G
     Nx          = qmc_data.Nx
     Nt          = qmc_data.Nt
     phi_in      = np.reshape(phi_in,(Nt,1))

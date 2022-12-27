@@ -16,10 +16,9 @@ if __name__ == "__main__":
     # initialize problem data
     N           = 2**8
     Nx          = 60
-    G           = 1
-    generator   = "random"
+    generator   = "sobol"
     solver      = "Picard"
-    data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=True)
+    data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=False)
     start       = time.time()
     maxit       = 10
     tol         = 1e-4

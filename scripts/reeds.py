@@ -16,30 +16,20 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N           = 2**11
+    N           = 1
     Nx          = 32
-    generator   = "sobol"
-    solver      = "LGMRES"
+    generator   = "halton"
+    solver      = "Picard"
     data1       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=False)
-    data2       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=True)
     start       = time.time()
-    maxit       = 10
+    maxit       = 1
     tol         = 1e-4
     phi1         = FixedSource(data1,solver=solver, maxit=maxit, tol=tol, 
                               save_data=False)
-    phi2         = FixedSource(data2,solver=solver, maxit=maxit, tol=tol, 
-                              save_data=False)
-    
-    sol = reeds_mcdc_sol()
-    sol = reeds_sol(Nx=32)
-    
-    err1 = np.linalg.norm(sol-phi1)
-    err2 = np.linalg.norm(sol-phi2)
-    print("Constant Source Error: ",err1)
-    print("Linear Source Error: ",err2)
-
+    sol = reeds_sol(Nx=Nx)
     stop = time.time()
     if (rank==0):
         print("time: ",stop-start)
-        plt.plot(data1.mesh.midpoints, phi1)
-        plt.plot(data1.mesh.midpoints, sol)
+        plt.plot(data1.mesh.midpoints, phi1[:,0], label='iQMC')
+        # plt.plot(data1.mesh.midpoints, sol, label='Sol')
+        plt.legend()

@@ -26,7 +26,7 @@ class Tallies:
         if (self.mode == "eigenvalue"):
             self.phi_f       = np.random.uniform(size=(self.Nr,self.G))
         if (self.flux):
-            self.phi_avg     = np.random.uniform(size=(self.Nr,self.G))
+            self.phi_avg     = np.ones((self.Nr,self.G))#np.random.uniform(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))
         if (self.source_tilt):
             self.dphi_s      = np.random.uniform(size=(self.Nr, self.G))
@@ -70,8 +70,8 @@ def avg_scalar_flux(phi_avg, particle, material, geometry):
     if (sigt.all() > 1e-12):
         phi_avg[zone,:] += (weight*(1-np.exp(-(ds*sigt)))/(sigt*dV))[0,:]
     else:
-        phi_avg[zone,:] += (weight*ds/dV)    
-        
+        phi_avg[zone,:] += (weight*ds/dV)
+
 def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
     if (geometry.geometry == "slab"):
         slab_integral(dphi, particle, material, geometry, mesh)

@@ -28,7 +28,7 @@ class GarciaInit:
         self.save_data          = False
         self.moment_match       = False
         self.true_flux          = np.array((False))
-        self.mesh               = Mesh(self.LB, self.RB, self.Nx)
+        self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.fixed_source       = np.zeros((self.Nx,self.G))
         self.tallies            = Tallies(self)

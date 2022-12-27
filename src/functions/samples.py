@@ -101,14 +101,17 @@ class Samples:
                 muSin   = math.sqrt(1-mu**2)
                 angle   = np.array((mu, muSin, phi))
                 pos     = np.array((x,0,0)) # x, y, z
+            # print('position ', pos)
+            # print('angle ', angle)
             zone     = self.mesh.GetZone(pos, angle)
             weight   = self.VolumetricWeight(zone, pos, self.mesh)
             particle = Particle(pos, angle, weight, zone)
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
-        pos = np.array((self.RB - 1e-9,0,0))
-        zone = self.self.mesh.GetZone(pos, [0])
+        x = self.RB - 1e-9
+        pos = np.array((x,0,0))
+        zone = self.mesh.GetZone(pos, [0])
         weight = self.BoundaryWeight(self.phi_right)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
@@ -143,7 +146,7 @@ class Samples:
         return samples
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=self.RQMC)
+        sampler = Halton(d=self.totalDim,scramble=True, seed=1234)
         sampler.fast_forward(1)
         return sampler.random(n=self.N)
     
@@ -182,6 +185,7 @@ class Samples:
         if (self.source_tilt):
             Q +=  self.qdot[zone,:]*(x - mesh.midpoints[zone])
         weight = Q*self.geometry.CellVolume(zone)/self.N*self.Nx
+        # print(weight)
         return weight
     
     def BoundaryWeight(self, BV):
