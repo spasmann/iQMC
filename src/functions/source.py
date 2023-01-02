@@ -9,17 +9,26 @@ import numpy as np
 
 def scattering_source(cell, phi, material):
     source = np.dot((material.sigs[cell,:,:]), phi[cell,:])
-    #source = np.zeros(material.G)
-    #for i in range(material.G):
-    #    source[i] = np.dot(material.sigs[cell,i,:], phi[cell,:])
     return source
 
 def fission_source(cell, phi, keff, material):
     source = np.dot(material.nu[cell,:]*material.chi[cell,:,:]*material.sigf[cell,:]/keff, phi[cell,:])
-    #source = np.zeros(material.G)
-    #for i in range(material.G):
-    #    source[i] = np.dot(material.chi[cell,i]*material.nu[cell,:]*material.sigf[cell,:]/keff, phi[cell,:])
     return source
+
+def GetLinearSource(qmc_data):
+    dphi_s       = qmc_data.tallies.dphi_s
+    material     = qmc_data.material
+    qdot         = np.zeros((material.Nx, material.G))
+    
+    for cell in range(material.Nx):
+        qdot[cell,:] = (scattering_source(cell, dphi_s, material))     
+    if (qmc_data.mode == "eigenvalue"):
+        keff    = qmc_data.keff
+        dphi_f  = qmc_data.tallies.dphi_f
+        for cell in range(material.Nx):
+            qdot[cell,:] += fission_source(cell, dphi_f, keff, material)
+            
+    qmc_data.tallies.qdot = qdot
 
 def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
     """
@@ -35,16 +44,18 @@ def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
 
     """
     material        = qmc_data.material
-    fixed_source    = qmc_data.source
+    fixed_source    = qmc_data.fixed_source
     q               = np.zeros((material.Nx, material.G))
-    if (phi_avg_f is None):
-        for cell in range(material.Nx):
-            q[cell,:] = (scattering_source(cell, phi_avg_s, material)  
-                         + fixed_source[cell,:]) 
-    else:
+    if (qmc_data.source_tilt):
+        GetLinearSource(qmc_data)
+            
+    for cell in range(material.Nx):
+        q[cell,:] = (scattering_source(cell, phi_avg_s, material)  
+                     + fixed_source[cell,:]) 
+            
+    if (phi_avg_f is not None):
         keff = qmc_data.keff
         for cell in range(material.Nx):
-            q[cell,:] = (scattering_source(cell, phi_avg_s, material) 
-                         + fission_source(cell, phi_avg_f, keff, material) 
-                         + fixed_source[cell,:]) 
+            q[cell,:] += fission_source(cell, phi_avg_f, keff, material) 
+            
     return q

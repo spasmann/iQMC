@@ -1,57 +1,65 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+from scipy.integrate import quadrature
 
+# =============================================================================
+# Talies class
+# =============================================================================
 class Tallies:
-    def __init__(self, init_data):
+    def __init__(self, qmc_data):
         
-        self.avg_scalar_flux    = init_data.avg_scalar_flux
-        self.edge_scalar_flux   = init_data.edge_scalar_flux
-        self.avg_angular_flux   = init_data.avg_angular_flux
-        self.avg_current        = init_data.avg_current
-        self.edge_current       = init_data.edge_current
-        self.shannon_entropy    = init_data.shannon_entropy
-        self.Nr                 = init_data.Nx
-        self.G                  = init_data.G
-        self.dtype              = np.float64
+        self.flux               = qmc_data.flux
+        self.source_tilt        = qmc_data.source_tilt
+        self.Nr                 = qmc_data.Nx
+        self.G                  = qmc_data.material.G
+        self.q                  = qmc_data.fixed_source
+        self.mode               = qmc_data.mode
+        self.qdot               = None
+        self.delta_flux         = 1.0
         
-        if (init_data.avg_scalar_flux):
-            self.phi_avg = np.random.uniform(size=(self.Nr,self.G))
+        self.left               = qmc_data.left
+        if (self.left):
+            self.phi_left       = qmc_data.phi_left
+        self.right              = qmc_data.right
+        if (self.right):
+            self.phi_right      = qmc_data.phi_right
+        if (self.mode == "eigenvalue"):
+            self.phi_f       = np.random.uniform(size=(self.Nr,self.G))
+        if (self.flux):
+            self.phi_avg     = np.ones((self.Nr,self.G))#np.random.uniform(size=(self.Nr,self.G))
             self.phi_avg_old = np.random.uniform(size=(self.Nr,self.G))
-            #self.phi_avg = np.zeros((self.Nr,self.G))
-            #self.phi_avg_old = np.zeros((self.Nr,self.G))
-        if (init_data.edge_scalar_flux):
-            self.phi_edge = np.zeros((self.Nr+1, self.G), self.dtype)
-        if (init_data.avg_current):
-            self.J_avg = np.zeros((self.Nr, self.G), self.dtype)
-        if (init_data.edge_current):
-            self.J_edge = np.zeros((self.Nr+1, self.G), self.dtype)
-        if (init_data.shannon_entropy):
-            self.SE = np.zeros((self.Nr, self.G), self.dtype)
+        if (self.source_tilt):
+            self.dphi_s      = np.random.uniform(size=(self.Nr, self.G))
+            self.dphi_f      = None
+            self.qdot        = np.zeros((self.Nr, self.G))
+            if (self.mode == "eigenvalue"):
+                self.dphi_f  = np.random.uniform(size=(self.Nr, self.G))
+
+# =============================================================================
+# Tallies class functions
+# =============================================================================
+
+    def Tally(self, particle, material, geometry, mesh):
+        if (self.flux):
+            avg_scalar_flux(self.phi_avg, particle, material, geometry)
+        if (self.source_tilt):
+            avg_scalar_flux_derivative(self.dphi_s, particle, material, geometry, mesh)
             
-        self.delta_flux = 1.0
-        
-    def Tally(self, particle, material, mesh):
-        if (self.avg_scalar_flux):
-            AvgScalarFlux(self.phi_avg, particle, material, mesh)
-            
-        #if (self.avg_angular_flux):
-        #    self.AvgAngularFlux()
-        """
-        if (self.edge_scalar_flux):
-            self.EdgeScalarFlux()
-        if (self.avg_current):
-            self.AvgCurrent()
-        if (self.edge_current):
-            self.EdgeCurrent()
-        """
     def DeltaFlux(self):
         self.delta_flux = np.linalg.norm(self.phi_avg - self.phi_avg_old, np.inf)
         
     def ResetPhiAvg(self):
-        self.phi_avg = np.zeros((self.Nr, self.G))
-        return self.phi_avg
-        
-def AvgScalarFlux(phi_avg, particle, material, geometry):
+        self.phi_avg     = np.zeros((self.Nr, self.G))
+        if (self.source_tilt):
+            self.dphi_s  = np.zeros((self.Nr, self.G))
+            if (self.mode == "eigenvalue"):
+                self.dphi_f  = np.zeros((self.Nr, self.G))
+
+# =============================================================================
+# Tallies
+# =============================================================================
+
+def avg_scalar_flux(phi_avg, particle, material, geometry):
     zone    = particle.zone
     G       = material.G
     weight  = particle.weight
@@ -62,7 +70,69 @@ def AvgScalarFlux(phi_avg, particle, material, geometry):
     if (sigt.all() > 1e-12):
         phi_avg[zone,:] += (weight*(1-np.exp(-(ds*sigt)))/(sigt*dV))[0,:]
     else:
-        phi_avg[zone,:] += (weight*ds/dV)    
+        phi_avg[zone,:] += (weight*ds/dV)
 
+def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
+    if (geometry.geometry == "slab"):
+        slab_integral(dphi, particle, material, geometry, mesh)
+    if (geometry.geometry == "cylinder"):
+        cylinder_integral(dphi, particle, material, geometry, mesh)
+        dphi[0,:] = 0
+    if (geometry.geometry == "sphere"):
+        sphere_integral(dphi, particle, material, geometry, mesh)
+        dphi[0,:] = 0
 
+        
+# =============================================================================
+# Geometry dependent functions
+# =============================================================================
+        
+def slab_integral(dphi, particle, material, geometry, mesh):
+    zone    = particle.zone
+    mu      = particle.angles[0]
+    x       = particle.pos[0]
+    x_mid   = mesh.midpoints[zone]
+    dx      = mesh.dx
+    G       = material.G
+    w       = particle.weight
+    ds      = particle.ds
+    sigt    = material.sigt[zone,:]
+    sigt    = np.reshape(sigt, (1,G))
+    if (sigt.all() > 1e-12):
+        dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
+                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt)))/dx**3)[0,:]
+        #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
+    else:
+        dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
+
+def cylinder_integral(dphi, particle, material, geometry, mesh):
+    (mu,muSin,phi)  = particle.angles
+    (x,y,z)         = particle.pos
+    zone            = particle.zone
+    R_mid           = mesh.midpoints[zone]
+    dx              = mesh.dx
+    w               = particle.weight[0]
+    ds              = particle.ds
+    sigt            = material.sigt[zone,:][0]
+    f = lambda s: (w*np.exp(-sigt*s)*(np.sqrt((y+muSin*np.sin(phi)*s)**2 +
+                                              (z+muSin*np.cos(phi)*s)**2)-R_mid))
+    F = quadrature(f, 0, ds)
+    dphi[zone,:] += F[0]
+    
+def sphere_integral(dphi, particle, material, geometry, mesh):    
+    (mu,muSin,phi)  = particle.angles
+    (x,y,z)         = particle.pos
+    zone            = particle.zone
+    R_mid           = mesh.midpoints[zone]
+    dx              = mesh.dx
+    w               = particle.weight[0]
+    ds              = particle.ds
+    sigt            = material.sigt[zone,:][0]
+    f = lambda s: (w*np.exp(-sigt*s)*(np.sqrt((x+mu*s)**2 +
+                                              (y+muSin*np.sin(phi)*s)**2 +
+                                              (z+muSin*np.cos(phi)*s)**2)-R_mid))
+    #print(ds)
+    F = quadrature(f, 0.0, ds)
+    dphi[zone,:] += F[0]
+    
         

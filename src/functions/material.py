@@ -5,11 +5,6 @@ Sigt and Siga cross sections need to be a matrix of size (Nx, G)
 
 """
 
-def MaterialAvail():
-    return ["garcia_data", 12, 70, 618, "reeds_data",
-            "URRb_H2Oa5_2_0_SL_data", "PUa_1_0_SL_data",
-            "Ua_1_0_SL_data", "URRa_2_0_SL", "PUa_H2O_1_0_SL"]
-
 class Material:
     def __init__(self, material_code, geometry, mesh):
         self.mesh = mesh
@@ -27,6 +22,10 @@ class Material:
             from src.materials.reeds_data import reeds_data
             self.sigt, self.sigs, self.siga, self.source, self.G = reeds_data(self.Nx, LB=self.LB, RB=self.RB)
             self.media = 9
+        
+        elif (material_code == "larsen_data"):
+            from src.input_files.larsen_init import larsen_material
+            self.sigt, self.sigs, self.siga, self.G = larsen_material(mesh)
             
         elif (material_code == "URRb_H2Oa5_2_0_SL_data"):
             from src.materials.URRb_H2Oa5_2_0_SL_data import URRb_H2Oa5_2_0_SL_data

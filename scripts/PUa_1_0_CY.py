@@ -18,20 +18,20 @@ if __name__ == "__main__":
     Nx = 11
     N = 2**10
     solver = "LGMRES"
-    generator = "halton"
+    generator = "sobol"
     
-    data = PUa_1_0_CY_init(N=N, Nx=Nx, generator=generator)
+    data = PUa_1_0_CY_init(N=N, Nx=Nx, generator=generator,source_tilt=True)
     data.save_data = False
     start = time.time()
-    phi, khist = PowerIteration(data,
+    phi, khist, itt = PowerIteration(data,
                         solver=solver,
-                        max_outter_itt=25, 
-                        max_inner_itt=25, 
-                        outter_tol=1e-6,
-                        inner_tol=1e-6)
+                        max_outter_itt=10, 
+                        max_inner_itt=10, 
+                        outter_tol=1e-4,
+                        inner_tol=1e-4)
     stop = time.time()
     print("PI took: ", stop-start)
     plt.plot(range(Nx),phi)
     
     #plt.plot(range(len(phi_hist)), phi_hist)
-    plt.yscale('log')
+    #plt.yscale('log')

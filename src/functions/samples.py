@@ -6,6 +6,9 @@ from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
 from mpi4py import MPI
 
+# =============================================================================
+# Class Initialization and Splitting for MPI
+# =============================================================================
 class Samples:
     """
     Class for generating list of Particles given various initial conditions.
@@ -13,30 +16,31 @@ class Samples:
     This will need to become more complex to return samples for different
     sources and sampling distributions.
     """
-    def __init__(self, init_data, geometry, mesh):
-        self.generator  = init_data.generator
-        self.RQMC       = False
-        self.geometry   = geometry
-        self.mesh       = mesh
-        self.G          = init_data.G
-        self.N          = init_data.N
-        self.Nx         = init_data.Nx
-        self.totalDim   = init_data.totalDim
-        self.RB         = init_data.RB
-        self.LB         = init_data.LB
-        self.left       = init_data.left
-        self.right      = init_data.right
+    def __init__(self, qmc_data, geometry, mesh):
+        self.geometry       = geometry
+        self.mesh           = mesh
+        self.generator      = qmc_data.generator
+        self.source_tilt    = qmc_data.source_tilt
+        self.RQMC           = qmc_data.RQMC
+        self.rng_seed       = qmc_data.rng_seed
+        self.G              = qmc_data.G
+        self.N              = qmc_data.N
+        self.Nx             = qmc_data.Nx
+        self.totalDim       = qmc_data.totalDim
+        self.RB             = qmc_data.RB
+        self.LB             = qmc_data.LB
+        self.left           = qmc_data.left
+        self.right          = qmc_data.right
         
         # split the total number of particles into the different sources
         #self.Nleft = 0
         #self.Nright=0
         #self.Nvolumetric = self.N
-        self.moment_match = init_data.moment_match
         if (self.left):
-            self.phi_left = init_data.phi_left
+            self.phi_left = qmc_data.phi_left
             #self.left = math.floor(0.125*self.N)
         if (self.right):
-            self.phi_right = init_data.phi_right
+            self.phi_right = qmc_data.phi_right
             #self.right = math.floor(0.125*self.N)
             
         #self.Nvolumetric = self.N - self.Nright - self.Nleft
@@ -50,9 +54,13 @@ class Samples:
         self.nproc  = comm.Get_size()
         self.start  = math.floor((rank/nproc)*self.N)
         self.stop   = math.floor((rank+1)/nproc*self.N) 
-
-    def GenerateParticles(self, q):
-        self.q = q
+        
+# =============================================================================
+# Generate Particles
+# =============================================================================
+    def GenerateParticles(self, q, qdot):
+        self.q       = q
+        self.qdot    = qdot
         self.counter = 0
         self.GetRnMatrix()
         self.particles = []
@@ -64,9 +72,6 @@ class Samples:
             self.counter += 1
         self.VolumetricParticles()
         self.counter += 2 # used  to index the random number matrix 
-        
-        if (self.moment_match):
-            self.moment_matching()
 
     def VolumetricParticles(self):
         geo = self.geometry.geometry
@@ -75,46 +80,61 @@ class Samples:
             randMu  = self.rng[i,self.counter+1]
             x       = self.GetPos(randX) 
             mu      = self.GetMu(randMu)
-            if (mu == 0.0):
-                mu += 0.01
             if (geo == "slab"):
+                if (mu == 0.0):
+                    mu += 0.01
                 angle   = np.array((mu, 0, 0)) # mu, muSin, phi
                 pos     = np.array((x,0,0)) # x, y, z
             if (geo == "cylinder"):
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)
+                if (muSin == 0.0):
+                    muSin += 0.01
                 angle   = np.array((0, muSin, phi))
                 pos     = np.array((0,0,x)) # x, y, z
             if (geo =="sphere"):
+                if (mu == 0.0):
+                    mu += 0.01
                 randPhi = self.rng[i,self.counter+2]
                 phi     = self.GetPhi(randPhi)
                 muSin   = math.sqrt(1-mu**2)
                 angle   = np.array((mu, muSin, phi))
-                pos      = np.array((x,0,0)) # x, y, z
+                pos     = np.array((x,0,0)) # x, y, z
+            # print('position ', pos)
+            # print('angle ', angle)
             zone     = self.mesh.GetZone(pos, angle)
-            weight   = self.VolumetricWeight(zone)
+            weight   = self.VolumetricWeight(zone, pos, self.mesh)
             particle = Particle(pos, angle, weight, zone)
             self.particles.append(particle)
             
     def RightBoundaryParticles(self):
-        pos = np.array((self.RB - 1e-9,))
+        x = self.RB - 1e-9
+        pos = np.array((x,0,0))
+        zone = self.mesh.GetZone(pos, [0])
         weight = self.BoundaryWeight(self.phi_right)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
             mu = -np.sqrt(randMu) - 1e-9
-            particle = Particle(pos, mu, weight)
+            angles = np.array((mu,0,0))
+            particle = Particle(pos, angles, weight, zone)
             self.particles.append(particle)
             
     def LeftBoundaryParticles(self):
-        pos = np.array((self.LB + 1e-9,))
+        x = self.LB + 1e-9
+        pos = np.array((x,0,0))
+        zone = self.mesh.GetZone(pos, [0])
         weight = self.BoundaryWeight(self.phi_left)
         for i in range(self.start,self.stop):
             randMu = self.rng[i,self.counter]
             mu = np.sqrt(randMu) + 1e-9
-            particle = Particle(pos, mu, weight)
+            angles = np.array((mu,0,0))
+            particle = Particle(pos, angles, weight, zone)
             self.particles.append(particle)
-        
+
+# =============================================================================
+# Generate LDS Matrix
+# =============================================================================
     def RandomMatrix(self):
         np.random.seed(56789)
         return np.random.random((self.N,self.totalDim))
@@ -126,7 +146,7 @@ class Samples:
         return samples
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=self.RQMC)
+        sampler = Halton(d=self.totalDim,scramble=True, seed=1234)
         sampler.fast_forward(1)
         return sampler.random(n=self.N)
     
@@ -143,7 +163,10 @@ class Samples:
             self.rng = self.HaltonMatrix()
         elif (self.generator == "latin_hypercube"):
             self.rng = self.LatinHypercube()
-    
+            
+# =============================================================================
+# Map Random Numbers to Physical Quantities
+# =============================================================================
     def GetPos(self, randPos):
         return ((self.RB-self.LB)*randPos + self.LB)
     
@@ -156,10 +179,15 @@ class Samples:
     def GetR(self,pos):
         return np.sqrt(sum(pos**2))
 
-    def VolumetricWeight(self, zone):
-        weight = self.q[zone,:]*self.geometry.CellVolume(zone)/self.N*self.Nx
+    def VolumetricWeight(self, zone, pos, mesh):
+        x = pos[0]
+        Q = self.q[zone,:]
+        if (self.source_tilt):
+            Q +=  self.qdot[zone,:]*(x - mesh.midpoints[zone])
+        weight = Q*self.geometry.CellVolume(zone)/self.N*self.Nx
+        # print(weight)
         return weight
     
     def BoundaryWeight(self, BV):
-        # BV: boundary value, i.e. phi_left or phi_right 
+        # BV: boundary value, a.k.a phi_left or phi_right 
         return (self.geometry.SurfaceArea()*BV/self.N)

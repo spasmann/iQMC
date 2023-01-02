@@ -18,7 +18,7 @@ def PUa_1_0_data(Nx=20):
     sigc = np.array((0.019584),dtype)
     sigf = np.array((0.081600),dtype)
     siga = sigf + sigc
-    nu = np.array((3.24),dtype)
+    nu = np.array((2.84),dtype)
     chi = np.array((1.0),dtype)
     
     sigt = np.tile(sigt,(Nx,G))

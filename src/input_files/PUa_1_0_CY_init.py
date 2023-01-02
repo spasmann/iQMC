@@ -9,32 +9,34 @@ Created on Mon Apr  4 17:52:36 2022
 import numpy as np
 from src.functions.material import Material
 from src.functions.mesh import Mesh
+from src.functions.tallies import Tallies
 
 class PUa_1_0_CY_init:
-    def __init__(self, N=2**10, Nx=100, generator="halton"):
+    def __init__(self, N=2**10, Nx=100, generator="halton", source_tilt=False):
         np.random.seed(123456)
         self.keff               = 1.0
         self.N                  = N
         self.Nx                 = Nx
         self.generator          = generator
+        self.source_tilt        = source_tilt
         self.totalDim           = 3
         self.RB                 = 4.279960
         self.LB                 = 0.0
-        self.right              = False
-        self.left               = False
+        self.rng_seed           = 12345
         self.material_code      = "PUa_1_0"
         self.geometry           = "cylinder"
-        self.avg_scalar_flux    = True
-        self.edge_scalar_flux   = False
-        self.avg_angular_flux   = False
-        self.avg_current        = False
-        self.edge_current       = False
-        self.shannon_entropy    = False
+        self.mode               = "eigenvalue"
+        self.flux               = True
         self.save_data          = False
-        self.moment_match       = False
+        self.right              = False
+        self.left               = False
+        self.RQMC               = False
         self.true_flux          = np.array((False))
-        self.mesh               = Mesh(self.LB, self.RB, self.Nx)
+        self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
-        self.source             = np.zeros((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
-        self.phi_f              = np.ones((self.Nx,self.G))#np.random.random(size=(self.Nx,self.G))
+        self.fixed_source       = np.zeros((self.Nx,self.G))
+        self.tallies            = Tallies(self)
+        self.Nt                 = int(self.Nx*self.G)
+        if (self.source_tilt):
+            self.Nt = int(self.Nt*2)

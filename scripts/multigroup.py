@@ -15,14 +15,14 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N = 2**12
+    N = 2**11
     Nx = 10
     G = 12
     maxit = 10
     generator = "sobol"
     data = MultiGroupInit(numGroups=G, N=N, Nx=Nx, generator=generator)
     start = time.time()
-    phi = FixedSource(data,maxit=maxit,save_data=False)
+    phi = FixedSource(data,solver="GMRES",maxit=maxit,save_data=False)
     stop = time.time()
     if (rank == 0):
         print("Time: ",stop-start)

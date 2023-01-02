@@ -28,7 +28,7 @@ class gmres_counter(object):
                 print("Iteration:", self.iter-1, "change: ",np.linalg.norm((rk - self.callbacks[self.iter-2])))
             
             
-def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=True):
+def Picard(qmc_data,tol=1e-5,maxit=40,save_data=False,report_progress=True):
     """
     Parameters
     ----------
@@ -48,21 +48,21 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=True):
     rank    = comm.Get_rank()
     nproc   = comm.Get_size()
 
-    Nx      = qmc_data.Nx
-    G       = qmc_data.G
-    phi0    = qmc_data.source
+    if (qmc_data.source_tilt):
+        phi0 = np.append(qmc_data.tallies.phi_avg, qmc_data.tallies.dphi_s)
+    else:
+        phi0 = qmc_data.tallies.phi_avg
     itc     = 0
     diff    = 1.0
     phic    = np.copy(phi0)
-    phi     = np.copy(phi0)
+    phic    = np.reshape(phic, (int(qmc_data.Nt),1))
     reshist = np.empty(0)
-    start = time.time()
+    start   = time.time()
     while (itc < maxit) and (diff > tol):
         phi_out = SI_Map(phic, qmc_data)
-        phi     = np.reshape(phi_out,(Nx,G))
-        diff    = np.linalg.norm((phic-phi))
+        diff    = np.linalg.norm((phic-phi_out))
         reshist = np.append(reshist, diff)
-        phic    = np.copy(phi)
+        phic    = np.copy(phi_out)
         itc += 1
         if (report_progress) and (rank==0):
             print("**********************")
@@ -73,10 +73,15 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=True,report_progress=True):
         if (save_data==True):
             sim_data = SimData(phi_out, run_time, tol, nproc)
             SaveData(qmc_data, sim_data)
-    return phi
+            
+    if (qmc_data.source_tilt):
+        Nv = int(qmc_data.Nx*qmc_data.G)
+        phi_out = phi_out[:Nv]
+    
+    return phi_out
 
 
-def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=True, save_data=True):
+def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=True, save_data=False):
     """
     Parameters
     ----------
@@ -96,6 +101,9 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=
     comm        = MPI.COMM_WORLD
     rank        = comm.Get_rank()
     nproc       = comm.Get_size()
+    start       = time.time()
+    Nx          = qmc_data.Nx
+    G           = qmc_data.G
     
     if (report_progress) and (rank==0):
         print("--------- Fixed Source Problem ---------")
@@ -104,47 +112,47 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=
         print("Random Number Generator: ",           qmc_data.generator)
         print("Number of Particles per Iteration: ", qmc_data.N)
         print("Number of Spatial Cells: ",           qmc_data.Nx)
-    
-    Nx          = qmc_data.Nx
-    G           = qmc_data.G
-    Nv          = Nx*G
-    start       = time.time()
-    matvec_data = MatVec_data(qmc_data)
-    A           = LinearOperator((Nv,Nv), 
-                              matvec=MatVec,
-                              rmatvec=MatVec,
-                              matmat= MatVec,
-                              rmatmat=MatVec,
-                              dtype=float)
-    b           = matvec_data[0]
-    phi0        = qmc_data.source
-    phi0        = np.reshape(phi0,(Nv,1))
-    if (solver=="LGMRES"):
-        counter     = gmres_counter(disp=report_progress)
-        gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
-        phi         = gmres_out[0]
-        exitCode    = gmres_out[1]
-        phi         = np.reshape(phi, (Nx,G))
-    elif (solver=="GMRES"):
-        counter     = gmres_counter(disp=report_progress)
-        gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
-        phi         = gmres_out[0]
-        exitCode    = gmres_out[1]
-        phi         = np.reshape(phi, (Nx,G))
-    elif (solver=="BICGSTAB"):
-        counter     = gmres_counter(disp=report_progress)
-        gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
-        phi         = gmres_out[0]
-        exitCode    = gmres_out[1]
-        phi         = np.reshape(phi, (Nx,G))
-    elif (solver=="Picard"):
-        phi         = Picard(qmc_data,maxit=maxit,tol=tol,report_progress=report_progress,save_data=False)
+
+    if (solver == "Picard"):
+        phi         = Picard(qmc_data,maxit=maxit,tol=tol,report_progress=report_progress)
         exitCode    = 0
     else:
-        if (rank==0):
-            print(" Invalid Solver ")
-            Exception
-            
+        Nt          = qmc_data.Nt
+        matvec_data = MatVec_data(qmc_data)
+        A           = LinearOperator((Nt,Nt), 
+                                  matvec=MatVec,
+                                  rmatvec=MatVec,
+                                  matmat= MatVec,
+                                  rmatmat=MatVec,
+                                  dtype=float)
+        b           = matvec_data[0]
+        
+        if (qmc_data.source_tilt):
+            phi0 = np.append(qmc_data.tallies.phi_avg, qmc_data.tallies.dphi_s)
+        else:
+            phi0 = qmc_data.tallies.phi_avg
+        phi0 = np.reshape(phi0,(Nt,1))
+        if (solver=="LGMRES"):
+            counter     = gmres_counter(disp=report_progress)
+            gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
+            phi         = gmres_out[0]
+            exitCode    = gmres_out[1]
+        elif (solver=="GMRES"):
+            counter     = gmres_counter(disp=report_progress)
+            gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
+            phi         = gmres_out[0]
+            exitCode    = gmres_out[1]
+        elif (solver=="BICGSTAB"):
+            counter     = gmres_counter(disp=report_progress)
+            gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit,callback=counter)
+            phi         = gmres_out[0]
+            exitCode    = gmres_out[1]
+        else:
+            if (rank==0):
+                print(" Invalid Solver ")
+                Exception
+                
+    phi         = np.reshape(phi[:int(Nx*G)], (Nx,G))        
     stop        = time.time()
     run_time    = stop - start
     
@@ -161,6 +169,37 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=
         
     return phi
 
+
+def GMRes(A, b, x0, e, nmax_iter, restart=None):
+    r = b - np.asarray(np.dot(A, x0)).reshape(-1)
+
+    x = []
+    q = [0] * (nmax_iter)
+
+    x.append(r)
+
+    q[0] = r / np.linalg.norm(r)
+
+    h = np.zeros((nmax_iter + 1, nmax_iter))
+
+    for k in range(nmax_iter):
+        y = np.asarray(np.dot(A, q[k])).reshape(-1)
+
+        for j in range(k):
+            h[j, k] = np.dot(q[j], y)
+            y = y - h[j, k] * q[j]
+        h[k + 1, k] = np.linalg.norm(y)
+        if (h[k + 1, k] != 0 and k != nmax_iter - 1):
+            q[k + 1] = y / h[k + 1, k]
+
+        b = np.zeros(nmax_iter + 1)
+        b[0] = np.linalg.norm(r)
+
+        result = np.linalg.lstsq(h, b)[0]
+
+        x.append(np.dot(np.asarray(q).transpose(), result) + x0)
+
+    return x
 
 def SimData(phi, time, tol, nproc):
     data = {

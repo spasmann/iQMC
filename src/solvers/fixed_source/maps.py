@@ -6,7 +6,6 @@ Created on Tue Jun  7 13:17:55 2022
 @author: sampasmann
 """
 import numpy as np
-from src.functions.tallies import Tallies
 from src.functions.sweep import Sweep
 from src.functions.source import GetSource
 from mpi4py import MPI
@@ -19,20 +18,26 @@ def SI_Map(phi_in, qmc_data):
     """
     G   = qmc_data.G
     Nx  = qmc_data.Nx
-    Nv  = phi_in.size
-    try:
-        (Nv == Nx*G)
-    except Exception as e: print(e) 
-    phi_in = np.reshape(phi_in, (Nx,G))
-    tallies = Tallies(qmc_data)
-    source = GetSource(phi_in, qmc_data)
-    sweep   = Sweep(qmc_data) # samples are gneratred with initialization of sweep
-    sweep.Run(tallies, source) # QMC sweep
-    phi_out = tallies.phi_avg
-    phi_out = np.reshape(phi_out,(Nv,1))
+    Nt  = qmc_data.Nt
+    Nv  = int(Nx*G)
+    if (qmc_data.source_tilt):
+        qmc_data.tallies.dphi_s = np.reshape(phi_in[Nv:], (Nx,G))
+        phi_in = phi_in[:Nv]
+    phi_in              = np.reshape(phi_in, (Nx,G))
+    qmc_data.tallies.q  = GetSource(phi_in, qmc_data)
+    sweep               = Sweep(qmc_data) # samples are generated with initialization of sweep
+    sweep.Run(qmc_data) # QMC sweep
+    phi_out             = qmc_data.tallies.phi_avg
+    phi_out             = np.reshape(phi_out,(Nv,1))
+    if (qmc_data.source_tilt):
+        dphi            = qmc_data.tallies.dphi_s
+        dphi            = np.reshape(dphi,(Nv,1))
+        phi_out         = np.append(phi_out, dphi)    
+        phi_out         = np.reshape(phi_out, (Nt,1))
+        
     # all reduce phi_out here (they automatically wait for each other)
-    comm = MPI.COMM_WORLD
-    phi_out = comm.allreduce(phi_out,op=MPI.SUM)
+    comm                = MPI.COMM_WORLD
+    phi_out             = comm.allreduce(phi_out,op=MPI.SUM)
     
     return phi_out
 
@@ -45,11 +50,14 @@ def RHS(qmc_data):
     b from Sam's qmc_data structure by doing a transport sweep with
     zero scattering term.
     """
-    G   = qmc_data.G
-    Nx  = qmc_data.Nx
-    Nv  = Nx*G
-    zed = np.zeros((Nx,G))
+    Nt  = qmc_data.Nt
+    zed = np.zeros((Nt,1))
+    if (qmc_data.source_tilt):
+        dphi = qmc_data.tallies.dphi_s
+        qmc_data.tallies.dphi_s = zed
     b   = SI_Map(zed,qmc_data) # qmc_sweep with phi(0)
+    if (qmc_data.source_tilt):
+        qmc_data.tallies.dphi_s = dphi
     return b
 
 
@@ -77,13 +85,11 @@ def MatVec(phi_in):
     """
     b           = matvec_data[0]
     qmc_data    = matvec_data[1]
-    Nx          = qmc_data.Nx
     G           = qmc_data.G
-    Nv          = Nx*G
-    phi_in      = np.reshape(phi_in,(Nv,1))
-
-    qmc_data.source = np.zeros((Nx,G))
-    axv = phi_in - SI_Map(phi_in, qmc_data)
+    Nx          = qmc_data.Nx
+    Nt          = qmc_data.Nt
+    phi_in      = np.reshape(phi_in,(Nt,1))
+    axv         = phi_in - (SI_Map(phi_in, qmc_data) - b)
     
     return axv
 
