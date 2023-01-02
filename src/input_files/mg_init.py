@@ -19,7 +19,7 @@ class MultiGroupInit:
         self.RQMC               = RQMC
         self.totalDim           = 4
         self.LB                 = 0
-        self.RB                 = 50
+        self.RB                 = 5
         self.G                  = numGroups
         self.rng_seed           = 12345
         self.geometry           = "slab"

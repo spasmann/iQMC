@@ -55,6 +55,7 @@ def Picard(qmc_data,tol=1e-5,maxit=40,save_data=False,report_progress=True):
     itc     = 0
     diff    = 1.0
     phic    = np.copy(phi0)
+    phic    = np.reshape(phic, (int(qmc_data.Nt),1))
     reshist = np.empty(0)
     start   = time.time()
     while (itc < maxit) and (diff > tol):

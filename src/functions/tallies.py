@@ -99,8 +99,8 @@ def slab_integral(dphi, particle, material, geometry, mesh):
     sigt    = material.sigt[zone,:]
     sigt    = np.reshape(sigt, (1,G))
     if (sigt.all() > 1e-12):
-        dphi[zone,:] += ((mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
-                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt))))[0,:]
+        dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
+                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt)))/dx**3)[0,:]
         #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
     else:
         dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
