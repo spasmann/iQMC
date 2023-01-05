@@ -5,7 +5,11 @@ Created on Wed Oct 19 10:43:20 2022
 @author: Sam Pasmann
 """
 import sys
-sys.path.append("../../")
+import os 
+script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+rel_path = "../../"
+abs_file_path = os.path.join(script_dir, rel_path)
+sys.path.append(abs_file_path)
 import numpy as np
 from src.functions.sweep import Sweep
 from src.functions.tallies import Tallies
@@ -21,11 +25,10 @@ from src.functions.source import GetSource
 # =============================================================================
 
 def fixed_source_sweep(phi_in, data):
-    tallies         = Tallies(data)
-    sweep           = Sweep(data)
-    source          = GetSource(phi_in, data)    
-    sweep.Run(tallies, source)
-    phi_out         = tallies.phi_avg
+    data.tallies.q  = GetSource(phi_in, data)
+    sweep           = Sweep(data)   
+    sweep.Run(data)
+    phi_out         = data.tallies.phi_avg
     return phi_out
 
 def fixed_source_mat_mul(phi_in, data, b):
@@ -33,11 +36,10 @@ def fixed_source_mat_mul(phi_in, data, b):
     return res
 
 def eigenval_sweep(phi_f_in, phi_s_in, data):
-    tallies     = Tallies(data)
-    source      = GetSource(phi_s_in, data, phi_avg_f=phi_f_in)
-    sweep       = Sweep(data) 
-    sweep.Run(tallies, source) # QMC sweep
-    phi_out     = tallies.phi_avg
+    data.tallies.q  = GetSource(phi_s_in, data, phi_avg_f=phi_f_in)
+    sweep           = Sweep(data) 
+    sweep.Run(data) # QMC sweep
+    phi_out         = data.tallies.phi_avg
     return phi_out
 
 def standard_eigenval_mat_mul(phi_f, phi_s, data, b):

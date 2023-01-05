@@ -43,7 +43,7 @@ class Tallies:
         if (self.flux):
             avg_scalar_flux(self.phi_avg, particle, material, geometry)
         if (self.source_tilt):
-            avg_scalar_flux_derivative(self.dphi_s, particle, material, geometry, mesh)
+            avg_scalar_flux_derivative(self.phi_avg, self.dphi_s, particle, material, geometry, mesh)
             
     def DeltaFlux(self):
         self.delta_flux = np.linalg.norm(self.phi_avg - self.phi_avg_old, np.inf)
@@ -72,9 +72,9 @@ def avg_scalar_flux(phi_avg, particle, material, geometry):
     else:
         phi_avg[zone,:] += (weight*ds/dV)
 
-def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
+def avg_scalar_flux_derivative(phi, dphi, particle, material, geometry, mesh):
     if (geometry.geometry == "slab"):
-        slab_integral(dphi, particle, material, geometry, mesh)
+        slab_integral(phi, dphi, particle, material, geometry, mesh)
     if (geometry.geometry == "cylinder"):
         cylinder_integral(dphi, particle, material, geometry, mesh)
         dphi[0,:] = 0
@@ -87,7 +87,25 @@ def avg_scalar_flux_derivative(dphi, particle, material, geometry, mesh):
 # Geometry dependent functions
 # =============================================================================
         
-def slab_integral(dphi, particle, material, geometry, mesh):
+# def slab_integral(phi, dphi, particle, material, geometry, mesh):
+#     zone    = particle.zone
+#     mu      = particle.angles[0]
+#     x       = particle.pos[0]
+#     x_mid   = mesh.midpoints[zone]
+#     dx      = mesh.dx
+#     G       = material.G
+#     w       = particle.weight
+#     ds      = particle.ds
+#     sigt    = material.sigt[zone,:]
+#     sigt    = np.reshape(sigt, (1,G))
+#     if (sigt.all() > 1e-12):
+#         dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
+#                         + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt)))/dx**3)[0,:]
+#         #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
+#     else:
+#         dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
+
+def slab_integral(phi, dphi, particle, material, geometry, mesh):
     zone    = particle.zone
     mu      = particle.angles[0]
     x       = particle.pos[0]
@@ -98,12 +116,23 @@ def slab_integral(dphi, particle, material, geometry, mesh):
     ds      = particle.ds
     sigt    = material.sigt[zone,:]
     sigt    = np.reshape(sigt, (1,G))
-    if (sigt.all() > 1e-12):
-        dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
-                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt)))/dx**3)[0,:]
-        #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
+
+    g = lambda z1,z2: ((phi[z1,:] - phi[z2,:])
+                        * (mesh.midpoints[z1] - mesh.midpoints[z2])
+                        / ((mesh.midpoints[z1]  - mesh.midpoints[z2])**2))
+    if (zone == 0):
+        m   = g(zone, zone+1)
+    if (zone == mesh.Nx-1):
+        m   = g(zone, zone-1)
     else:
-        dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
+        m1   = g(zone, zone+1)       
+        m2   = g(zone, zone-1)        
+        if (m1<m2):
+            m = m1
+        else:
+            m = m2
+    dphi[zone,:] = m
+
 
 def cylinder_integral(dphi, particle, material, geometry, mesh):
     (mu,muSin,phi)  = particle.angles

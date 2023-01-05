@@ -11,7 +11,7 @@ import numpy as np
 if __name__ == "__main__":
     
     N           = 2**11
-    Nx          = 5
+    Nx          = 10
     generator   = "sobol"
     solver      = "Picard"
     source_tilt = True
@@ -22,16 +22,19 @@ if __name__ == "__main__":
     tol         = 1e-3
     phi1         = FixedSource(data,solver=solver, maxit=maxit, tol=tol, 
                               save_data=False)
+    
+    # plot scalar flux
     sol = data.true_flux
     stop = time.time()
     print("time: ",stop-start)
-    plt.title('Solution')
+    plt.title('Larsen Solution')
     plt.plot(data.mesh.midpoints, phi1[:,0], label='iQMC')
     plt.plot(data.mesh.midpoints, sol, label='Sol')
     plt.legend()
     
+    # plot piecewise source
     plt.figure(figsize=(6,4),dpi=300)
-    plt.title('Source')
+    plt.title('Larsen Source')
     q    = data.tallies.q
     mesh = data.mesh.edges
     mid  = data.mesh.midpoints

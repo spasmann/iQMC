@@ -31,7 +31,7 @@ class PUa_1_0_SL_init:
         self.left               = False
         self.RQMC               = False
         self.true_flux          = np.array((False))
-        self.mesh               = Mesh(self.LB, self.RB, self.Nx)
+        self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
         self.fixed_source       = np.zeros((self.Nx,self.G))

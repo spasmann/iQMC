@@ -19,9 +19,7 @@ if __name__ == "__main__":
     N           = 2**10
     solver      = "LGMRES"
     generator   = "sobol"
-    data        = PUa_1_0_SL_init(N=N, Nx=Nx, generator=generator)
-    
-    data.source_tilt = False
+    data        = PUa_1_0_SL_init(N=N, Nx=Nx, generator=generator, source_tilt=False)
     start = time.time()
     phi, khist, itt = PowerIteration(data,
                         solver=solver,

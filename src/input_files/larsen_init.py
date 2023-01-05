@@ -24,7 +24,7 @@ class LarsenInit:
         self.G                  = 1
         self.rng_seed           = 12345
         self.q0                 = 1.0
-        self.q1                 = 50.0
+        self.q1                 = 5.0
         self.material_code      = "larsen_data"
         self.geometry           = "slab"
         self.mode               = "fixed_source"
