@@ -27,6 +27,6 @@ def Ua_1_0_data(Nx=100):
     sigf = np.tile(sigf,(Nx,G))
     siga = np.tile(siga, (Nx,G))
     nu = np.tile(nu,(Nx,G))
-    chi = np.tile(chi,(Nx,G))
+    chi = np.tile(chi,(Nx,G,G))
     
     return sigt, sigs, siga, sigf, chi, nu, G
