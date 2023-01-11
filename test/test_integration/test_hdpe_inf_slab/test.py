@@ -16,8 +16,8 @@ def test_hdpe_inf_slab():
     
     Tests multigroup capabilites for Fixed-Source problems.
     """
-    a           = np.genfromtxt("answers_gmres.csv",  delimiter=',')
-    b           = np.genfromtxt("answers_picard.csv",  delimiter=',')
+    a           = np.genfromtxt("./test/test_integration/test_hdpe_inf_slab/answers_gmres.csv",  delimiter=',')
+    b           = np.genfromtxt("./test/test_integration/test_hdpe_inf_slab/answers_picard.csv",  delimiter=',')
     N           = 2**6
     Nx          = 10
     G           = 12

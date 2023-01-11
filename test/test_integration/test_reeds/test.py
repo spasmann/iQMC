@@ -16,9 +16,9 @@ def test_reeds():
     
     Tests multimedia capabilites for Fixed-Source problems.
     """
-    print(sys.path)
-    a           = np.genfromtxt("answers_gmres.csv",  delimiter=',')
-    b           = np.genfromtxt("answers_picard.csv",  delimiter=',')
+    script_dir = os.path.dirname(__file__)
+    a           = np.genfromtxt("./test/test_integration/test_reeds/answers_gmres.csv",  delimiter=',')
+    b           = np.genfromtxt("./test/test_integration/test_reeds/answers_picard.csv",  delimiter=',')
     N           = 2**6
     Nx          = 16
     maxit       = 10
