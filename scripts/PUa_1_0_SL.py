@@ -15,8 +15,8 @@ import time
 
 if __name__ == "__main__":
     # initialize problem data
-    Nx          = 20
-    N           = 2**10
+    Nx          = 10
+    N           = 2**6
     solver      = "LGMRES"
     generator   = "sobol"
     data        = PUa_1_0_SL_init(N=N, Nx=Nx, generator=generator, source_tilt=False)

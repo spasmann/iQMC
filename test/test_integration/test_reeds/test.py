@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-import sys, os
-sys.path.append(os.getcwd()+"/../../../")
+import sys
+import os 
+script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+rel_path = "../../../"
+abs_file_path = os.path.join(script_dir, rel_path)
+sys.path.append(abs_file_path)
 from src.input_files.reeds_init import ReedsInit
 from src.solvers.fixed_source.solvers import FixedSource
 import numpy as np
@@ -12,6 +16,7 @@ def test_reeds():
     
     Tests multimedia capabilites for Fixed-Source problems.
     """
+    print(sys.path)
     a           = np.genfromtxt("answers_gmres.csv",  delimiter=',')
     b           = np.genfromtxt("answers_picard.csv",  delimiter=',')
     N           = 2**6

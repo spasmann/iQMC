@@ -86,7 +86,8 @@ def avg_scalar_flux_derivative(phi, dphi, particle, material, geometry, mesh):
 # =============================================================================
 # Geometry dependent functions
 # =============================================================================
-        
+
+# analytic scheme
 # def slab_integral(phi, dphi, particle, material, geometry, mesh):
 #     zone    = particle.zone
 #     mu      = particle.angles[0]
@@ -105,6 +106,7 @@ def avg_scalar_flux_derivative(phi, dphi, particle, material, geometry, mesh):
 #     else:
 #         dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
 
+# numerical scheme
 def slab_integral(phi, dphi, particle, material, geometry, mesh):
     zone    = particle.zone
     mu      = particle.angles[0]

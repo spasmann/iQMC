@@ -13,20 +13,19 @@ if __name__ == "__main__":
     N           = 2**11
     Nx          = 10
     generator   = "sobol"
-    solver      = "Picard"
-    source_tilt = True
+    solver      = "GMRES"
+    source_tilt = False
     data        = LarsenInit(N=N, Nx=Nx, generator=generator,
                              source_tilt=source_tilt)
     start       = time.time()
     maxit       = 10
     tol         = 1e-3
-    phi1         = FixedSource(data,solver=solver, maxit=maxit, tol=tol, 
-                              save_data=False)
-    
+    phi1         = FixedSource(data,solver=solver, maxit=maxit, tol=tol)
     # plot scalar flux
     sol = data.true_flux
     stop = time.time()
     print("time: ",stop-start)
+    plt.figure(dpi=300)
     plt.title('Larsen Solution')
     plt.plot(data.mesh.midpoints, phi1[:,0], label='iQMC')
     plt.plot(data.mesh.midpoints, sol, label='Sol')

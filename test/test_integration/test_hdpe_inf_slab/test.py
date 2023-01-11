@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
-import sys, os
-sys.path.append(os.getcwd()+"/../../../")
+import sys
+import os 
+script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
+rel_path = "../../../"
+abs_file_path = os.path.join(script_dir, rel_path)
+sys.path.append(abs_file_path)
 from src.input_files.mg_init import MultiGroupInit
 from src.solvers.fixed_source.solvers import FixedSource
 import numpy as np
