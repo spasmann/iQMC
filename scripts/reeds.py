@@ -16,13 +16,13 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N           = 1
-    Nx          = 32
-    generator   = "halton"
+    N           = 2**6
+    Nx          = 16
+    generator   = "sobol"
     solver      = "Picard"
     data1       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=False)
     start       = time.time()
-    maxit       = 1
+    maxit       = 10
     tol         = 1e-4
     phi1         = FixedSource(data1,solver=solver, maxit=maxit, tol=tol, 
                               save_data=False)
