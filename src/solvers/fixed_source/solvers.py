@@ -106,13 +106,14 @@ def FixedSource(qmc_data, solver="LGMRES", tol=1e-5, maxit=100, report_progress=
     G           = qmc_data.G
     
     if (report_progress) and (rank==0):
-        print(" __    ______     .___  ___.   ______")
-        print("|  |  /  __  \    |   \/   |  /      |")
-        print("|  | |  |  |  |   |  \  /  | |  ,----'")
-        print("|  | |  |  |  |   |  |\/|  | |  |")
-        print("|  | |  `--'  '--.|  |  |  | |  `----.")
-        print("|__|  \_____\_____\__|  |__|  \______|")
-        print("                                      ")
+        print("")
+        print("    ██╗ ██████╗ ███╗   ███╗ ██████╗")
+        print("    ║ ║██╔═══██╗████╗ ████║██╔════╝")
+        print("    ██║██║   ██║██╔████╔██║██║     ")
+        print("    ██║██║▄▄ ██║██║╚██╔╝██║██║     ")
+        print("    ██║╚██████╔╝██║ ╚═╝ ██║╚██████╗")
+        print("    ╚═╝ ╚══▀▀═╝ ╚═╝     ╚═╝ ╚═════╝")
+        print("")
         print("--------- Fixed Source Problem --------")
         print("Solver:",                             solver)
         print("Material: ",                          qmc_data.material_code)

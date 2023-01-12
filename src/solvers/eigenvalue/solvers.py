@@ -49,6 +49,14 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10,
     #res_hist        = []
     k_hist          = []
     if (rank==0):
+        print("")
+        print("    ██╗ ██████╗ ███╗   ███╗ ██████╗")
+        print("    ║ ║██╔═══██╗████╗ ████║██╔════╝")
+        print("    ██║██║   ██║██╔████╔██║██║     ")
+        print("    ██║██║▄▄ ██║██║╚██╔╝██║██║     ")
+        print("    ██║╚██████╔╝██║ ╚═╝ ██║╚██████╗")
+        print("    ╚═╝ ╚══▀▀═╝ ╚═╝     ╚═╝ ╚═════╝")
+        print("")
         print("--------- K-Effective Eigenvalue Problem ---------")
         print("Outter Solver: Power Iteration")
         print("Inner Sovler:",                       solver)

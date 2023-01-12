@@ -16,10 +16,10 @@ if __name__ == "__main__":
     nproc = comm.Get_size()
     procname = MPI.Get_processor_name()
     
-    N           = 2**6
-    Nx          = 16
+    N           = 2**10
+    Nx          = 64
     generator   = "sobol"
-    solver      = "Picard"
+    solver      = "GMRES"
     data1       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=False)
     start       = time.time()
     maxit       = 10
@@ -30,6 +30,8 @@ if __name__ == "__main__":
     stop = time.time()
     if (rank==0):
         print("time: ",stop-start)
+        plt.figure(dpi=300)
         plt.plot(data1.mesh.midpoints, phi1[:,0], label='iQMC')
         # plt.plot(data1.mesh.midpoints, sol, label='Sol')
         plt.legend()
+        plt.show
