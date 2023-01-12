@@ -1,5 +1,8 @@
 ![alt text](https://raw.githubusercontent.com/spasmann/iQMC/main/post_process/figures/iQMC_logo_2.png)
 
+[![License](https://img.shields.io/github/license/spasmann/iQMC)
+[![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-contributor%20covenant-green.svg)](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md)
+
 Author: Sam Pasmann
 
 This codebase serves as a testbed for the iterative Quasi-Monte Carlo (iQMC) method for neutron transport.
@@ -32,3 +35,6 @@ Currently the available *generator* variables are:
 [2] Garcia, R., Siewert, C., Radiative Transfer in Finite Inhomogeneous 
     Plane-Parallel Atmospheres, J. Quantitative Spectroscopy & Radiative 
     Transfer, 27, 2, pp. 141–148.
+    
+## Random Joke
+![Jokes Card](https://readme-jokes.vercel.app/api)
