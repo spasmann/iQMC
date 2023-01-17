@@ -10,8 +10,8 @@ import numpy as np
 
 if __name__ == "__main__":
     
-    N           = 2**11
-    Nx          = 10
+    N           = 2**10
+    Nx          = 3
     generator   = "sobol"
     solver      = "GMRES"
     source_tilt = True

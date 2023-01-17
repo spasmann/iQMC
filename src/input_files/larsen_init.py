@@ -64,8 +64,8 @@ def larsen_source(q0, q1, G, mesh):
 def larsen_material(mesh):
     Nx   = mesh.Nx
     G    = 1
-    sigt = 1.0
-    sigs = 0.2
+    sigt = 0.5
+    sigs = 0.05
     siga = sigt - sigs
     sigt = np.tile(sigt, (Nx,G))
     sigs = np.tile(sigs, (Nx,G,G))

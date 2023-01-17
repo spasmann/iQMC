@@ -179,7 +179,7 @@ class Samples:
 
     def VolumetricWeight(self, zone, pos, mesh):
         x = pos[0]
-        Q = self.q[zone,:]
+        Q = self.q[zone,:] + (1.0 + 5.0*x)
         if (self.source_tilt):
             Q +=  self.qdot[zone,:]*(x - mesh.midpoints[zone])
         weight = Q*self.geometry.CellVolume(zone)/self.N*self.Nx
