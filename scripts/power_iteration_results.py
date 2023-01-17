@@ -31,7 +31,7 @@ if __name__ == "__main__":
         N = NList[i]
         data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=QMC)
         data.save_data = False
-        phi_QMC, k_hist_QMC = PowerIteration(data,
+        phi_QMC, k_hist_QMC, itt_QMC = PowerIteration(data,
                                              solver         = solver,
                                              max_outter_itt = maxit, 
                                              max_inner_itt  = maxit, 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         
         data = PUa_1_0_SL_init(N=N, Nx=Nx, generator=MC)
         data.save_data = False
-        phi_MC, k_hist_MC = PowerIteration(data,
+        phi_MC, k_hist_MC, itt_MC = PowerIteration(data,
                                            solver         = solver,
                                            max_outter_itt = maxit, 
                                            max_inner_itt  = maxit, 
