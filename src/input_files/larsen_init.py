@@ -12,7 +12,7 @@ from src.functions.material import Material
 import numpy as np
 
 class LarsenInit:
-    def __init__(self, N=2**12, Nx=20, generator="sobol", LB=0.0, RB=5.0,
+    def __init__(self, N=2**12, Nx=20, generator="sobol", LB=0.0, RB=50.0,
                  source_tilt=False):
         self.N                  = N
         self.Nx                 = Nx
@@ -22,7 +22,7 @@ class LarsenInit:
         self.source_tilt        = source_tilt
         self.totalDim           = 4
         self.G                  = 1
-        self.rng_seed           = 12345
+        self.rng_seed           = 54321
         self.q0                 = 1.0
         self.q1                 = 5.0
         self.material_code      = "larsen_data"
@@ -65,7 +65,7 @@ def larsen_material(mesh):
     Nx   = mesh.Nx
     G    = 1
     sigt = 0.5
-    sigs = 0.05
+    sigs = 0.499
     siga = sigt - sigs
     sigt = np.tile(sigt, (Nx,G))
     sigs = np.tile(sigs, (Nx,G,G))

@@ -144,7 +144,7 @@ class Samples:
         return samples
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=True, seed=1234)
+        sampler = Halton(d=self.totalDim,scramble=False, seed=1234)
         sampler.fast_forward(1)
         return sampler.random(n=self.N)
     
