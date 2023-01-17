@@ -49,13 +49,10 @@ if __name__ == "__main__":
         
         err3[i]     = np.linalg.norm((phi3-data3.true_flux)/data3.true_flux.sum())
         err4[i]     = np.linalg.norm((phi4-data4.true_flux)/data4.true_flux.sum())
-        
-        # plt.figure(1, dpi=300)
-        # plt.plot(data1.mesh.midpoints, data1.true_flux)
-        # plt.plot(data1.mesh.midpoints, phi1, '-o', label=r'$a_j$')
-        # plt.plot(data2.mesh.midpoints, phi2, '-o', label=r'$a_j + b_j(x)$')
-        # plt.legend()
-        # plt.show()
+
+# =============================================================================
+# 
+# =============================================================================
         
         
 plt.figure(dpi=300,figsize=(8,5))
@@ -123,6 +120,7 @@ plt.plot(N_list[:count], err1[:count], 'b-o', label='QMC')
 plt.plot(N_list[:count], err2[:count], 'g--^', label='MC')
 plt.yscale('log')
 plt.xscale('log')
+plt.ylabel(r'$\phi$ Relative Error')
 plt.xlabel('N')
 plt.legend()
 
@@ -134,6 +132,5 @@ plt.plot(N_list[:count], err3[:count], 'b-o', label='QMC')
 plt.plot(N_list[:count], err4[:count], 'g--^', label='MC')
 plt.yscale('log')
 plt.xscale('log')
-plt.ylabel(r'$\phi$ Relative Error')
 plt.xlabel('N')
 plt.legend()
