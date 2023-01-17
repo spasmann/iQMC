@@ -88,25 +88,6 @@ def avg_scalar_flux_derivative(phi, dphi, particle, material, geometry, mesh):
 # =============================================================================
 
 # analytic scheme
-# def slab_integral(phi, dphi, particle, material, geometry, mesh):
-#     zone    = particle.zone
-#     mu      = particle.angles[0]
-#     x       = particle.pos[0]
-#     x_mid   = mesh.midpoints[zone]
-#     dx      = mesh.dx
-#     G       = material.G
-#     w       = particle.weight
-#     ds      = particle.ds
-#     sigt    = material.sigt[zone,:]
-#     sigt    = np.reshape(sigt, (1,G))
-#     if (sigt.all() > 1e-12):
-#         dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
-#                         + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt)))/dx**3)[0,:]
-#         #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
-#     else:
-#         dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
-
-# numerical scheme
 def slab_integral(phi, dphi, particle, material, geometry, mesh):
     zone    = particle.zone
     mu      = particle.angles[0]
@@ -118,22 +99,41 @@ def slab_integral(phi, dphi, particle, material, geometry, mesh):
     ds      = particle.ds
     sigt    = material.sigt[zone,:]
     sigt    = np.reshape(sigt, (1,G))
-
-    g = lambda z1,z2: ((phi[z1,:] - phi[z2,:])
-                        * (mesh.midpoints[z1] - mesh.midpoints[z2])
-                        / ((mesh.midpoints[z1]  - mesh.midpoints[z2])**2))
-    if (zone == 0):
-        m   = g(zone, zone+1)
-    if (zone == mesh.Nx-1):
-        m   = g(zone, zone-1)
+    if (sigt.all() > 1e-12):
+        dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) 
+                        + (x - x_mid)*(w*(1-np.exp(-sigt*ds))/(sigt)))/dx**3)[0,:]
+        #dphi[zone,:] += (12*(mu*(w*(1-(1+ds*sigt)*np.exp(-sigt*ds))/sigt**2) + (x-x_mid)*(w*(1-np.exp(-sigt*ds))/sigt))/dx**3)[0,:]
     else:
-        m1   = g(zone, zone+1)       
-        m2   = g(zone, zone-1)        
-        if (m1<m2):
-            m = m1
-        else:
-            m = m2
-    dphi[zone,:] = m
+        dphi[zone,:] += (mu*w*ds**(2)/2 + w*(x - x_mid)*ds)
+
+# numerical scheme
+# def slab_integral(phi, dphi, particle, material, geometry, mesh):
+#     zone    = particle.zone
+#     mu      = particle.angles[0]
+#     x       = particle.pos[0]
+#     x_mid   = mesh.midpoints[zone]
+#     dx      = mesh.dx
+#     G       = material.G
+#     w       = particle.weight
+#     ds      = particle.ds
+#     sigt    = material.sigt[zone,:]
+#     sigt    = np.reshape(sigt, (1,G))
+
+#     g = lambda z1,z2: ((phi[z1,:] - phi[z2,:])
+#                         * (mesh.midpoints[z1] - mesh.midpoints[z2])
+#                         / ((mesh.midpoints[z1]  - mesh.midpoints[z2])**2))
+#     if (zone == 0):
+#         m   = g(zone, zone+1)
+#     if (zone == mesh.Nx-1):
+#         m   = g(zone, zone-1)
+#     else:
+#         m1   = g(zone, zone+1)       
+#         m2   = g(zone, zone-1)        
+#         if (m1<m2):
+#             m = m1
+#         else:
+#             m = m2
+#     dphi[zone,:] = m
 
 
 def cylinder_integral(dphi, particle, material, geometry, mesh):

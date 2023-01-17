@@ -14,7 +14,7 @@ if __name__ == "__main__":
     Nx          = 10
     generator   = "sobol"
     solver      = "GMRES"
-    source_tilt = False
+    source_tilt = True
     data        = LarsenInit(N=N, Nx=Nx, generator=generator,
                              source_tilt=source_tilt)
     start       = time.time()
