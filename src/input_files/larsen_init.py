@@ -13,16 +13,17 @@ import numpy as np
 
 class LarsenInit:
     def __init__(self, N=2**12, Nx=20, generator="sobol", LB=0.0, RB=50.0,
-                 source_tilt=False):
+                 source_tilt=False, RQMC=False, seed=12345):
         self.N                  = N
         self.Nx                 = Nx
         self.RB                 = RB
         self.LB                 = LB
         self.generator          = generator
         self.source_tilt        = source_tilt
+        self.RQMC               = RQMC
+        self.rng_seed           = seed
         self.totalDim           = 4
         self.G                  = 1
-        self.rng_seed           = 54321
         self.q0                 = 1.0
         self.q1                 = 5.0
         self.material_code      = "larsen_data"
@@ -31,7 +32,6 @@ class LarsenInit:
         self.flux               = True
         self.save_data          = False
         self.moment_match       = False
-        self.RQMC               = False
         self.right              = True
         self.left               = True
         self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)

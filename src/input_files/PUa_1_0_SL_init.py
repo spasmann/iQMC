@@ -30,7 +30,7 @@ class PUa_1_0_SL_init:
         self.right              = False
         self.left               = False
         self.RQMC               = False
-        self.true_flux          = np.array((False))
+        self.true_flux          = np.array((0.9701734, 0.8810540, 0.7318131))
         self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
@@ -39,4 +39,4 @@ class PUa_1_0_SL_init:
         self.Nt                 = int(self.Nx*self.G)
         if (self.source_tilt):
             self.Nt = int(self.Nt*2)
-        
+    

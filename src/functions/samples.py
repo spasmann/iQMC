@@ -134,17 +134,17 @@ class Samples:
 # Generate LDS Matrix
 # =============================================================================
     def RandomMatrix(self):
-        np.random.seed(56789)
+        np.random.seed(self.rng_seed)
         return np.random.random((self.N,self.totalDim))
     
     def SobolMatrix(self):
-        sampler = Sobol(d=self.totalDim,scramble=self.RQMC, seed=1234)
+        sampler = Sobol(d=self.totalDim,scramble=self.RQMC, seed=self.rng_seed)
         m = round(math.log(self.N, 2))
         samples = sampler.random_base2(m=m)
         return samples
     
     def HaltonMatrix(self):
-        sampler = Halton(d=self.totalDim,scramble=False, seed=1234)
+        sampler = Halton(d=self.totalDim,scramble=self.RQMC, seed=self.rng_seed)
         sampler.fast_forward(1)
         return sampler.random(n=self.N)
     

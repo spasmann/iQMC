@@ -99,7 +99,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10,
 
 
 # =============================================================================
-# Functions for Power Iteration
+# Inner Source Iteration for Power Iteration
 # =============================================================================
 # TODO: make exitCode an actual output from Picard
 def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):

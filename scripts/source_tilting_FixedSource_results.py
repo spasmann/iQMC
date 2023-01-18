@@ -14,7 +14,7 @@ import time
 import numpy as np
 
 if __name__ == "__main__":
-    N_list      = 100*np.array((1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20))
+    N_list      = 100*np.array((1,2,3,4,5,6,7,8,9,10))
     # Nx_list     = [2, 4, 8, 16, 32]
     Nx          = 4
     maxit       = 50
@@ -61,11 +61,11 @@ plt.title('Cell Avg Scalar Flux Relative Error')
 plt.plot(N_list, err1[0]*N_list[0]/N_list, label='$N^{-1}$')
 plt.plot(N_list, err2[0]*np.sqrt(N_list[0]/N_list), label=r'$N^{-1/2}$')
 
-plt.plot(N_list, err1, 'b-o', label='QMC')#label=r'$a_j$')
-plt.plot(N_list, err2, 'g-^', label='MC')#label=r'$a_j + b_j(x)$')
+plt.plot(N_list, err1, 'b-o', label='QMC')
+plt.plot(N_list, err2, 'g-^', label='MC')
 
-plt.plot(N_list, err3, 'b--o', label='QMC (ST)')#label=r'$a_j$')
-plt.plot(N_list, err4, 'g--^', label='MC (ST)')#label=r'$a_j + b_j(x)$')
+plt.plot(N_list, err3, 'b--o', label='QMC (ST)')
+plt.plot(N_list, err4, 'g--^', label='MC (ST)')
 
 
 plt.yscale('log')
