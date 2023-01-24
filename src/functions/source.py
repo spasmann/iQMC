@@ -50,8 +50,8 @@ def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
         GetLinearSource(qmc_data)
             
     for cell in range(material.Nx):
-        q[cell,:] = (scattering_source(cell, phi_avg_s, material))  
-                     # + fixed_source[cell,:]) 
+        q[cell,:] = (scattering_source(cell, phi_avg_s, material) 
+                     + fixed_source[cell,:]) 
             
     if (phi_avg_f is not None):
         keff = qmc_data.keff

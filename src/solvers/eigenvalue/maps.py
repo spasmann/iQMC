@@ -24,6 +24,7 @@ def SI_Map(phi_f, phi_s, qmc_data):
     if (qmc_data.source_tilt):
         qmc_data.tallies.dphi_s = np.reshape(phi_s[Nv:], (Nx,G))
         phi_s = phi_s[:Nv]
+        phi_f = phi_f[:Nv]
     phi_s               = np.reshape(phi_s, (Nx,G))
     phi_f               = np.reshape(phi_f, (Nx,G))
     qmc_data.tallies.q  = GetSource(phi_s, qmc_data, phi_avg_f=phi_f)

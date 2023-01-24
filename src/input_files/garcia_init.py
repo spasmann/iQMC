@@ -15,12 +15,13 @@ class GarciaInit:
         self.RB                 = 5.0
         self.LB                 = 0.0
         self.G                  = 1
-        self.c                  = 1.0
+        self.c                  = np.inf
         self.rng_seed           = 12345
         self.RQMC               = False
         self.right              = False
         self.left               = True
         self.phi_left           = 1.0
+        self.phi_right          = 0.0
         self.material_code      = "garcia_data"
         self.geometry           = "slab"
         self.mode               = "fixed_source"

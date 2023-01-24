@@ -6,12 +6,17 @@ Created on Thu Jun 23 10:46:45 2022
 @author: sampasmann
 """
 
+import sys, os
+sys.path.append(os.getcwd()+"/../../")
 import numpy as np
-labeimport h5py
+import h5py
 import os
-from src.init_files.reeds_solution import reeds_mcdc_sol, reeds_sol
-from src.init_files.mg_init import MultiGroupInit
+from src.input_files.reeds_solution import reeds_mcdc_sol, reeds_sol
+from src.input_files.mg_init import MultiGroupInit
 
+# =============================================================================
+# Spatial Averaging Technique
+# =============================================================================
 def ReduceFlux(phi, NxRef):
     """
     This function averages over the spatial cells until phi is of the desired 
@@ -40,6 +45,77 @@ def ReduceFlux(phi, NxRef):
 
     return phi_new
 
+
+# =============================================================================
+# Garcia Angular Flux Retrieval
+# =============================================================================
+def garcia_angle_bins():
+    angles = np.array((-0.05))
+    angles = np.append(angles, np.arange(-0.1,-1.1,step=-0.1))
+    angles = np.append(angles, 0.05)
+    angles = np.append(angles, np.arange(0.1,1.1,step=0.1))
+    return angles
+
+def garcia_angular_flux_sol():
+    sol_left=np.array((8.97797e-01, 8.87836e-01, 8.69581e-01, 8.52299e-01, 
+                       8.35503e-01, 8.18996e-01, 8.02676e-01, 7.86493e-01, 
+                       7.70429e-01, 7.54496e-01, 7.38721e-01))
+    sol_right= np.array((1.02202e-01, 1.12164e-01, 1.30419e-01, 1.47701e-01, 
+                         1.64497e-01, 1.81004e-01, 1.97324e-01, 2.13507e-01, 
+                         2.29571e-01, 2.45504e-01, 2.61279e-01))
+    return (sol_left, sol_right)
+
+def SN_Sweep(angles, qmc_data):
+    #
+    # data from angles
+    #
+    Na2 = angles.size
+    Na  = int(Na2*0.5)
+    #
+    # data from iQMC
+    #
+    Nx              = qmc_data.Nx
+    dx              = qmc_data.mesh.dx
+    phi             = qmc_data.tallies.phi_avg
+    fixed_source    = qmc_data.fixed_source
+    xspan           = qmc_data.mesh.midpoints
+    c               = qmc_data.c 
+    c               = np.exp(-xspan / c)
+    psi             = np.zeros((Na2,Nx))
+    psi[:,0]        = qmc_data.phi_left
+    psi[:,-1]       = qmc_data.phi_right
+    #
+    # data for SN sweep
+    #
+    source_total    = (0.5 * c * phi[:,0] + fixed_source[:,0])
+    forward_angles  = angles[Na:Na2]
+    backward_angles = angles[:Na]
+    # TODO: find out what this section is doing
+    vfl             = (forward_angles / dx) + 0.5
+    vfl             = 1.0 / vfl
+    vfr             = (forward_angles / dx) - 0.5
+    #
+    # forward sweep
+    #
+    for i in range(1,Nx):
+        psi[Na:Na2, i]  = np.copy(psi[Na:Na2, i-1])
+        psi[Na:Na2, i] *= vfr
+        psi[Na:Na2, i] += source_total[i-1]
+        psi[Na:Na2, i] *= vfl
+    #
+    # backward sweep
+    #
+    for i in range(Nx-2,-1,-1):
+        psi[:Na, i]  = np.copy(psi[:Na, i+1])
+        psi[:Na, i] *= vfr
+        psi[:Na, i] += source_total[i+1]
+        psi[:Na, i] *= vfl
+    
+    return psi
+
+# =============================================================================
+# Misc
+# =============================================================================
 def RelError(phi, sol, order=np.inf):
     RelError = abs(phi - sol)/sol
     return np.linalg.norm(RelError, ord=order)
@@ -49,7 +125,8 @@ def AbsError(phi, sol, order=np.inf):
     AbsError = abs(phi-sol)
     return np.linalg.norm(AbsError, ord=order)
 
-def PlotLine(Nvals=np.array((2**10)), Nx=80, generator="halton", problem = "reeds_data", nproc=64):
+def PlotLine(Nvals=np.array((2**10)), Nx=80, generator="halton", problem = 
+             "reeds_data", nproc=64):
     #sol = reeds_mcdc_sol()
     data = MultiGroupInit(numGroups=12,Nx=10)
     sol = data.true_flux
@@ -69,3 +146,9 @@ def PlotLine(Nvals=np.array((2**10)), Nx=80, generator="halton", problem = "reed
         line[i] = error
 
     return line
+
+if (__name__ == "__main__"):
+    from src.input_files.garcia_init import GarciaInit
+    data = GarciaInit(N=2**6, Nx=4)
+    angles = garcia_angle_bins()
+    SN_Sweep(angles, data)

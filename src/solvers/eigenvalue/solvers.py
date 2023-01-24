@@ -36,7 +36,8 @@ class gmres_counter(object):
 # =============================================================================
 # TODO: Picard PI is not working
 def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10, 
-                   max_inner_itt=10, outter_tol=1e-5, inner_tol=1e-5):
+                   max_inner_itt=10, outter_tol=1e-5, inner_tol=1e-5,
+                   report_progress=True):
     comm        = MPI.COMM_WORLD
     rank        = comm.Get_rank()
     # nproc       = comm.Get_size()
@@ -70,7 +71,8 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10,
     while (itt<=max_outter_itt) and (dk>=outter_tol):
         # iterate over scattering source
         phi_new                 = InnerIteration(qmc_data, solver=solver, 
-                                                 maxit=max_inner_itt,tol=inner_tol)
+                                                 maxit=max_inner_itt,tol=inner_tol,
+                                                 report_progress=report_progress)
         #phi_hist.append(phi_new)
         k_old                   = k
         k                       = UpdateK(phi_old, phi_new, qmc_data)
@@ -83,7 +85,7 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10,
             qmc_data.tallies.dphi_f = qmc_data.tallies.dphi_s
         dk   = abs(k-k_old)
         itt += 1
-        if (rank==0):
+        if (rank==0) and (report_progress):
             print("**********************")
             print("Iteration:", itt)
             print("k: ", k)
@@ -102,7 +104,8 @@ def PowerIteration(qmc_data, solver="LGMRES", max_outter_itt=10,
 # Inner Source Iteration for Power Iteration
 # =============================================================================
 # TODO: make exitCode an actual output from Picard
-def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
+def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False,
+                   report_progress=True):
     """
     Parameters
     ----------
@@ -134,10 +137,11 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
         phi0    = qmc_data.tallies.phi_avg
     phi0 = np.reshape(phi0,(Nt,1))
 
-    if (rank==0):
+    if (rank==0) and (report_progress):
         print("     Inner Iteration: ")
     if (solver=="Picard"):
-        phi = Picard(qmc_data,tol=tol,maxit=maxit,save_data=False,report_progress=True)
+        phi = Picard(qmc_data,tol=tol,maxit=maxit,save_data=False,
+                     report_progress=report_progress)
         exitCode = 0 
     else:
         A  = LinearOperator((Nt,Nt), 
@@ -148,13 +152,13 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
              dtype=float)
         b  = matvec_data[0]
         if (solver=="LGMRES"):
-            counter     = gmres_counter()
+            counter     = gmres_counter(disp=report_progress)
             gmres_out   = lgmres(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
         elif (solver=="GMRES"):
-            counter     = gmres_counter()
+            counter     = gmres_counter(disp=report_progress)
             gmres_out   = gmres(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
         elif (solver=="BICGSTAB"):
-            counter     = gmres_counter()
+            counter     = gmres_counter(disp=report_progress)
             gmres_out   = bicgstab(A,b,x0=phi0,tol=tol,maxiter=maxit, callback=counter)
         else:
             print(" Not a valid solver ")
@@ -171,11 +175,11 @@ def InnerIteration(qmc_data,solver="LGMRES",tol=1e-5,maxit=50,save_data=False):
         if (save_data):
             sim_data = SimData(phi, run_time, tol, nproc)
             SaveData(qmc_data, sim_data)
-        if (exitCode>0):
+        if (exitCode>0) and (report_progress):
             print("     Convergence to tolerance not achieved: Maximum number of iterations.")
-        elif (exitCode<0):
+        elif (exitCode<0) and (report_progress):
             print("     Illegal input or breakdown.")
-        elif (exitCode==0):
+        elif (exitCode==0) and (report_progress):
             print("     Successful convergence.")
         
     return phi
@@ -193,7 +197,8 @@ def UpdateK(phi_f, phi_s, qmc_data):
 # =============================================================================
 # TODO: Correct normalization of scalar flux in Davidson's output
 # TODO: Enable Source Tilting with Davidson's
-def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30):
+def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30,
+             report_progress=True):
     """
     Parameters
     ----------
@@ -221,21 +226,46 @@ def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30):
         DESCRIPTION.
 
     """
-        
+    comm        = MPI.COMM_WORLD
+    rank        = comm.Get_rank()
+    
     # Davidson Parameters
-    Nx      = qmc_data.Nx
-    G       = qmc_data.G
-    Nv      = int(Nx*G)
-    u       = qmc_data.tallies.phi_f.reshape(Nv)
-    V0      = np.array(u/np.linalg.norm(u).T) # orthonormalize initial guess
-    V       = np.zeros((Nv,maxit))
-    axv     = np.zeros((Nv,maxit))
-    bxv     = np.zeros((Nv,maxit))
+    Nt      = qmc_data.Nt
+    if (qmc_data.source_tilt):
+        phi0 = np.append(qmc_data.tallies.phi_avg, qmc_data.tallies.dphi_s)
+    else:
+        phi0 = qmc_data.tallies.phi_avg
+    phi0 = np.reshape(phi0,(Nt))
+    
+    
+    # u       = qmc_data.tallies.phi_f.reshape(Nt)
+    V0      = np.array(phi0/np.linalg.norm(phi0).T) # orthonormalize initial guess
+    V       = np.zeros((Nt,maxit))
+    axv     = np.zeros((Nt,maxit))
+    bxv     = np.zeros((Nt,maxit))
     Vsize   = 1
     V[:,0]  = V0
     k_old   = 0.0
     dk      = 1.0
     itt     = 1
+    if (rank==0):
+        print("")
+        print("    ██╗ ██████╗ ███╗   ███╗ ██████╗")
+        print("    ║ ║██╔═══██╗████╗ ████║██╔════╝")
+        print("    ██║██║   ██║██╔████╔██║██║     ")
+        print("    ██║██║▄▄ ██║██║╚██╔╝██║██║     ")
+        print("    ██║╚██████╔╝██║ ╚═╝ ██║╚██████╗")
+        print("    ╚═╝ ╚══▀▀═╝ ╚═╝     ╚═╝ ╚═════╝")
+        print("")
+        print("--------- K-Effective Eigenvalue Problem ---------")
+        print("Outter Solver: Davidson's Method")
+        print("Material: ",                          qmc_data.material_code)
+        print("Random Number Generator: ",           qmc_data.generator)
+        print("Number of Particles per Iteration: ", qmc_data.N)
+        print("Number of Spatial Cells: ",           qmc_data.Nx)
+        print("Initial K: ",                         qmc_data.keff)
+        
+        
     if (m is None):
         m = maxit+1 # unless specified there is no restart parameter
     V[:,:Vsize] = PreConditioner(V[:,:Vsize], qmc_data, numSweeps)
@@ -243,8 +273,9 @@ def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30):
     # Davidson Routine
     while (itt <= maxit) and (dk>=tol):
         #print(V)
-        print("**********************")
-        print(" Davidson Iteration: ", itt)
+        if (report_progress):
+            print("**********************")
+            print(" Davidson Iteration: ", itt)
         axv[:,Vsize-1] = AxV(V[:,:Vsize], qmc_data)[:,0]
         bxv[:,Vsize-1] = BxV(V[:,:Vsize], qmc_data)[:,0]
         AV          = np.dot(V[:,:Vsize].T, axv[:,:Vsize]) # Scattering linear operator
@@ -256,8 +287,9 @@ def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30):
         Lambda      = Lambda[:l].real   # take the real component of the l largest eigenvalues
         k           = 1/Lambda
         dk          = abs(k - k_old)
-        print("K Effective: ", k)
-        print("dk: ",dk)
+        if (report_progress):
+            print("K Effective: ", k)
+            print("dk: ",dk)
         k_old       = k
         w           = w[:,idx]          # sort corresponding eigenvector
         w           = w[:,:l].real      # take the l largest eigenvectors
@@ -270,10 +302,11 @@ def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30):
         else:
             Vsize = 2
             V[:,:Vsize] = Gram(u,t) # "restarts" by appending to a new array 
-            
         if (itt==maxit):
-            print("Maximum number of iterations")
+            print(" Convergence to tolerance not achieved: Maximum number of iterations.")
             break
+        else:
+            print(" Successful convergence.")
         itt += 1
     
     keff = 1/Lambda
@@ -283,7 +316,7 @@ def Davidson(qmc_data, k0=1.0, l=1, m=None, numSweeps=8, tol=1e-6, maxit=30):
 
 
 # =============================================================================
-# Functions for Davidson's
+# Functions for Davidson's Method
 # =============================================================================
 
 def AxV(V, qmc_data):
@@ -293,9 +326,9 @@ def AxV(V, qmc_data):
     v       = V[:,-1]
     Nx      = qmc_data.Nx
     G       = qmc_data.G
-    Nv      = int(Nx*G)
+    Nt      = qmc_data.Nt
     zed     = np.zeros((Nx,G))
-    phi_in  = np.reshape(v, (Nv,1))
+    phi_in  = np.reshape(v, (Nt,1))
     axv     = (phi_in - SI_Map(zed, phi_in, qmc_data))
         
     return axv 
@@ -308,10 +341,19 @@ def BxV(V, qmc_data):
     v       = V[:,-1]
     Nx      = qmc_data.Nx
     G       = qmc_data.G
-    Nv      = Nx*G
-    zed     = np.zeros((Nx,G))
-    phi_in  = np.reshape(v, (Nv,1))
+    Nv      = int(Nx*G)
+    Nt      = qmc_data.Nt
+    zed     = np.zeros(Nt)
+    phi_in  = np.reshape(v, (Nt,1))
+    if (qmc_data.source_tilt):
+        dphi = qmc_data.tallies.dphi_s
+        qmc_data.tallies.dphi_s = zed
+        
     bxv     = SI_Map(phi_in, zed, qmc_data)
+    
+    if (qmc_data.source_tilt):
+        qmc_data.tallies.dphi_s = dphi
+        v[Nv:] = dphi.reshape(Nv)
       
     return bxv
 
@@ -324,13 +366,12 @@ def PreConditioner(V, qmc_data, numSweeps=8):
     transport sweeps.
     """
     v       = V[:,-1]
-    # maxit   = 10
-    # tol     = 1e-6
     Nx      = qmc_data.Nx
     G       = qmc_data.G
+    Nt      = qmc_data.Nt
     Nv      = Nx*G
     zed     = np.zeros((Nx,G))
-    phi_in  = np.reshape(v, (Nv,1))
+    phi_in  = np.reshape(v, (Nt,1))
     for i in range(numSweeps):
         phi_in = SI_Map(zed, phi_in, qmc_data)
 
@@ -338,6 +379,10 @@ def PreConditioner(V, qmc_data, numSweeps=8):
 
 
 def Gram(V,u):
+    """
+    Modified Gram Schmidt
+
+    """
     w1  = u - np.dot(V,np.dot(V.T,u))
     v1  = w1 / np.linalg.norm(w1)
     w2  = v1 - np.dot(V,np.dot(V.T,v1))
