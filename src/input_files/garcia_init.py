@@ -16,6 +16,7 @@ class GarciaInit:
         self.LB                 = 0.0
         self.G                  = 1
         self.c                  = np.inf
+        self.keff               = 0
         self.rng_seed           = 12345
         self.RQMC               = False
         self.right              = False

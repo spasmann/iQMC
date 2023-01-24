@@ -11,15 +11,15 @@ from post_process.functions.functions import SN_Sweep, garcia_angle_bins, garcia
 
 if __name__ == "__main__":
     # initialize problem data
-    N           = 10000
-    Nx          = 100
+    N           = 1000
+    Nx          = 10
     generator   = "halton"
     solver      = "LGMRES"
     source_tilt = False
     data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=source_tilt)
     start       = time.time()
     maxit       = 50
-    tol         = 1e-6
+    tol         = 1e-3
     phi         = FixedSource(data,solver=solver, maxit=maxit, tol=tol)
 
     stop = time.time()
