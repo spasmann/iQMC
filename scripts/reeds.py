@@ -17,7 +17,7 @@ if __name__ == "__main__":
     procname = MPI.Get_processor_name()
     
     N           = 2**10
-    Nx          = 64
+    Nx          = 32
     generator   = "sobol"
     solver      = "GMRES"
     data1       = ReedsInit(N=N, Nx=Nx, generator=generator, source_tilt=False)

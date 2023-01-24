@@ -16,18 +16,11 @@ class Sweep:
     
     def Run(self, qmc_data):
         count = 0
-        # print(qmc_data.tallies.phi_avg)
         qmc_data.tallies.ResetPhiAvg()
         self.tallies = qmc_data.tallies
-        # print(qmc_data.tallies.q)
         self.samples.GenerateParticles(self.tallies.q, self.tallies.qdot)
-        #print("New Sweep ****************************************")
         for particle in self.samples.particles:
-            # print()
-            # print("Particle ", count+1, " ################################")
-            # print("Pos ", particle.pos[0], "Angle ", particle.angles[0])
             while (particle.alive):
-                # print("Zone: ", particle.zone)#, "|  Weight: ", particle.weight)
                 particle.ds = self.geometry.DistanceToEdge(particle)
                 self.tallies.Tally(particle, self.material, self.geometry, self.mesh)
                 sigt = self.material.sigt[particle.zone,:]

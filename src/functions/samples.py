@@ -5,7 +5,7 @@ import math
 from scipy.stats.qmc import Sobol, Halton, LatinHypercube
 from src.functions.particle import Particle
 from mpi4py import MPI
-
+from functools import partial
 # =============================================================================
 # Class Initialization and Splitting for MPI
 # =============================================================================
@@ -31,6 +31,9 @@ class Samples:
         self.LB             = qmc_data.LB
         self.left           = qmc_data.left
         self.right          = qmc_data.right
+        self.FixedSource    = qmc_data.FixedSource
+        
+        self.phi            = qmc_data.tallies.phi_avg
         
         # split the total number of particles into the different sources
         #self.Nleft = 0
@@ -179,11 +182,10 @@ class Samples:
 
     def VolumetricWeight(self, zone, pos, mesh):
         x = pos[0]
-        Q = self.q[zone,:] #+ (1.0 + 5.0*x)
+        Q = self.q[zone,:] + self.FixedSource(x,zone)
         if (self.source_tilt):
             Q +=  self.qdot[zone,:]*(x - mesh.midpoints[zone])
         weight = Q*self.geometry.CellVolume(zone)/self.N*self.Nx
-        # print(weight)
         return weight
     
     def BoundaryWeight(self, BV):

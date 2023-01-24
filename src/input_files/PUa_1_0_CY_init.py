@@ -36,6 +36,7 @@ class PUa_1_0_CY_init:
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.G                  = self.material.G
         self.fixed_source       = np.zeros((self.Nx,self.G))
+        self.FixedSource        = lambda x,cell: self.fixed_source[cell,:]
         self.tallies            = Tallies(self)
         self.Nt                 = int(self.Nx*self.G)
         if (self.source_tilt):

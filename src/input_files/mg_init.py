@@ -7,7 +7,7 @@ from src.functions.tallies import Tallies
 
 class MultiGroupInit:
     def __init__(self, numGroups=12 ,N=2**12, Nx=20, generator="sobol",
-                 source_tilt=False, RQMC=False):
+                 source_tilt=False, seed=12345, RQMC=False):
         
         if (numGroups != 12) and (numGroups != 70) and (numGroups != 618):
             raise ValueError("Number of groups must be 12, 70, or 618.")
@@ -17,14 +17,16 @@ class MultiGroupInit:
         self.generator          = generator
         self.source_tilt        = source_tilt
         self.RQMC               = RQMC
+        self.rng_seed           = seed
         self.totalDim           = 4
         self.LB                 = 0
         self.RB                 = 5
+        self.keff               = 0
         self.G                  = numGroups
-        self.rng_seed           = 12345
         self.geometry           = "slab"
         self.mode               = "fixed_source"
         self.fixed_source       = np.ones((self.Nx,self.G))
+        self.FixedSource        = lambda x,cell: self.fixed_source[cell,:]
         self.material_code      = numGroups
         self.flux               = True
         self.flux_derivative    = False

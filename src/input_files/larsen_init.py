@@ -26,6 +26,7 @@ class LarsenInit:
         self.G                  = 1
         self.q0                 = 1.0
         self.q1                 = 5.0
+        self.keff               = 0
         self.material_code      = "larsen_data"
         self.geometry           = "slab"
         self.mode               = "fixed_source"
@@ -37,6 +38,7 @@ class LarsenInit:
         self.mesh               = Mesh(self.LB, self.RB, self.Nx, self.geometry)
         self.material           = Material(self.material_code, self.geometry, self.mesh)
         self.fixed_source       = larsen_source(self.q0, self.q1, self.G, self.mesh)
+        self.FixedSource        = lambda x,cell: self.q0 + self.q1*x
         self.a                  = larsen_constant(1, 0, self.q0, self.q1, 
                                                   self.LB, 
                                                   self.material.siga[0,:], 

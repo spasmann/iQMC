@@ -11,9 +11,9 @@ from post_process.functions.functions import SN_Sweep, garcia_angle_bins, garcia
 
 if __name__ == "__main__":
     # initialize problem data
-    N           = 1000
-    Nx          = 10
-    generator   = "halton"
+    N           = 2**11
+    Nx          = 20
+    generator   = "sobol"
     solver      = "LGMRES"
     source_tilt = False
     data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=source_tilt)
@@ -55,15 +55,16 @@ if __name__ == "__main__":
 # =============================================================================
 # Angular Flux 
 # =============================================================================
+    sol_left, sol_right = garcia_angular_flux_sol()
     angles              = garcia_angle_bins()
     Na2                 = angles.size
     Na                  = int(Na2 / 2)
-    sol_left, sol_right = garcia_angular_flux_sol()
     out                 = SN_Sweep(angles, data)
     out_left            = out[:Na,0]
     out_right           = out[Na:Na2:,-1]
     
-    diff = np.linalg.norm((sol_left - out_left)) + np.linalg.norm((sol_right - out_right))
+    diff = (np.linalg.norm((sol_left - out_left)/sol_left) 
+            + np.linalg.norm((sol_right - out_right)/sol_right))
     print("Diff: ", diff)
 
 # =============================================================================

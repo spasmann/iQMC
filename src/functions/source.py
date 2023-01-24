@@ -12,6 +12,7 @@ def scattering_source(cell, phi, material):
     return source
 
 def fission_source(cell, phi, keff, material):
+    
     if (keff == 0):
         return 0
     source = np.dot(material.nu[cell,:]*material.chi[cell,:,:]*material.sigf[cell,:]/keff, phi[cell,:])
@@ -47,7 +48,6 @@ def GetSource(phi_avg_s, qmc_data,  phi_avg_f=None):
     """
     mode            = qmc_data.mode
     material        = qmc_data.material
-    fixed_source    = qmc_data.fixed_source
     keff            = qmc_data.keff
     q               = np.zeros((material.Nx, material.G))
     if (qmc_data.source_tilt):
