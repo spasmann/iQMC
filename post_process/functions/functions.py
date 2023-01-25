@@ -125,7 +125,7 @@ def MOC_Sweep(angles, qmc_data):
     Na2             = angles.size
     Na              = int(Na2*0.5)
     forward_angles  = angles[Na:Na2]
-    backward_angles = angles[:Na]
+    # backward_angles = angles[:Na]
     #
     # data from iQMC
     #
@@ -133,7 +133,6 @@ def MOC_Sweep(angles, qmc_data):
     dx              = qmc_data.mesh.dx
     phi             = qmc_data.tallies.phi_avg
     fixed_source    = qmc_data.fixed_source
-    xspan           = qmc_data.mesh.midpoints
     sigt            = qmc_data.material.sigt
     sigs            = qmc_data.material.sigs
     psi             = np.zeros((Na2,Nx))
