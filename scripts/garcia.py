@@ -7,15 +7,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-from post_process.functions.functions import SN_Sweep, garcia_angle_bins, garcia_angular_flux_sol
+from post_process.functions.functions import SN_Sweep, MOC_Sweep, garcia_angle_bins, garcia_angular_flux_sol
 
 if __name__ == "__main__":
     # initialize problem data
     N           = 2**11
-    Nx          = 20
+    Nx          = 12
     generator   = "sobol"
     solver      = "LGMRES"
-    source_tilt = False
+    source_tilt = True
     data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=source_tilt)
     start       = time.time()
     maxit       = 50
@@ -24,8 +24,11 @@ if __name__ == "__main__":
 
     stop = time.time()
     print("time: ",stop-start)
+    plt.figure(dpi=300)
     plt.plot(data.mesh.midpoints,phi)
-        
+    plt.xlabel('x')
+    plt.ylabel(r'$\phi$')
+    plt.title('Scalar Flux')
 # =============================================================================
 # Plot piecewise source
 # =============================================================================
@@ -59,7 +62,7 @@ if __name__ == "__main__":
     angles              = garcia_angle_bins()
     Na2                 = angles.size
     Na                  = int(Na2 / 2)
-    out                 = SN_Sweep(angles, data)
+    out                 = MOC_Sweep(angles, data)
     out_left            = out[:Na,0]
     out_right           = out[Na:Na2:,-1]
     
@@ -72,6 +75,7 @@ if __name__ == "__main__":
 # =============================================================================
 
 plt.subplots(nrows=1,ncols=2,dpi=300,figsize=(8,4))
+plt.suptitle('Angular Flux Error')
 
 plt.subplot(121)
 plt.plot(angles[:Na], sol_left, 'o--', label='Sol')

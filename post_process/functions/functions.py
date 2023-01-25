@@ -78,29 +78,33 @@ def SN_Sweep(angles, qmc_data):
     dx              = qmc_data.mesh.dx
     phi             = qmc_data.tallies.phi_avg
     fixed_source    = qmc_data.fixed_source
-    xspan           = qmc_data.mesh.midpoints
-    c               = qmc_data.c 
-    c               = np.exp(-xspan / c)
+    sigt            = qmc_data.material.sigt
+    sigs            = qmc_data.material.sigs
     psi             = np.zeros((Na2,Nx))
     psi[:,0]        = qmc_data.phi_left
     psi[:,-1]       = qmc_data.phi_right
     #
     # data for SN sweep
     #
-    source_total    = (0.5 * c * phi[:,0] + fixed_source[:,0])
+    source_total    = (0.5 * sigs[:,0,0] * phi[:,0] + fixed_source[:,0])
     forward_angles  = angles[Na:Na2]
-    backward_angles = angles[:Na]
-    # TODO: find out what this section is doing
-    vfl             = (forward_angles / dx) + 0.5
+    # backward_angles = angles[:Na]
+    #
+    # These next terms should technically be in the for loop to index the XS
+    # also we only use the forward angles because the formula calls for 
+    # the abs(\mu) and the forward/backward angles are the same in this case
+    # SN-DD Denominator
+    vfl             = (forward_angles / dx) + sigt[0,0]*0.5
     vfl             = 1.0 / vfl
-    vfr             = (forward_angles / dx) - 0.5
+    # SN-DD part of numerator
+    vfr             = (forward_angles / dx) - sigt[0,0]*0.5
     #
     # forward sweep
     #
     for i in range(1,Nx):
         psi[Na:Na2, i]  = np.copy(psi[Na:Na2, i-1])
         psi[Na:Na2, i] *= vfr
-        psi[Na:Na2, i] += source_total[i-1]
+        psi[Na:Na2, i] += source_total[i]
         psi[Na:Na2, i] *= vfl
     #
     # backward sweep
@@ -108,8 +112,51 @@ def SN_Sweep(angles, qmc_data):
     for i in range(Nx-2,-1,-1):
         psi[:Na, i]  = np.copy(psi[:Na, i+1])
         psi[:Na, i] *= vfr
-        psi[:Na, i] += source_total[i+1]
+        psi[:Na, i] += source_total[i]
         psi[:Na, i] *= vfl
+    
+    return psi
+
+
+def MOC_Sweep(angles, qmc_data):
+    #
+    # data from angles
+    #
+    Na2             = angles.size
+    Na              = int(Na2*0.5)
+    forward_angles  = angles[Na:Na2]
+    backward_angles = angles[:Na]
+    #
+    # data from iQMC
+    #
+    Nx              = qmc_data.Nx
+    dx              = qmc_data.mesh.dx
+    phi             = qmc_data.tallies.phi_avg
+    fixed_source    = qmc_data.fixed_source
+    xspan           = qmc_data.mesh.midpoints
+    sigt            = qmc_data.material.sigt
+    sigs            = qmc_data.material.sigs
+    psi             = np.zeros((Na2,Nx))
+    psi[:,0]        = qmc_data.phi_left
+    psi[:,-1]       = qmc_data.phi_right
+    #
+    # Forward sweep
+    #
+    for i in range(1,Nx):
+        psi[Na:Na2, i]  = np.copy(psi[Na:Na2, i-1])
+        source_total    =  (0.5 * sigs[i,0,0] * phi[i,0] + fixed_source[i,0])
+        psi[Na:Na2, i] -= source_total / sigt[i,0]
+        psi[Na:Na2, i] *= np.exp(-sigt[i,0] * dx / forward_angles)
+        psi[Na:Na2, i] += source_total / sigt[i,0]
+    #
+    # backward sweep
+    #
+    for i in range(Nx-2,-1,-1):
+        psi[:Na, i]  = np.copy(psi[Na:Na2, i+1])
+        source_total =  (0.5 * sigs[i,0,0] * phi[i,0] + fixed_source[i,0])
+        psi[:Na, i] -= source_total / sigt[i,0]
+        psi[:Na, i] *= np.exp(-sigt[i,0] * dx / forward_angles)
+        psi[:Na, i] += source_total / sigt[i,0]
     
     return psi
 
