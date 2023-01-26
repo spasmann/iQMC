@@ -12,11 +12,13 @@ from post_process.functions.functions import SN_Sweep, MOC_Sweep, garcia_angle_b
 if __name__ == "__main__":
     # initialize problem data
     N           = 2**11
-    Nx          = 12
+    Nx          = 24
     generator   = "sobol"
     solver      = "LGMRES"
     source_tilt = True
-    data        = GarciaInit(N=N, Nx=Nx, generator=generator, source_tilt=source_tilt)
+    s           = 1
+    data        = GarciaInit(N=N, Nx=Nx, generator=generator, 
+                             source_tilt=source_tilt, s=s)
     start       = time.time()
     maxit       = 50
     tol         = 1e-3
@@ -51,23 +53,24 @@ if __name__ == "__main__":
             y2[i] = q[zone] + qdot[zone]*(x[i] - x_mid)
         plt.plot(x,y2,label=r'$a_j + b_j(x)$')
     for i in range(len(mesh)):
-        plt.axvline(mesh[i],linestyle='-',color='black')
+        plt.axvline(mesh[i],linestyle='--',color='black')
     plt.legend()
     plt.tight_layout()
 
 # =============================================================================
 # Angular Flux 
 # =============================================================================
-    sol_left, sol_right = garcia_angular_flux_sol()
+    sol                 = garcia_angular_flux_sol(s)
     angles              = garcia_angle_bins()
     Na2                 = angles.size
     Na                  = int(Na2 / 2)
-    out                 = MOC_Sweep(angles, data)
-    out_left            = out[:Na,0]
-    out_right           = out[Na:Na2:,-1]
+    sol_left            = sol[:Na]
+    sol_right           = sol[Na:Na2]
+    out                 = SN_Sweep(angles, data)
+    out_left            = out[:Na]
+    out_right           = out[Na:Na2]
     
-    diff = (np.linalg.norm((sol_left - out_left)/sol_left) 
-            + np.linalg.norm((sol_right - out_right)/sol_right))
+    diff = np.linalg.norm((sol-out)/sol.sum())
     print("Diff: ", diff)
 
 # =============================================================================
