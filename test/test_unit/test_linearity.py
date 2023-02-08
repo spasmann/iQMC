@@ -15,8 +15,8 @@ from src.functions.sweep import Sweep
 from src.functions.tallies import Tallies
 from src.input_files.reeds_init import ReedsInit
 from src.input_files.Ua_1_0_SL_init import Ua_1_0_SL_init
-from src.solvers.eigenvalue.davidson import AxV, BxV
-from src.solvers.eigenvalue.davidson import PreConditioner
+from src.solvers.eigenvalue.solvers import AxV, BxV
+from src.solvers.eigenvalue.solvers import PreConditioner
 from src.solvers.fixed_source.maps import RHS as fixed_source_RHS
 from src.functions.source import GetSource
 
